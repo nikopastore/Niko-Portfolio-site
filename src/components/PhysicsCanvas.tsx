@@ -23,18 +23,19 @@ export default function PhysicsCanvas() {
   const bodiesRef = useRef<Matter.Body[]>([]);
   const [isClient, setIsClient] = useState(false);
 
-  const createPill = useCallback(
+  // Create a rounded rectangle body (NOT a pill shape)
+  const createBox = useCallback(
     (
       x: number,
       y: number,
       width: number,
       height: number,
-      label: string,
-      chamferRadius: number
+      label: string
     ) => {
+      // Use small chamfer radius for subtle rounding (8px), NOT pill shape
       const body = Matter.Bodies.rectangle(x, y, width, height, {
-        chamfer: { radius: chamferRadius },
-        restitution: 0.5,
+        chamfer: { radius: 8 },
+        restitution: 0.4,
         friction: 0.3,
         density: 0.001,
         label: label,
@@ -53,9 +54,9 @@ export default function PhysicsCanvas() {
     const container = sceneRef.current;
     const { clientWidth: width, clientHeight: height } = container;
 
-    // Engine
+    // Engine with realistic gravity
     const engine = Matter.Engine.create({
-      gravity: { x: 0, y: 0.5 },
+      gravity: { x: 0, y: 0.6 },
     });
     engineRef.current = engine;
 
@@ -73,30 +74,32 @@ export default function PhysicsCanvas() {
     });
     renderRef.current = render;
 
-    // Walls
+    // Walls (invisible boundaries)
     const wallOptions = {
       isStatic: true,
       render: { visible: false },
     };
     const walls = [
+      // Bottom wall
       Matter.Bodies.rectangle(width / 2, height + 30, width, 60, wallOptions),
+      // Left wall
       Matter.Bodies.rectangle(-30, height / 2, 60, height * 2, wallOptions),
+      // Right wall
       Matter.Bodies.rectangle(width + 30, height / 2, 60, height * 2, wallOptions),
     ];
     Matter.Composite.add(engine.world, walls);
 
-    // Pills
+    // Create skill tag boxes (rounded rectangles, NOT pills)
     bodiesRef.current = SKILL_TAGS.map((label, index) => {
-      const pillWidth = Math.max(140, label.length * 11 + 48);
-      const pillHeight = 44;
-      const chamferRadius = 22;
-      const x = Math.random() * (width - pillWidth - 100) + pillWidth / 2 + 50;
-      const y = -60 - index * 70;
-      return createPill(x, y, pillWidth, pillHeight, label, chamferRadius);
+      const boxWidth = Math.max(130, label.length * 10 + 40);
+      const boxHeight = 40;
+      const x = Math.random() * (width - boxWidth - 100) + boxWidth / 2 + 50;
+      const y = -50 - index * 60;
+      return createBox(x, y, boxWidth, boxHeight, label);
     });
     Matter.Composite.add(engine.world, bodiesRef.current);
 
-    // Mouse Control
+    // Mouse/touch interaction
     const mouse = Matter.Mouse.create(render.canvas);
     const mouseConstraint = Matter.MouseConstraint.create(engine, {
       mouse: mouse,
@@ -108,54 +111,61 @@ export default function PhysicsCanvas() {
     Matter.Composite.add(engine.world, mouseConstraint);
     render.mouse = mouse;
 
-    // Custom Rendering for Pills with Labels
+    // Custom rendering for boxes with text labels
     Matter.Events.on(render, "afterRender", () => {
       const context = render.context;
       const isDark = !document.documentElement.classList.contains("light");
 
+      // Akio-matching colors
+      const bgColor = isDark ? "#1a1a1a" : "#ffffff";
+      const borderColor = isDark ? "#292929" : "#e5e5e5";
+      const textColor = isDark ? "#e3e3e1" : "#000000";
+
       bodiesRef.current.forEach((body) => {
         const { position, angle, bounds } = body;
         const label = body.label;
-        const pillWidth = bounds.max.x - bounds.min.x;
-        const pillHeight = bounds.max.y - bounds.min.y;
-        const radius = pillHeight / 2;
+        const boxWidth = bounds.max.x - bounds.min.x;
+        const boxHeight = bounds.max.y - bounds.min.y;
+
+        // Subtle corner radius (8px) - NOT pill shape
+        const cornerRadius = 8;
 
         context.save();
         context.translate(position.x, position.y);
         context.rotate(angle);
 
-        // Draw pill background
+        // Draw rounded rectangle background
         context.beginPath();
         context.roundRect(
-          -pillWidth / 2,
-          -pillHeight / 2,
-          pillWidth,
-          pillHeight,
-          radius
+          -boxWidth / 2,
+          -boxHeight / 2,
+          boxWidth,
+          boxHeight,
+          cornerRadius
         );
-        context.fillStyle = isDark ? "#1a1a1a" : "#f5f5f5";
+        context.fillStyle = bgColor;
         context.fill();
-        context.strokeStyle = isDark ? "#333333" : "#cccccc";
-        context.lineWidth = 1.5;
+        context.strokeStyle = borderColor;
+        context.lineWidth = 1;
         context.stroke();
 
-        // Draw label
-        context.fillStyle = isDark ? "#ffffff" : "#0f0f0f";
-        context.font = "500 14px 'Space Grotesk', system-ui, sans-serif";
+        // Draw text label
+        context.fillStyle = textColor;
+        context.font = "500 13px 'Space Grotesk', system-ui, sans-serif";
         context.textAlign = "center";
         context.textBaseline = "middle";
-        context.fillText(label, 0, 1);
+        context.fillText(label, 0, 0);
 
         context.restore();
       });
     });
 
-    // Runner
+    // Run physics simulation
     const runner = Matter.Runner.create();
     runnerRef.current = runner;
     Matter.Runner.run(runner, engine);
     Matter.Render.run(render);
-  }, [createPill]);
+  }, [createBox]);
 
   const cleanup = useCallback(() => {
     if (renderRef.current) {
@@ -202,7 +212,7 @@ export default function PhysicsCanvas() {
     };
   }, [isClient, setup, cleanup, handleResize]);
 
-  // SSR fallback
+  // SSR fallback - show static tags
   if (!isClient) {
     return (
       <div className="w-full h-[500px] flex items-center justify-center">
@@ -210,7 +220,7 @@ export default function PhysicsCanvas() {
           {SKILL_TAGS.map((tag) => (
             <span
               key={tag}
-              className="px-5 py-2.5 rounded-full border border-card-border bg-card text-sm font-medium"
+              className="px-4 py-2 rounded-lg border border-card-border bg-card text-sm font-medium"
             >
               {tag}
             </span>
