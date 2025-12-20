@@ -1,192 +1,263 @@
 "use client";
 
-import React, { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Matter from "matter-js";
 
-const SKILL_TAGS = [
-  "Data Engineering",
-  "Generative AI",
-  "Next.js",
-  "Full Stack",
-  "Python",
-  "LLM Orchestration",
-  "TypeScript",
-  "PostgreSQL",
-  "Cloud Architecture",
+interface PhysicsTag {
+  id: string;
+  text: string;
+  width: number;
+  height: number;
+  isCircle?: boolean;
+  icon?: string;
+}
+
+// Skill tags that will fall - customize text and sizes here
+const PHYSICS_TAGS: PhysicsTag[] = [
+  { id: "tag-1", text: "DATA ENGINEERING", width: 220, height: 52 },
+  { id: "tag-2", text: "GENERATIVE AI", width: 190, height: 52 },
+  { id: "tag-3", text: "NEXT.JS", width: 130, height: 52 },
+  { id: "tag-4", text: "FULL STACK", width: 160, height: 52 },
+  { id: "tag-5", text: "PYTHON", width: 120, height: 52 },
+  { id: "tag-6", text: "LLM ORCHESTRATION", width: 230, height: 52 },
+  { id: "tag-7", text: "TYPESCRIPT", width: 160, height: 52 },
+  { id: "tag-8", text: "POSTGRESQL", width: 160, height: 52 },
+  { id: "tag-9", text: "CLOUD ARCHITECTURE", width: 240, height: 52 },
+  // Decorative circles
+  { id: "circle-1", text: "✱", width: 60, height: 60, isCircle: true, icon: "asterisk" },
+  { id: "circle-2", text: "→", width: 60, height: 60, isCircle: true, icon: "arrow" },
 ];
 
 export default function PhysicsCanvas() {
-  const sceneRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
   const renderRef = useRef<Matter.Render | null>(null);
   const runnerRef = useRef<Matter.Runner | null>(null);
-  const bodiesRef = useRef<Matter.Body[]>([]);
   const [isClient, setIsClient] = useState(false);
 
-  // Create a rounded rectangle body (NOT a pill shape)
-  const createBox = useCallback(
-    (
-      x: number,
-      y: number,
-      width: number,
-      height: number,
-      label: string
-    ) => {
-      // Use small chamfer radius for subtle rounding (8px), NOT pill shape
-      const body = Matter.Bodies.rectangle(x, y, width, height, {
-        chamfer: { radius: 8 },
-        restitution: 0.4,
-        friction: 0.3,
-        density: 0.001,
-        label: label,
-        render: {
-          fillStyle: "transparent",
-        },
-      });
-      return body;
-    },
-    []
-  );
+  // Theme colors - updates based on current theme
+  const themeColorsRef = useRef({
+    strokeColor: "rgba(255,255,255,0.8)",
+    textColor: "rgba(255,255,255,0.9)",
+    circleFill: "#ffffff",
+    circleIconColor: "#000000",
+  });
 
-  const setup = useCallback(() => {
-    if (!sceneRef.current) return;
+  // Update colors when theme changes
+  const updateThemeColors = useCallback(() => {
+    const isDark = !document.documentElement.classList.contains("light");
+    themeColorsRef.current = {
+      strokeColor: isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.8)",
+      textColor: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.9)",
+      circleFill: isDark ? "#ffffff" : "#000000",
+      circleIconColor: isDark ? "#000000" : "#ffffff",
+    };
+  }, []);
 
-    const container = sceneRef.current;
-    const { clientWidth: width, clientHeight: height } = container;
+  const initPhysics = useCallback(() => {
+    if (!containerRef.current || !canvasRef.current) return;
 
-    // Engine with realistic gravity
-    const engine = Matter.Engine.create({
-      gravity: { x: 0, y: 0.6 },
+    const { Engine, Render, World, Bodies, Mouse, MouseConstraint, Runner, Composite, Body } = Matter;
+
+    const container = containerRef.current;
+    const width = container.offsetWidth;
+    const height = container.offsetHeight;
+
+    // Update theme colors
+    updateThemeColors();
+
+    // Create engine with gentle gravity
+    const engine = Engine.create({
+      gravity: { x: 0, y: 0.8, scale: 0.001 },
     });
     engineRef.current = engine;
 
-    // Renderer
-    const render = Matter.Render.create({
-      element: container,
+    // Create renderer
+    const render = Render.create({
+      canvas: canvasRef.current,
       engine: engine,
       options: {
         width,
         height,
         wireframes: false,
         background: "transparent",
-        pixelRatio: window.devicePixelRatio || 1,
+        pixelRatio: Math.min(window.devicePixelRatio, 2),
       },
     });
     renderRef.current = render;
 
-    // Walls (invisible boundaries)
-    const wallOptions = {
-      isStatic: true,
-      render: { visible: false },
-    };
+    // Create boundary walls (invisible)
+    const wallThickness = 60;
     const walls = [
-      // Bottom wall
-      Matter.Bodies.rectangle(width / 2, height + 30, width, 60, wallOptions),
+      // Ground
+      Bodies.rectangle(width / 2, height + wallThickness / 2, width + 200, wallThickness, {
+        isStatic: true,
+        render: { visible: false },
+        friction: 0.8,
+        restitution: 0.2,
+      }),
       // Left wall
-      Matter.Bodies.rectangle(-30, height / 2, 60, height * 2, wallOptions),
+      Bodies.rectangle(-wallThickness / 2, height / 2, wallThickness, height * 2, {
+        isStatic: true,
+        render: { visible: false },
+      }),
       // Right wall
-      Matter.Bodies.rectangle(width + 30, height / 2, 60, height * 2, wallOptions),
+      Bodies.rectangle(width + wallThickness / 2, height / 2, wallThickness, height * 2, {
+        isStatic: true,
+        render: { visible: false },
+      }),
     ];
-    Matter.Composite.add(engine.world, walls);
 
-    // Create skill tag boxes (rounded rectangles, NOT pills)
-    bodiesRef.current = SKILL_TAGS.map((label, index) => {
-      const boxWidth = Math.max(130, label.length * 10 + 40);
-      const boxHeight = 40;
-      const x = Math.random() * (width - boxWidth - 100) + boxWidth / 2 + 50;
-      const y = -50 - index * 60;
-      return createBox(x, y, boxWidth, boxHeight, label);
+    World.add(engine.world, walls);
+
+    // Create physics bodies with staggered drops
+    PHYSICS_TAGS.forEach((tag, index) => {
+      setTimeout(() => {
+        if (!engineRef.current) return;
+
+        const x = 150 + Math.random() * (width - 300);
+        const startY = -100 - Math.random() * 300;
+
+        let body;
+
+        if (tag.isCircle) {
+          // Circle body
+          body = Bodies.circle(x, startY, tag.width / 2, {
+            restitution: 0.4,
+            friction: 0.5,
+            frictionAir: 0.01,
+            render: {
+              fillStyle: "transparent",
+              strokeStyle: "transparent",
+              lineWidth: 0,
+            },
+            label: tag.id,
+          });
+        } else {
+          // Pill-shaped body (rectangle with full chamfer radius)
+          body = Bodies.rectangle(x, startY, tag.width, tag.height, {
+            restitution: 0.4,
+            friction: 0.5,
+            frictionAir: 0.01,
+            chamfer: { radius: tag.height / 2 }, // Full pill shape
+            render: {
+              fillStyle: "transparent",
+              strokeStyle: "transparent",
+              lineWidth: 0,
+            },
+            label: tag.id,
+          });
+        }
+
+        // Add slight random spin
+        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
+        Composite.add(engineRef.current.world, body);
+      }, index * 150 + Math.random() * 100);
     });
-    Matter.Composite.add(engine.world, bodiesRef.current);
 
-    // Mouse/touch interaction
-    const mouse = Matter.Mouse.create(render.canvas);
-    const mouseConstraint = Matter.MouseConstraint.create(engine, {
-      mouse: mouse,
+    // Mouse interaction for dragging
+    const mouse = Mouse.create(render.canvas);
+    const mouseConstraint = MouseConstraint.create(engine, {
+      mouse,
       constraint: {
         stiffness: 0.2,
         render: { visible: false },
       },
     });
-    Matter.Composite.add(engine.world, mouseConstraint);
+    World.add(engine.world, mouseConstraint);
     render.mouse = mouse;
 
-    // Custom rendering for boxes with text labels
+    // Allow page scrolling over the canvas
+    const wheelHandler = (mouse as any).mousewheel;
+    if (wheelHandler) {
+      mouse.element.removeEventListener("wheel", wheelHandler);
+      mouse.element.removeEventListener("mousewheel", wheelHandler);
+      mouse.element.removeEventListener("DOMMouseScroll", wheelHandler);
+    }
+
+    // Run physics
+    const runner = Runner.create();
+    runnerRef.current = runner;
+    Runner.run(runner, engine);
+    Render.run(render);
+
+    // Custom rendering for pills and circles
     Matter.Events.on(render, "afterRender", () => {
-      const context = render.context;
-      const isDark = !document.documentElement.classList.contains("light");
+      const ctx = render.context;
+      const bodies = Composite.allBodies(engine.world);
 
-      // Akio-matching colors
-      const bgColor = isDark ? "#1a1a1a" : "#ffffff";
-      const borderColor = isDark ? "#292929" : "#e5e5e5";
-      const textColor = isDark ? "#e3e3e1" : "#000000";
+      // Update colors in case theme changed
+      updateThemeColors();
+      const colors = themeColorsRef.current;
 
-      bodiesRef.current.forEach((body) => {
-        const { position, angle, bounds } = body;
-        const label = body.label;
-        const boxWidth = bounds.max.x - bounds.min.x;
-        const boxHeight = bounds.max.y - bounds.min.y;
+      bodies.forEach((body) => {
+        const tag = PHYSICS_TAGS.find((t) => t.id === body.label);
+        if (tag) {
+          ctx.save();
+          ctx.translate(body.position.x, body.position.y);
+          ctx.rotate(body.angle);
 
-        // Subtle corner radius (8px) - NOT pill shape
-        const cornerRadius = 8;
+          if (tag.isCircle && tag.icon) {
+            // Solid filled circle with icon
+            ctx.beginPath();
+            ctx.arc(0, 0, tag.width / 2, 0, Math.PI * 2);
+            ctx.fillStyle = colors.circleFill;
+            ctx.fill();
 
-        context.save();
-        context.translate(position.x, position.y);
-        context.rotate(angle);
+            // Icon inside circle
+            ctx.font = "bold 24px system-ui, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = colors.circleIconColor;
+            ctx.fillText(tag.icon === "asterisk" ? "✱" : "→", 0, 1);
+          } else {
+            // Pill outline (NO FILL, only stroke)
+            const w = tag.width;
+            const h = tag.height;
+            const radius = h / 2;
 
-        // Draw rounded rectangle background
-        context.beginPath();
-        context.roundRect(
-          -boxWidth / 2,
-          -boxHeight / 2,
-          boxWidth,
-          boxHeight,
-          cornerRadius
-        );
-        context.fillStyle = bgColor;
-        context.fill();
-        context.strokeStyle = borderColor;
-        context.lineWidth = 1;
-        context.stroke();
+            // Draw pill path manually for perfect shape
+            ctx.beginPath();
+            ctx.moveTo(-w / 2 + radius, -h / 2);
+            ctx.lineTo(w / 2 - radius, -h / 2);
+            ctx.arc(w / 2 - radius, 0, radius, -Math.PI / 2, Math.PI / 2);
+            ctx.lineTo(-w / 2 + radius, h / 2);
+            ctx.arc(-w / 2 + radius, 0, radius, Math.PI / 2, -Math.PI / 2);
+            ctx.closePath();
 
-        // Draw text label
-        context.fillStyle = textColor;
-        context.font = "500 13px 'Space Grotesk', system-ui, sans-serif";
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-        context.fillText(label, 0, 0);
+            // Stroke only - NO fill
+            ctx.strokeStyle = colors.strokeColor;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
 
-        context.restore();
+            // Text label
+            ctx.font = "500 15px 'Space Grotesk', system-ui, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = colors.textColor;
+            ctx.fillText(tag.text, 0, 1);
+          }
+
+          ctx.restore();
+        }
       });
     });
-
-    // Run physics simulation
-    const runner = Matter.Runner.create();
-    runnerRef.current = runner;
-    Matter.Runner.run(runner, engine);
-    Matter.Render.run(render);
-  }, [createBox]);
+  }, [updateThemeColors]);
 
   const cleanup = useCallback(() => {
-    if (renderRef.current) {
-      Matter.Render.stop(renderRef.current);
-      if (renderRef.current.canvas) {
-        renderRef.current.canvas.remove();
-      }
-    }
-    if (runnerRef.current) {
-      Matter.Runner.stop(runnerRef.current);
-    }
+    if (runnerRef.current) Matter.Runner.stop(runnerRef.current);
+    if (renderRef.current) Matter.Render.stop(renderRef.current);
     if (engineRef.current) {
+      Matter.World.clear(engineRef.current.world, false);
       Matter.Engine.clear(engineRef.current);
     }
-    bodiesRef.current = [];
   }, []);
 
   const handleResize = useCallback(() => {
     cleanup();
-    setup();
-  }, [cleanup, setup]);
+    initPhysics();
+  }, [cleanup, initPhysics]);
 
   useEffect(() => {
     setIsClient(true);
@@ -195,7 +266,7 @@ export default function PhysicsCanvas() {
   useEffect(() => {
     if (!isClient) return;
 
-    setup();
+    initPhysics();
 
     let resizeTimeout: NodeJS.Timeout;
     const debouncedResize = () => {
@@ -210,19 +281,19 @@ export default function PhysicsCanvas() {
       window.removeEventListener("resize", debouncedResize);
       cleanup();
     };
-  }, [isClient, setup, cleanup, handleResize]);
+  }, [isClient, initPhysics, cleanup, handleResize]);
 
-  // SSR fallback - show static tags
+  // SSR fallback
   if (!isClient) {
     return (
       <div className="w-full h-[500px] flex items-center justify-center">
-        <div className="flex flex-wrap gap-3 justify-center max-w-3xl px-6">
-          {SKILL_TAGS.map((tag) => (
+        <div className="flex flex-wrap gap-3 justify-center max-w-4xl px-6">
+          {PHYSICS_TAGS.filter(t => !t.isCircle).map((tag) => (
             <span
-              key={tag}
-              className="px-4 py-2 rounded-lg border border-card-border bg-card text-sm font-medium"
+              key={tag.id}
+              className="px-6 py-3 rounded-full border border-foreground/20 text-sm font-medium"
             >
-              {tag}
+              {tag.text}
             </span>
           ))}
         </div>
@@ -231,10 +302,12 @@ export default function PhysicsCanvas() {
   }
 
   return (
-    <div
-      ref={sceneRef}
-      className="w-full overflow-hidden relative"
-      style={{ height: "500px", touchAction: "none" }}
-    />
+    <div ref={containerRef} className="w-full h-[500px] overflow-hidden relative">
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full"
+        style={{ touchAction: "pan-y" }}
+      />
+    </div>
   );
 }
