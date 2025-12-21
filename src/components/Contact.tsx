@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { siteConfig } from "@/lib/data";
+import { useToast } from "@/components/Toast";
 import { cn } from "@/lib/utils";
 
 const socialLinks = [
@@ -14,13 +15,16 @@ const socialLinks = [
     name: "GitHub",
     href: siteConfig.github,
   },
-  {
-    name: "Email",
-    href: `mailto:${siteConfig.email}`,
-  },
 ];
 
 export default function Contact() {
+  const { showToast } = useToast();
+
+  const copyEmail = () => {
+    navigator.clipboard.writeText(siteConfig.email);
+    showToast("Email copied to clipboard!");
+  };
+
   return (
     <section id="contact" className="py-32 px-6">
       <div className="max-w-7xl mx-auto text-center">
@@ -34,20 +38,20 @@ export default function Contact() {
             LET&apos;S WORK TOGETHER
           </h2>
 
-          <a
-            href={`mailto:${siteConfig.email}`}
-            className="inline-block text-2xl md:text-4xl text-muted hover:text-foreground transition-colors duration-300 mb-12"
+          <button
+            onClick={copyEmail}
+            className="inline-block text-2xl md:text-4xl text-muted hover:text-foreground transition-colors duration-300 mb-12 cursor-pointer"
           >
             {siteConfig.email}
-          </a>
+          </button>
 
           <div className="flex flex-wrap justify-center gap-4 mt-8">
             {socialLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
-                target={link.name !== "Email" ? "_blank" : undefined}
-                rel={link.name !== "Email" ? "noopener noreferrer" : undefined}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={cn(
                   "group flex items-center gap-2 px-6 py-3",
                   "border border-card-border rounded-full",
@@ -59,6 +63,18 @@ export default function Contact() {
                 <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </a>
             ))}
+            <button
+              onClick={copyEmail}
+              className={cn(
+                "group flex items-center gap-2 px-6 py-3",
+                "border border-card-border rounded-full",
+                "hover:bg-foreground hover:text-background",
+                "transition-all duration-300 cursor-pointer"
+              )}
+            >
+              <span className="font-medium">Email</span>
+              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </button>
           </div>
         </motion.div>
       </div>
