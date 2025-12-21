@@ -64,9 +64,9 @@ export default function PhysicsCanvas() {
     // Update theme colors
     updateThemeColors();
 
-    // Create engine with gentle gravity
+    // Create engine with stronger gravity for heavier feel
     const engine = Engine.create({
-      gravity: { x: 0, y: 0.8, scale: 0.001 },
+      gravity: { x: 0, y: 1.5, scale: 0.001 },
     });
     engineRef.current = engine;
 
@@ -125,7 +125,7 @@ export default function PhysicsCanvas() {
           body = Bodies.circle(x, startY, tag.width / 2, {
             restitution: 0.3,
             friction: 0.8,
-            frictionAir: 0.02,
+            frictionAir: 0.01,
             render: {
               fillStyle: "transparent",
               strokeStyle: "transparent",
@@ -138,7 +138,7 @@ export default function PhysicsCanvas() {
           body = Bodies.rectangle(x, startY, tag.width, tag.height, {
             restitution: 0.3,
             friction: 0.8,
-            frictionAir: 0.02,
+            frictionAir: 0.01,
             chamfer: { radius: tag.height / 2 }, // Full pill shape
             render: {
               fillStyle: "transparent",
