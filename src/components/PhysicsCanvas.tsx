@@ -344,7 +344,7 @@ export default function PhysicsCanvas() {
   // SSR fallback
   if (!isClient) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="w-full h-[500px] flex items-center justify-center">
         <div className="flex flex-wrap gap-3 justify-center max-w-4xl px-6">
           {PHYSICS_TAGS.filter(t => !t.isCircle).map((tag) => (
             <span
@@ -360,7 +360,7 @@ export default function PhysicsCanvas() {
   }
 
   return (
-    <div ref={containerRef} className="w-full h-full overflow-hidden relative">
+    <div ref={containerRef} className="w-full h-[500px] overflow-hidden relative">
       <canvas
         ref={canvasRef}
         className="w-full h-full"

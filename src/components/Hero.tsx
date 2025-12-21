@@ -6,7 +6,7 @@ import { siteConfig } from "@/lib/data";
 
 export default function Hero() {
   return (
-    <section className="h-[85vh] pt-16 flex flex-col">
+    <section className="min-h-screen pt-16 flex flex-col -mb-24">
       {/* Physics Canvas Container - Full width edge to edge */}
       <div className="flex-grow w-full">
         <PhysicsCanvas />
