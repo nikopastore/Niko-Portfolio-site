@@ -17,7 +17,7 @@ export default function Hero() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.5 }}
-        className="w-full overflow-hidden -mt-16"
+        className="w-full overflow-hidden -mt-40"
       >
         <h1
           className="font-[family-name:var(--font-space-grotesk)] font-bold tracking-tighter leading-[0.85] text-center whitespace-nowrap"
