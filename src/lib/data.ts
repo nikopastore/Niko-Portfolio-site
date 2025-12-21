@@ -26,7 +26,7 @@ export interface Project {
   description: string;
   skills: string[];
   image: string;
-  span: "normal" | "wide" | "full";
+  url?: string;
 }
 
 export const projects: Project[] = [
