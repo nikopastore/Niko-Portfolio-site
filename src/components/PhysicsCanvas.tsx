@@ -248,12 +248,21 @@ export default function PhysicsCanvas() {
             ctx.lineWidth = 1.5;
             ctx.stroke();
 
-            // Text label
-            ctx.font = "500 20px 'Space Grotesk', system-ui, sans-serif";
+            // Text label - larger monospace font with letter-spacing
+            ctx.font = "400 32px 'Space Mono', monospace";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillStyle = colors.textColor;
-            ctx.fillText(tag.text, 0, 1);
+            // Add letter-spacing by drawing characters individually
+            const text = tag.text;
+            const letterSpacing = 3;
+            const totalWidth = ctx.measureText(text).width + (text.length - 1) * letterSpacing;
+            let xPos = -totalWidth / 2;
+            for (let i = 0; i < text.length; i++) {
+              const char = text[i];
+              ctx.fillText(char, xPos + ctx.measureText(char).width / 2, 1);
+              xPos += ctx.measureText(char).width + letterSpacing;
+            }
           }
 
           ctx.restore();
