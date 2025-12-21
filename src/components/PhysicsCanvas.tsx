@@ -15,7 +15,7 @@ interface PhysicsTag {
 // Consolidated skill tags - widths sized to fit 32px Space Mono with letter-spacing
 const PHYSICS_TAGS: PhysicsTag[] = [
   { id: "tag-1", text: "DATA ENGINEERING", width: 400, height: 72 },
-  { id: "tag-2", text: "LLM ORCHESTRATION / RAG", width: 520, height: 72 },
+  { id: "tag-2", text: "LLM ORCHESTRATION / RAG", width: 580, height: 72 },
   { id: "tag-3", text: "FULL STACK", width: 270, height: 72 },
   { id: "tag-4", text: "PYTHON", width: 200, height: 72 },
   { id: "tag-5", text: "CLOUD ARCHITECTURE", width: 450, height: 72 },
