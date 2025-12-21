@@ -12,17 +12,14 @@ interface PhysicsTag {
   icon?: string;
 }
 
-// Skill tags that will fall - customize text and sizes here
+// Consolidated skill tags - removed redundancy
 const PHYSICS_TAGS: PhysicsTag[] = [
   { id: "tag-1", text: "DATA ENGINEERING", width: 220, height: 52 },
   { id: "tag-2", text: "GENERATIVE AI", width: 190, height: 52 },
-  { id: "tag-3", text: "NEXT.JS", width: 130, height: 52 },
-  { id: "tag-4", text: "FULL STACK", width: 160, height: 52 },
-  { id: "tag-5", text: "PYTHON", width: 120, height: 52 },
-  { id: "tag-6", text: "LLM ORCHESTRATION", width: 230, height: 52 },
-  { id: "tag-7", text: "TYPESCRIPT", width: 160, height: 52 },
-  { id: "tag-8", text: "POSTGRESQL", width: 160, height: 52 },
-  { id: "tag-9", text: "CLOUD ARCHITECTURE", width: 240, height: 52 },
+  { id: "tag-3", text: "FULL STACK", width: 160, height: 52 },
+  { id: "tag-4", text: "PYTHON", width: 120, height: 52 },
+  { id: "tag-5", text: "CLOUD ARCHITECTURE", width: 240, height: 52 },
+  { id: "tag-6", text: "REACT / NEXT.JS", width: 200, height: 52 },
   // Decorative circles
   { id: "circle-1", text: "✱", width: 60, height: 60, isCircle: true, icon: "asterisk" },
   { id: "circle-2", text: "→", width: 60, height: 60, isCircle: true, icon: "arrow" },
@@ -124,9 +121,9 @@ export default function PhysicsCanvas() {
         if (tag.isCircle) {
           // Circle body
           body = Bodies.circle(x, startY, tag.width / 2, {
-            restitution: 0.4,
-            friction: 0.5,
-            frictionAir: 0.01,
+            restitution: 0.3,
+            friction: 0.8,
+            frictionAir: 0.02,
             render: {
               fillStyle: "transparent",
               strokeStyle: "transparent",
@@ -137,9 +134,9 @@ export default function PhysicsCanvas() {
         } else {
           // Pill-shaped body (rectangle with full chamfer radius)
           body = Bodies.rectangle(x, startY, tag.width, tag.height, {
-            restitution: 0.4,
-            friction: 0.5,
-            frictionAir: 0.01,
+            restitution: 0.3,
+            friction: 0.8,
+            frictionAir: 0.02,
             chamfer: { radius: tag.height / 2 }, // Full pill shape
             render: {
               fillStyle: "transparent",
@@ -148,10 +145,12 @@ export default function PhysicsCanvas() {
             },
             label: tag.id,
           });
+          // Increase inertia to resist rotation (makes them want to stay upright)
+          Body.setInertia(body, body.inertia * 8);
         }
 
-        // Add slight random spin
-        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
+        // Very minimal initial spin (almost none)
+        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.01);
         Composite.add(engineRef.current.world, body);
       }, index * 150 + Math.random() * 100);
     });
@@ -181,6 +180,22 @@ export default function PhysicsCanvas() {
     runnerRef.current = runner;
     Runner.run(runner, engine);
     Render.run(render);
+
+    // Apply restoring torque to keep pills mostly upright
+    Matter.Events.on(engine, "beforeUpdate", () => {
+      const bodies = Composite.allBodies(engine.world);
+      bodies.forEach((body) => {
+        const tag = PHYSICS_TAGS.find((t) => t.id === body.label);
+        if (tag && !tag.isCircle && !body.isStatic) {
+          // Apply a gentle torque to rotate back toward 0 angle
+          const torque = -body.angle * 0.0005 * body.mass;
+          Body.applyForce(body, body.position, { x: 0, y: 0 });
+          body.torque = torque;
+          // Also dampen angular velocity
+          Body.setAngularVelocity(body, body.angularVelocity * 0.95);
+        }
+      });
+    });
 
     // Custom rendering for pills and circles
     Matter.Events.on(render, "afterRender", () => {
