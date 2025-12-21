@@ -86,20 +86,22 @@ export default function PhysicsCanvas() {
 
     // Create boundary walls (invisible)
     const wallThickness = 60;
+    // Ground positioned so pills sit flush at visible bottom (accounting for pill height ~52px)
+    const groundY = height - 26; // Half of pill height so they sit on the visible edge
     const walls = [
-      // Ground
-      Bodies.rectangle(width / 2, height + wallThickness / 2, width + 200, wallThickness, {
+      // Ground - positioned at bottom edge of visible area
+      Bodies.rectangle(width / 2, groundY + wallThickness / 2, width + 200, wallThickness, {
         isStatic: true,
         render: { visible: false },
         friction: 0.8,
         restitution: 0.2,
       }),
-      // Left wall
+      // Left wall - flush with edge
       Bodies.rectangle(-wallThickness / 2, height / 2, wallThickness, height * 2, {
         isStatic: true,
         render: { visible: false },
       }),
-      // Right wall
+      // Right wall - flush with edge
       Bodies.rectangle(width + wallThickness / 2, height / 2, wallThickness, height * 2, {
         isStatic: true,
         render: { visible: false },

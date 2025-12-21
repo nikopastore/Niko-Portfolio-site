@@ -6,20 +6,25 @@ import { siteConfig } from "@/lib/data";
 
 export default function Hero() {
   return (
-    <section className="min-h-screen pt-24 pb-12 px-6 flex flex-col">
-      {/* Physics Canvas Container */}
-      <div className="flex-grow flex items-center justify-center max-w-7xl mx-auto w-full">
+    <section className="min-h-screen pt-20 flex flex-col">
+      {/* Physics Canvas Container - Full width edge to edge */}
+      <div className="flex-grow w-full">
         <PhysicsCanvas />
       </div>
 
-      {/* Name Display */}
+      {/* Name Display - Full width edge to edge */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.5 }}
-        className="text-center mt-8"
+        className="w-full overflow-hidden"
       >
-        <h1 className="font-[family-name:var(--font-space-grotesk)] text-6xl sm:text-8xl md:text-9xl lg:text-[12rem] font-bold tracking-tighter leading-none">
+        <h1
+          className="font-[family-name:var(--font-space-grotesk)] font-bold tracking-tighter leading-[0.85] text-center whitespace-nowrap"
+          style={{
+            fontSize: 'clamp(3rem, 15vw, 20rem)',
+          }}
+        >
           {siteConfig.name.toUpperCase()}
         </h1>
       </motion.div>
