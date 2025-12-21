@@ -184,17 +184,49 @@ export default function PhysicsCanvas() {
     Render.run(render);
 
     // Apply restoring torque to keep pills mostly upright
+    // Apply weighted rotation to circles (5 heavy points like real weighted objects)
     Matter.Events.on(engine, "beforeUpdate", () => {
       const bodies = Composite.allBodies(engine.world);
       bodies.forEach((body) => {
         const tag = PHYSICS_TAGS.find((t) => t.id === body.label);
-        if (tag && !tag.isCircle && !body.isStatic) {
-          // Apply a gentle torque to rotate back toward 0 angle
-          const torque = -body.angle * 0.0005 * body.mass;
-          Body.applyForce(body, body.position, { x: 0, y: 0 });
-          body.torque = torque;
-          // Also dampen angular velocity
-          Body.setAngularVelocity(body, body.angularVelocity * 0.95);
+        if (tag && !body.isStatic) {
+          if (tag.isCircle) {
+            // 5 weighted points evenly distributed (like a pentagon)
+            // Points at angles: 0, 72°, 144°, 216°, 288° from center
+            const numPoints = 5;
+            const currentAngle = body.angle % (Math.PI * 2);
+
+            // Find nearest stable angle (where a weight point is at bottom = PI/2 from horizontal)
+            // Stable positions are when a point is directly below center
+            const stableAngles = Array.from({ length: numPoints }, (_, i) =>
+              (Math.PI / 2) + (i * (Math.PI * 2) / numPoints)
+            );
+
+            // Find the nearest stable angle
+            let nearestAngle = stableAngles[0];
+            let minDiff = Math.abs(currentAngle - nearestAngle);
+
+            for (const angle of stableAngles) {
+              // Check both the angle and angle ± 2π for wraparound
+              for (const checkAngle of [angle, angle - Math.PI * 2, angle + Math.PI * 2]) {
+                const diff = Math.abs(currentAngle - checkAngle);
+                if (diff < minDiff) {
+                  minDiff = diff;
+                  nearestAngle = checkAngle;
+                }
+              }
+            }
+
+            // Apply torque toward nearest stable point
+            const angleDiff = nearestAngle - currentAngle;
+            const torque = angleDiff * 0.00003 * body.mass;
+            body.torque = torque;
+          } else {
+            // Pills: keep mostly upright (rotate toward 0 angle)
+            const torque = -body.angle * 0.0005 * body.mass;
+            body.torque = torque;
+            Body.setAngularVelocity(body, body.angularVelocity * 0.95);
+          }
         }
       });
     });
