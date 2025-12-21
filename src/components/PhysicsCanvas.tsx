@@ -12,15 +12,15 @@ interface PhysicsTag {
   icon?: string;
 }
 
-// Consolidated skill tags - BIGGER sizes
+// Consolidated skill tags - widths sized to fit 32px Space Mono with letter-spacing
 const PHYSICS_TAGS: PhysicsTag[] = [
-  { id: "tag-1", text: "DATA ENGINEERING", width: 320, height: 72 },
-  { id: "tag-2", text: "GENERATIVE AI", width: 280, height: 72 },
-  { id: "tag-3", text: "FULL STACK", width: 220, height: 72 },
-  { id: "tag-4", text: "PYTHON", width: 170, height: 72 },
-  { id: "tag-5", text: "CLOUD ARCHITECTURE", width: 350, height: 72 },
-  { id: "tag-6", text: "REACT / NEXT.JS", width: 280, height: 72 },
-  // Decorative circles - bigger
+  { id: "tag-1", text: "DATA ENGINEERING", width: 400, height: 72 },
+  { id: "tag-2", text: "GENERATIVE AI", width: 340, height: 72 },
+  { id: "tag-3", text: "FULL STACK", width: 270, height: 72 },
+  { id: "tag-4", text: "PYTHON", width: 200, height: 72 },
+  { id: "tag-5", text: "CLOUD ARCHITECTURE", width: 450, height: 72 },
+  { id: "tag-6", text: "REACT / NEXT.JS", width: 360, height: 72 },
+  // Decorative circles
   { id: "circle-1", text: "✱", width: 80, height: 80, isCircle: true, icon: "asterisk" },
   { id: "circle-2", text: "→", width: 80, height: 80, isCircle: true, icon: "arrow" },
 ];
