@@ -3,7 +3,7 @@ export const siteConfig = {
   email: "nikopastore@gmail.com",
   role: "DATA & FULL STACK ENGINEER",
   location: "BASED IN PHOENIX, ARIZONA",
-  linkedin: "https://linkedin.com/in/nikopastore",
+  linkedin: "https://www.linkedin.com/in/nikolai-pastore/",
   github: "https://github.com/nikopastore",
 };
 
