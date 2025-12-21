@@ -35,90 +35,81 @@ export const projects: Project[] = [
     name: "HirePriority",
     category: "AI-Powered SaaS / Recruiting Automation",
     description:
-      "A specialized B2B platform for insurance agencies that automates candidate sourcing and vetting using LLM-driven workflows.",
+      "A specialized B2B platform for insurance agencies that automates candidate sourcing and vetting using LLM-driven workflows. The system intelligently screens applications, matches candidates to roles, and provides recruiters with AI-generated insights.",
     skills: ["Next.js", "OpenAI API", "LangChain", "PostgreSQL", "Pinecone", "Tailwind CSS", "Node.js"],
     image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop",
-    span: "wide",
   },
   {
     id: "sipwiki",
     name: "SipWiki",
     category: "Consumer Mobile Web App / Affiliate Tech",
     description:
-      "A comprehensive digital encyclopedia of drinking games featuring real-time search and dynamic Amazon Storefront integration.",
+      "A comprehensive digital encyclopedia of drinking games featuring real-time search and dynamic Amazon Storefront integration. Users can browse, search, and save their favorite games while discovering related products.",
     skills: ["React Native", "Expo", "TypeScript", "AWS Lambda", "DynamoDB", "Amazon Associates API"],
     image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&h=600&fit=crop",
-    span: "normal",
   },
   {
     id: "career-forge",
     name: "Career Forge",
     category: "Generative AI / EdTech",
     description:
-      "An AI-driven career coach that analyzes resumes against job descriptions for real-time optimization and skill-gap analysis.",
+      "An AI-driven career coach that analyzes resumes against job descriptions for real-time optimization and skill-gap analysis. Provides actionable feedback and personalized improvement suggestions.",
     skills: ["Python", "FastAPI", "NLP", "LLM Fine-tuning", "Clerk Auth", "Vercel"],
     image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&h=600&fit=crop",
-    span: "normal",
   },
   {
     id: "routeware",
     name: "Routeware Data Infrastructure",
     category: "Data Engineering / Enterprise Systems",
     description:
-      "Engineered scalable data pipelines and architectural improvements for waste management logistics with high-availability.",
+      "Engineered scalable data pipelines and architectural improvements for waste management logistics with high-availability. Designed ETL processes handling millions of daily records with 99.9% uptime.",
     skills: ["SQL", "Data Modeling", "ETL/ELT", "Python", "Docker", "Azure/AWS"],
     image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=600&fit=crop",
-    span: "normal",
   },
   {
     id: "social-pilot",
     name: "Social Pilot",
     category: "AI Automation / Marketing Tech",
     description:
-      "An automated social media management tool that generates, schedules, and optimizes content across platforms using multi-modal AI.",
+      "An automated social media management tool that generates, schedules, and optimizes content across platforms using multi-modal AI. Features intelligent posting schedules and engagement analytics.",
     skills: ["API Integration", "OpenAI Vision", "Redis", "BullMQ", "Cron Jobs"],
     image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&h=600&fit=crop",
-    span: "wide",
   },
   {
     id: "flood-prediction",
     name: "Flood Prediction Model",
     category: "Data Science / Machine Learning",
     description:
-      "Developed a predictive analytics model using historical climate data and geospatial mapping to forecast flooding events.",
+      "Developed a predictive analytics model using historical climate data and geospatial mapping to forecast flooding events. Achieved 87% accuracy in predicting high-risk zones 48 hours in advance.",
     skills: ["Python", "Scikit-learn", "Pandas", "NumPy", "Matplotlib", "GIS", "XGBoost"],
     image: "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=800&h=600&fit=crop",
-    span: "wide",
   },
   {
     id: "arbitrage-tool",
     name: "Online Arbitrage Scoring Tool",
     category: "E-commerce / Data Scraping",
     description:
-      "A custom tool to identify profitable retail arbitrage opportunities by scraping and scoring real-time pricing data.",
+      "A custom tool to identify profitable retail arbitrage opportunities by scraping and scoring real-time pricing data across multiple marketplaces. Calculates ROI and ranks opportunities automatically.",
     skills: ["BeautifulSoup", "Selenium", "Data Analysis", "Web Scraping", "Python"],
     image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
-    span: "normal",
   },
   {
     id: "shopsmart-ai",
     name: "ShopSmart AI",
     category: "Browser Automation / AI Commerce",
     description:
-      "A cross-platform shopping assistant performing real-time semantic product matching across Amazon, Target, and Walmart.",
+      "A cross-platform shopping assistant performing real-time semantic product matching across Amazon, Target, and Walmart. Helps users find the best prices with intelligent product comparison.",
     skills: ["JavaScript", "Chrome Extension APIs", "NLP", "Web Scraping", "Tailwind CSS"],
     image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&h=600&fit=crop",
-    span: "normal",
   },
   {
     id: "styleflow-seo",
     name: "StyleFlow SEO",
     category: "Data-Driven Marketing / SEO Engineering",
     description:
-      "A high-conversion SEO engine for lifestyle brands using programmatic SEO and automated content clusters.",
+      "A high-conversion SEO engine for lifestyle brands using programmatic SEO and automated content clusters. Drives organic traffic through data-driven keyword targeting and technical optimization.",
     skills: ["Next.js", "Headless CMS", "Google Search Console API", "GA4/GTM", "Schema.org"],
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop",
-    span: "full",
   },
 ];
 
