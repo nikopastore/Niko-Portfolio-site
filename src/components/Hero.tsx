@@ -6,9 +6,9 @@ import { siteConfig } from "@/lib/data";
 
 export default function Hero() {
   return (
-    <section className="min-h-screen pt-16 flex flex-col -mb-24">
+    <section className="pt-16 -mb-24">
       {/* Physics Canvas Container - Full width edge to edge */}
-      <div className="flex-grow w-full">
+      <div className="w-full">
         <PhysicsCanvas />
       </div>
 
@@ -17,7 +17,7 @@ export default function Hero() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.5 }}
-        className="w-full overflow-hidden -mt-40"
+        className="w-full overflow-hidden -mt-8"
       >
         <h1
           className="font-[family-name:var(--font-space-grotesk)] font-bold tracking-tighter leading-[0.85] text-center whitespace-nowrap"
