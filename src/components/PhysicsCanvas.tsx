@@ -12,17 +12,17 @@ interface PhysicsTag {
   icon?: string;
 }
 
-// Consolidated skill tags - removed redundancy
+// Consolidated skill tags - BIGGER sizes
 const PHYSICS_TAGS: PhysicsTag[] = [
-  { id: "tag-1", text: "DATA ENGINEERING", width: 220, height: 52 },
-  { id: "tag-2", text: "GENERATIVE AI", width: 190, height: 52 },
-  { id: "tag-3", text: "FULL STACK", width: 160, height: 52 },
-  { id: "tag-4", text: "PYTHON", width: 120, height: 52 },
-  { id: "tag-5", text: "CLOUD ARCHITECTURE", width: 240, height: 52 },
-  { id: "tag-6", text: "REACT / NEXT.JS", width: 200, height: 52 },
-  // Decorative circles
-  { id: "circle-1", text: "✱", width: 60, height: 60, isCircle: true, icon: "asterisk" },
-  { id: "circle-2", text: "→", width: 60, height: 60, isCircle: true, icon: "arrow" },
+  { id: "tag-1", text: "DATA ENGINEERING", width: 320, height: 72 },
+  { id: "tag-2", text: "GENERATIVE AI", width: 280, height: 72 },
+  { id: "tag-3", text: "FULL STACK", width: 220, height: 72 },
+  { id: "tag-4", text: "PYTHON", width: 170, height: 72 },
+  { id: "tag-5", text: "CLOUD ARCHITECTURE", width: 350, height: 72 },
+  { id: "tag-6", text: "REACT / NEXT.JS", width: 280, height: 72 },
+  // Decorative circles - bigger
+  { id: "circle-1", text: "✱", width: 80, height: 80, isCircle: true, icon: "asterisk" },
+  { id: "circle-2", text: "→", width: 80, height: 80, isCircle: true, icon: "arrow" },
 ];
 
 export default function PhysicsCanvas() {
@@ -86,8 +86,8 @@ export default function PhysicsCanvas() {
 
     // Create boundary walls (invisible)
     const wallThickness = 60;
-    // Ground positioned so pills sit flush at visible bottom (accounting for pill height ~52px)
-    const groundY = height - 26; // Half of pill height so they sit on the visible edge
+    // Ground positioned so pills sit flush at visible bottom (accounting for pill height ~72px)
+    const groundY = height - 36; // Half of pill height so they sit on the visible edge
     const walls = [
       // Ground - positioned at bottom edge of visible area
       Bodies.rectangle(width / 2, groundY + wallThickness / 2, width + 200, wallThickness, {
@@ -223,7 +223,7 @@ export default function PhysicsCanvas() {
             ctx.fill();
 
             // Icon inside circle
-            ctx.font = "bold 24px system-ui, sans-serif";
+            ctx.font = "bold 32px system-ui, sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillStyle = colors.circleIconColor;
@@ -249,7 +249,7 @@ export default function PhysicsCanvas() {
             ctx.stroke();
 
             // Text label
-            ctx.font = "500 15px 'Space Grotesk', system-ui, sans-serif";
+            ctx.font = "500 20px 'Space Grotesk', system-ui, sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillStyle = colors.textColor;
