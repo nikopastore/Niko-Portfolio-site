@@ -37,7 +37,8 @@ export const projects: Project[] = [
     description:
       "A specialized B2B platform for insurance agencies that automates candidate sourcing and vetting using LLM-driven workflows. The system intelligently screens applications, matches candidates to roles, and provides recruiters with AI-generated insights.",
     skills: ["Next.js", "OpenAI API", "LangChain", "PostgreSQL", "Pinecone", "Tailwind CSS", "Node.js"],
-    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop",
+    image: "/screenshots/hirepriority.png",
+    url: "https://hirepriority.scalepilotlabs.com/",
   },
   {
     id: "sipwiki",
@@ -46,7 +47,8 @@ export const projects: Project[] = [
     description:
       "A comprehensive digital encyclopedia of drinking games featuring real-time search and dynamic Amazon Storefront integration. Users can browse, search, and save their favorite games while discovering related products.",
     skills: ["React Native", "Expo", "TypeScript", "AWS Lambda", "DynamoDB", "Amazon Associates API"],
-    image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&h=600&fit=crop",
+    image: "/screenshots/sipwiki.png",
+    url: "https://www.sipwiki.app/",
   },
   {
     id: "career-forge",
