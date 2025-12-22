@@ -50,7 +50,7 @@ async function captureScreenshots() {
       });
 
       // Wait a bit for any animations to complete
-      await page.waitForTimeout(2000);
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Take screenshot
       const screenshotPath = path.join(screenshotsDir, site.filename);
