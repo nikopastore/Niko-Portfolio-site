@@ -6,7 +6,10 @@
       "Bash(where:*)",
       "Bash(where import)",
       "Bash(npm install:*)",
-      "Bash(node capture-screenshots.js:*)"
+      "Bash(node capture-screenshots.js:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx next build)",
+      "Bash(timeout:*)"
     ]
   }
 }

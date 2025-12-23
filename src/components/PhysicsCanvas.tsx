@@ -6,24 +6,44 @@ import Matter from "matter-js";
 interface PhysicsTag {
   id: string;
   text: string;
-  width: number;
-  height: number;
+  baseWidth: number;  // Base width at 1920px viewport
+  baseHeight: number; // Base height at 1920px viewport
   isCircle?: boolean;
   icon?: string;
 }
 
-// Consolidated skill tags - widths sized to fit 32px Space Mono with letter-spacing
-const PHYSICS_TAGS: PhysicsTag[] = [
-  { id: "tag-1", text: "DATA ENGINEERING", width: 400, height: 72 },
-  { id: "tag-2", text: "LLM ORCHESTRATION / RAG", width: 580, height: 72 },
-  { id: "tag-3", text: "FULL STACK", width: 270, height: 72 },
-  { id: "tag-4", text: "PYTHON", width: 200, height: 72 },
-  { id: "tag-5", text: "CLOUD ARCHITECTURE", width: 450, height: 72 },
-  { id: "tag-6", text: "REACT / NEXT.JS", width: 360, height: 72 },
+// Base dimensions designed for 1920px viewport width
+// These will be scaled proportionally for other viewport sizes
+const BASE_VIEWPORT_WIDTH = 1920;
+const MIN_SCALE = 0.5;  // Minimum scale factor (for very small screens)
+const MAX_SCALE = 1.0;  // Maximum scale factor (don't go larger than base)
+
+const PHYSICS_TAGS_BASE: PhysicsTag[] = [
+  { id: "tag-1", text: "DATA ENGINEERING", baseWidth: 400, baseHeight: 72 },
+  { id: "tag-2", text: "LLM ORCHESTRATION / RAG", baseWidth: 580, baseHeight: 72 },
+  { id: "tag-3", text: "FULL STACK", baseWidth: 270, baseHeight: 72 },
+  { id: "tag-4", text: "PYTHON", baseWidth: 200, baseHeight: 72 },
+  { id: "tag-5", text: "CLOUD ARCHITECTURE", baseWidth: 450, baseHeight: 72 },
+  { id: "tag-6", text: "REACT / NEXT.JS", baseWidth: 360, baseHeight: 72 },
   // Decorative circles
-  { id: "circle-1", text: "✱", width: 80, height: 80, isCircle: true, icon: "asterisk" },
-  { id: "circle-2", text: "→", width: 80, height: 80, isCircle: true, icon: "arrow" },
+  { id: "circle-1", text: "✱", baseWidth: 80, baseHeight: 80, isCircle: true, icon: "asterisk" },
+  { id: "circle-2", text: "→", baseWidth: 80, baseHeight: 80, isCircle: true, icon: "arrow" },
 ];
+
+// Calculate scale factor based on viewport width
+function getScaleFactor(viewportWidth: number): number {
+  const scale = viewportWidth / BASE_VIEWPORT_WIDTH;
+  return Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale));
+}
+
+// Get scaled dimensions for a tag
+function getScaledTag(tag: PhysicsTag, scale: number) {
+  return {
+    ...tag,
+    width: Math.round(tag.baseWidth * scale),
+    height: Math.round(tag.baseHeight * scale),
+  };
+}
 
 export default function PhysicsCanvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,6 +52,10 @@ export default function PhysicsCanvas() {
   const renderRef = useRef<Matter.Render | null>(null);
   const runnerRef = useRef<Matter.Runner | null>(null);
   const [isClient, setIsClient] = useState(false);
+
+  // Store current scale factor and scaled tags for rendering
+  const scaleRef = useRef(1);
+  const scaledTagsRef = useRef<ReturnType<typeof getScaledTag>[]>([]);
 
   // Theme colors - updates based on current theme
   const themeColorsRef = useRef({
@@ -61,6 +85,13 @@ export default function PhysicsCanvas() {
     const width = container.offsetWidth;
     const height = container.offsetHeight;
 
+    // Calculate scale factor based on viewport width
+    const scale = getScaleFactor(window.innerWidth);
+    scaleRef.current = scale;
+
+    // Create scaled tags for this viewport size
+    scaledTagsRef.current = PHYSICS_TAGS_BASE.map(tag => getScaledTag(tag, scale));
+
     // Update theme colors
     updateThemeColors();
 
@@ -86,8 +117,9 @@ export default function PhysicsCanvas() {
 
     // Create boundary walls (invisible)
     const wallThickness = 60;
-    // Ground positioned so pills sit flush at visible bottom (accounting for pill height ~72px)
-    const groundY = height - 36; // Half of pill height so they sit on the visible edge
+    // Ground positioned so pills sit flush at visible bottom (accounting for scaled pill height)
+    const scaledPillHeight = Math.round(72 * scale);
+    const groundY = height - scaledPillHeight / 2; // Half of pill height so they sit on the visible edge
     const walls = [
       // Ground - positioned at bottom edge of visible area
       Bodies.rectangle(width / 2, groundY + wallThickness / 2, width + 200, wallThickness, {
@@ -110,8 +142,11 @@ export default function PhysicsCanvas() {
 
     World.add(engine.world, walls);
 
+    // Get the scaled tags for body creation
+    const scaledTags = scaledTagsRef.current;
+
     // Create physics bodies with staggered drops
-    PHYSICS_TAGS.forEach((tag, index) => {
+    scaledTags.forEach((tag, index) => {
       setTimeout(() => {
         if (!engineRef.current) return;
 
@@ -188,7 +223,7 @@ export default function PhysicsCanvas() {
     Matter.Events.on(engine, "beforeUpdate", () => {
       const bodies = Composite.allBodies(engine.world);
       bodies.forEach((body) => {
-        const tag = PHYSICS_TAGS.find((t) => t.id === body.label);
+        const tag = scaledTagsRef.current.find((t) => t.id === body.label);
         if (tag && !body.isStatic) {
           if (tag.isCircle) {
             // 5 weighted points evenly distributed (like a pentagon)
@@ -235,13 +270,20 @@ export default function PhysicsCanvas() {
     Matter.Events.on(render, "afterRender", () => {
       const ctx = render.context;
       const bodies = Composite.allBodies(engine.world);
+      const currentScale = scaleRef.current;
 
       // Update colors in case theme changed
       updateThemeColors();
       const colors = themeColorsRef.current;
 
+      // Scale font sizes proportionally
+      const baseFontSize = 32;
+      const scaledFontSize = Math.round(baseFontSize * currentScale);
+      const baseLetterSpacing = 3;
+      const scaledLetterSpacing = Math.round(baseLetterSpacing * currentScale);
+
       bodies.forEach((body) => {
-        const tag = PHYSICS_TAGS.find((t) => t.id === body.label);
+        const tag = scaledTagsRef.current.find((t) => t.id === body.label);
         if (tag) {
           ctx.save();
           ctx.translate(body.position.x, body.position.y);
@@ -255,7 +297,7 @@ export default function PhysicsCanvas() {
             ctx.fill();
 
             // Icon inside circle
-            ctx.font = "bold 32px system-ui, sans-serif";
+            ctx.font = `bold ${scaledFontSize}px system-ui, sans-serif`;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillStyle = colors.circleIconColor;
@@ -277,23 +319,22 @@ export default function PhysicsCanvas() {
 
             // Stroke only - NO fill
             ctx.strokeStyle = colors.strokeColor;
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = Math.max(1, 1.5 * currentScale);
             ctx.stroke();
 
-            // Text label - larger monospace font with letter-spacing
-            ctx.font = "400 32px 'Space Mono', monospace";
+            // Text label - scaled monospace font with letter-spacing
+            ctx.font = `400 ${scaledFontSize}px 'Space Mono', monospace`;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillStyle = colors.textColor;
             // Add letter-spacing by drawing characters individually
             const text = tag.text;
-            const letterSpacing = 3;
-            const totalWidth = ctx.measureText(text).width + (text.length - 1) * letterSpacing;
+            const totalWidth = ctx.measureText(text).width + (text.length - 1) * scaledLetterSpacing;
             let xPos = -totalWidth / 2;
             for (let i = 0; i < text.length; i++) {
               const char = text[i];
               ctx.fillText(char, xPos + ctx.measureText(char).width / 2, 1);
-              xPos += ctx.measureText(char).width + letterSpacing;
+              xPos += ctx.measureText(char).width + scaledLetterSpacing;
             }
           }
 
@@ -341,15 +382,15 @@ export default function PhysicsCanvas() {
     };
   }, [isClient, initPhysics, cleanup, handleResize]);
 
-  // SSR fallback
+  // SSR fallback - use responsive height that matches canvas
   if (!isClient) {
     return (
-      <div className="w-full h-[500px] flex items-center justify-center">
-        <div className="flex flex-wrap gap-3 justify-center max-w-4xl px-6">
-          {PHYSICS_TAGS.filter(t => !t.isCircle).map((tag) => (
+      <div className="w-full h-[300px] sm:h-[400px] lg:h-[500px] flex items-center justify-center">
+        <div className="flex flex-wrap gap-2 sm:gap-3 justify-center max-w-4xl px-6">
+          {PHYSICS_TAGS_BASE.filter(t => !t.isCircle).map((tag) => (
             <span
               key={tag.id}
-              className="px-6 py-3 rounded-full border border-foreground/20 text-sm font-medium"
+              className="px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-foreground/20 text-xs sm:text-sm font-medium"
             >
               {tag.text}
             </span>
@@ -360,7 +401,7 @@ export default function PhysicsCanvas() {
   }
 
   return (
-    <div ref={containerRef} className="w-full h-[500px] overflow-hidden relative">
+    <div ref={containerRef} className="w-full h-[300px] sm:h-[400px] lg:h-[500px] overflow-hidden relative">
       <canvas
         ref={canvasRef}
         className="w-full h-full"
