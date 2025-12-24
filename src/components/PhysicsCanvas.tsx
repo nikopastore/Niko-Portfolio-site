@@ -6,44 +6,28 @@ import Matter from "matter-js";
 interface PhysicsTag {
   id: string;
   text: string;
-  baseWidth: number;  // Base width at 1920px viewport
-  baseHeight: number; // Base height at 1920px viewport
+  width: number;
+  height: number;
   isCircle?: boolean;
   icon?: string;
 }
 
-// Base dimensions designed for 1920px viewport width
-// These will be scaled proportionally for other viewport sizes
-const BASE_VIEWPORT_WIDTH = 1920;
-const MIN_SCALE = 0.5;  // Minimum scale factor (for very small screens)
-const MAX_SCALE = 1.0;  // Maximum scale factor (don't go larger than base)
-
-const PHYSICS_TAGS_BASE: PhysicsTag[] = [
-  { id: "tag-1", text: "DATA ENGINEERING", baseWidth: 400, baseHeight: 72 },
-  { id: "tag-2", text: "LLM ORCHESTRATION / RAG", baseWidth: 580, baseHeight: 72 },
-  { id: "tag-3", text: "FULL STACK", baseWidth: 270, baseHeight: 72 },
-  { id: "tag-4", text: "PYTHON", baseWidth: 200, baseHeight: 72 },
-  { id: "tag-5", text: "CLOUD ARCHITECTURE", baseWidth: 450, baseHeight: 72 },
-  { id: "tag-6", text: "REACT / NEXT.JS", baseWidth: 360, baseHeight: 72 },
+// Fixed dimensions - no dynamic scaling for performance
+// Sized to work well across common screen sizes (1366px - 1920px+)
+const PHYSICS_TAGS: PhysicsTag[] = [
+  { id: "tag-1", text: "DATA ENGINEERING", width: 340, height: 60 },
+  { id: "tag-2", text: "LLM ORCHESTRATION / RAG", width: 480, height: 60 },
+  { id: "tag-3", text: "FULL STACK", width: 230, height: 60 },
+  { id: "tag-4", text: "PYTHON", width: 170, height: 60 },
+  { id: "tag-5", text: "CLOUD ARCHITECTURE", width: 380, height: 60 },
+  { id: "tag-6", text: "REACT / NEXT.JS", width: 300, height: 60 },
   // Decorative circles
-  { id: "circle-1", text: "✱", baseWidth: 80, baseHeight: 80, isCircle: true, icon: "asterisk" },
-  { id: "circle-2", text: "→", baseWidth: 80, baseHeight: 80, isCircle: true, icon: "arrow" },
+  { id: "circle-1", text: "✱", width: 65, height: 65, isCircle: true, icon: "asterisk" },
+  { id: "circle-2", text: "→", width: 65, height: 65, isCircle: true, icon: "arrow" },
 ];
 
-// Calculate scale factor based on viewport width
-function getScaleFactor(viewportWidth: number): number {
-  const scale = viewportWidth / BASE_VIEWPORT_WIDTH;
-  return Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale));
-}
-
-// Get scaled dimensions for a tag
-function getScaledTag(tag: PhysicsTag, scale: number) {
-  return {
-    ...tag,
-    width: Math.round(tag.baseWidth * scale),
-    height: Math.round(tag.baseHeight * scale),
-  };
-}
+// Create a Map for O(1) tag lookups instead of .find() on every frame
+const PHYSICS_TAGS_MAP = new Map(PHYSICS_TAGS.map(tag => [tag.id, tag]));
 
 export default function PhysicsCanvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -53,27 +37,27 @@ export default function PhysicsCanvas() {
   const runnerRef = useRef<Matter.Runner | null>(null);
   const [isClient, setIsClient] = useState(false);
 
-  // Store current scale factor and scaled tags for rendering
-  const scaleRef = useRef(1);
-  const scaledTagsRef = useRef<ReturnType<typeof getScaledTag>[]>([]);
-
-  // Theme colors - updates based on current theme
+  // Theme colors - cached and only updated when theme actually changes
   const themeColorsRef = useRef({
     strokeColor: "rgba(255,255,255,0.8)",
     textColor: "rgba(255,255,255,0.9)",
     circleFill: "#ffffff",
     circleIconColor: "#000000",
+    isDark: true,
   });
 
-  // Update colors when theme changes
+  // Update colors only when theme changes (check cached state)
   const updateThemeColors = useCallback(() => {
     const isDark = !document.documentElement.classList.contains("light");
-    themeColorsRef.current = {
-      strokeColor: isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.8)",
-      textColor: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.9)",
-      circleFill: isDark ? "#ffffff" : "#000000",
-      circleIconColor: isDark ? "#000000" : "#ffffff",
-    };
+    if (isDark !== themeColorsRef.current.isDark) {
+      themeColorsRef.current = {
+        strokeColor: isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.8)",
+        textColor: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.9)",
+        circleFill: isDark ? "#ffffff" : "#000000",
+        circleIconColor: isDark ? "#000000" : "#ffffff",
+        isDark,
+      };
+    }
   }, []);
 
   const initPhysics = useCallback(() => {
@@ -84,13 +68,6 @@ export default function PhysicsCanvas() {
     const container = containerRef.current;
     const width = container.offsetWidth;
     const height = container.offsetHeight;
-
-    // Calculate scale factor based on viewport width
-    const scale = getScaleFactor(window.innerWidth);
-    scaleRef.current = scale;
-
-    // Create scaled tags for this viewport size
-    scaledTagsRef.current = PHYSICS_TAGS_BASE.map(tag => getScaledTag(tag, scale));
 
     // Update theme colors
     updateThemeColors();
@@ -117,9 +94,8 @@ export default function PhysicsCanvas() {
 
     // Create boundary walls (invisible)
     const wallThickness = 60;
-    // Ground positioned so pills sit flush at visible bottom (accounting for scaled pill height)
-    const scaledPillHeight = Math.round(72 * scale);
-    const groundY = height - scaledPillHeight / 2; // Half of pill height so they sit on the visible edge
+    // Ground positioned so pills sit flush at visible bottom (pill height is 60px)
+    const groundY = height - 30; // Half of pill height so they sit on the visible edge
     const walls = [
       // Ground - positioned at bottom edge of visible area
       Bodies.rectangle(width / 2, groundY + wallThickness / 2, width + 200, wallThickness, {
@@ -142,11 +118,8 @@ export default function PhysicsCanvas() {
 
     World.add(engine.world, walls);
 
-    // Get the scaled tags for body creation
-    const scaledTags = scaledTagsRef.current;
-
     // Create physics bodies with staggered drops
-    scaledTags.forEach((tag, index) => {
+    PHYSICS_TAGS.forEach((tag, index) => {
       setTimeout(() => {
         if (!engineRef.current) return;
 
@@ -223,7 +196,7 @@ export default function PhysicsCanvas() {
     Matter.Events.on(engine, "beforeUpdate", () => {
       const bodies = Composite.allBodies(engine.world);
       bodies.forEach((body) => {
-        const tag = scaledTagsRef.current.find((t) => t.id === body.label);
+        const tag = PHYSICS_TAGS_MAP.get(body.label);
         if (tag && !body.isStatic) {
           if (tag.isCircle) {
             // 5 weighted points evenly distributed (like a pentagon)
@@ -270,20 +243,17 @@ export default function PhysicsCanvas() {
     Matter.Events.on(render, "afterRender", () => {
       const ctx = render.context;
       const bodies = Composite.allBodies(engine.world);
-      const currentScale = scaleRef.current;
 
-      // Update colors in case theme changed
+      // Update colors only if theme changed (cached check inside)
       updateThemeColors();
       const colors = themeColorsRef.current;
 
-      // Scale font sizes proportionally
-      const baseFontSize = 32;
-      const scaledFontSize = Math.round(baseFontSize * currentScale);
-      const baseLetterSpacing = 3;
-      const scaledLetterSpacing = Math.round(baseLetterSpacing * currentScale);
+      // Set fonts once outside loop
+      const pillFont = "400 26px 'Space Mono', monospace";
+      const circleFont = "bold 26px system-ui, sans-serif";
 
       bodies.forEach((body) => {
-        const tag = scaledTagsRef.current.find((t) => t.id === body.label);
+        const tag = PHYSICS_TAGS_MAP.get(body.label);
         if (tag) {
           ctx.save();
           ctx.translate(body.position.x, body.position.y);
@@ -297,7 +267,7 @@ export default function PhysicsCanvas() {
             ctx.fill();
 
             // Icon inside circle
-            ctx.font = `bold ${scaledFontSize}px system-ui, sans-serif`;
+            ctx.font = circleFont;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillStyle = colors.circleIconColor;
@@ -319,23 +289,15 @@ export default function PhysicsCanvas() {
 
             // Stroke only - NO fill
             ctx.strokeStyle = colors.strokeColor;
-            ctx.lineWidth = Math.max(1, 1.5 * currentScale);
+            ctx.lineWidth = 1.5;
             ctx.stroke();
 
-            // Text label - scaled monospace font with letter-spacing
-            ctx.font = `400 ${scaledFontSize}px 'Space Mono', monospace`;
+            // Text label - single fillText call (much faster than char-by-char)
+            ctx.font = pillFont;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillStyle = colors.textColor;
-            // Add letter-spacing by drawing characters individually
-            const text = tag.text;
-            const totalWidth = ctx.measureText(text).width + (text.length - 1) * scaledLetterSpacing;
-            let xPos = -totalWidth / 2;
-            for (let i = 0; i < text.length; i++) {
-              const char = text[i];
-              ctx.fillText(char, xPos + ctx.measureText(char).width / 2, 1);
-              xPos += ctx.measureText(char).width + scaledLetterSpacing;
-            }
+            ctx.fillText(tag.text, 0, 1);
           }
 
           ctx.restore();
@@ -382,15 +344,15 @@ export default function PhysicsCanvas() {
     };
   }, [isClient, initPhysics, cleanup, handleResize]);
 
-  // SSR fallback - use responsive height that matches canvas
+  // SSR fallback
   if (!isClient) {
     return (
-      <div className="w-full h-[300px] sm:h-[400px] lg:h-[500px] flex items-center justify-center">
-        <div className="flex flex-wrap gap-2 sm:gap-3 justify-center max-w-4xl px-6">
-          {PHYSICS_TAGS_BASE.filter(t => !t.isCircle).map((tag) => (
+      <div className="w-full h-[500px] flex items-center justify-center">
+        <div className="flex flex-wrap gap-3 justify-center max-w-4xl px-6">
+          {PHYSICS_TAGS.filter(t => !t.isCircle).map((tag) => (
             <span
               key={tag.id}
-              className="px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-foreground/20 text-xs sm:text-sm font-medium"
+              className="px-6 py-3 rounded-full border border-foreground/20 text-sm font-medium"
             >
               {tag.text}
             </span>
@@ -401,7 +363,7 @@ export default function PhysicsCanvas() {
   }
 
   return (
-    <div ref={containerRef} className="w-full h-[300px] sm:h-[400px] lg:h-[500px] overflow-hidden relative">
+    <div ref={containerRef} className="w-full h-[500px] overflow-hidden relative">
       <canvas
         ref={canvasRef}
         className="w-full h-full"
