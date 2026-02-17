@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Zap } from "lucide-react";
 import { Project } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -68,20 +68,45 @@ export default function WorksGrid({ projects }: WorksGridProps) {
                           <span className="text-xs text-muted uppercase tracking-wider">
                             {project.category}
                           </span>
-                          <h3 className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold mt-2 mb-4">
+                          <h3 className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold mt-2 mb-3">
                             {project.name}
                           </h3>
 
+                          {/* Metrics badge */}
+                          {project.metrics && (
+                            <div className="flex items-center gap-2 mb-3 text-sm">
+                              <Zap className="w-4 h-4 text-yellow-500" />
+                              <span className="text-foreground/80">{project.metrics}</span>
+                            </div>
+                          )}
+
+                          {/* Tech Highlights */}
+                          {project.techHighlights && project.techHighlights.length > 0 && (
+                            <div className="mb-4 space-y-1">
+                              {project.techHighlights.slice(0, 3).map((highlight, i) => (
+                                <div key={i} className="flex items-start gap-2 text-xs text-muted">
+                                  <span className="text-foreground/40 mt-0.5">▸</span>
+                                  <span>{highlight}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
                           {/* Skills */}
                           <div className="flex flex-wrap gap-2 mb-4">
-                            {project.skills.map((skill) => (
+                            {project.skills.slice(0, 6).map((skill) => (
                               <span
                                 key={skill}
-                                className="text-xs px-3 py-1 rounded-full border border-card-border text-muted"
+                                className="text-xs px-3 py-1 rounded-full border border-card-border text-muted hover:border-foreground/50 transition-colors"
                               >
                                 {skill}
                               </span>
                             ))}
+                            {project.skills.length > 6 && (
+                              <span className="text-xs px-3 py-1 text-muted">
+                                +{project.skills.length - 6} more
+                              </span>
+                            )}
                           </div>
 
                           {/* Visit button */}
@@ -108,7 +133,7 @@ export default function WorksGrid({ projects }: WorksGridProps) {
                                 "font-medium text-sm cursor-default"
                               )}
                             >
-                              Coming Soon
+                              In Development
                             </span>
                           )}
                         </div>

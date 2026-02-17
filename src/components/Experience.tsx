@@ -36,8 +36,17 @@ export default function Experience({ experiences, education }: ExperienceProps) 
                     {item.company}
                   </span>
                   <span className="text-muted">{item.role}</span>
+                  {item.highlights && (
+                    <div className="mt-2 space-y-1">
+                      {item.highlights.map((h, i) => (
+                        <span key={i} className="text-sm text-muted/70 block">
+                          • {h}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <span className="text-muted text-sm sm:text-base mt-1 sm:mt-0">
+                <span className="text-muted text-sm sm:text-base mt-1 sm:mt-0 shrink-0">
                   {item.years}
                 </span>
               </div>
