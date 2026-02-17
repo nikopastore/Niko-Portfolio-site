@@ -1,24 +1,35 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { siteConfig } from "@/lib/data";
 import { useToast } from "@/components/Toast";
-import { cn } from "@/lib/utils";
 
-const socialLinks = [
-  {
-    name: "LinkedIn",
-    href: siteConfig.linkedin,
-  },
-  {
-    name: "GitHub",
-    href: siteConfig.github,
-  },
+const socials = [
+  { name: "GitHub", url: siteConfig.github },
+  { name: "LinkedIn", url: siteConfig.linkedin },
+  { name: "Email", url: `mailto:${siteConfig.email}` },
 ];
 
 export default function Contact() {
+  const [time, setTime] = useState("");
   const { showToast } = useToast();
+
+  useEffect(() => {
+    const updateTime = () => {
+      setTime(
+        new Date().toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          second: "2-digit",
+          timeZone: "America/Phoenix",
+        })
+      );
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const copyEmail = () => {
     navigator.clipboard.writeText(siteConfig.email);
@@ -26,56 +37,44 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-32 px-6">
-      <div className="max-w-7xl mx-auto text-center">
+    <section id="contact" className="py-16 px-6 border-t border-card-border">
+      <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          className="flex flex-col md:flex-row md:items-center md:justify-between gap-6"
         >
-          <h2 className="font-[family-name:var(--font-space-grotesk)] text-4xl md:text-6xl lg:text-7xl font-bold mb-8 tracking-tight">
-            LET&apos;S WORK TOGETHER
+          {/* CTA */}
+          <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl md:text-2xl font-bold tracking-wide">
+            LET'S GET IN TOUCH
           </h2>
 
-          <button
-            onClick={copyEmail}
-            className="inline-block text-2xl md:text-4xl text-muted hover:text-foreground transition-colors duration-300 mb-12 cursor-pointer"
-          >
-            {siteConfig.email}
-          </button>
-
-          <div className="flex flex-wrap justify-center gap-4 mt-8">
-            {socialLinks.map((link) => (
+          {/* Social Pills */}
+          <div className="flex flex-wrap gap-3">
+            {socials.map((social) => (
               <a
-                key={link.name}
-                href={link.href}
+                key={social.name}
+                href={social.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={cn(
-                  "group flex items-center gap-2 px-6 py-3",
-                  "border border-card-border rounded-full",
-                  "hover:bg-foreground hover:text-background",
-                  "transition-all duration-300"
-                )}
+                className="px-5 py-2 border border-card-border rounded-full text-sm font-medium hover:bg-foreground hover:text-background transition-all duration-200"
               >
-                <span className="font-medium">{link.name}</span>
-                <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                {social.name}
               </a>
             ))}
             <button
               onClick={copyEmail}
-              className={cn(
-                "group flex items-center gap-2 px-6 py-3",
-                "border border-card-border rounded-full",
-                "hover:bg-foreground hover:text-background",
-                "transition-all duration-300 cursor-pointer"
-              )}
+              className="px-5 py-2 border border-card-border rounded-full text-sm font-medium hover:bg-foreground hover:text-background transition-all duration-200 cursor-pointer"
             >
-              <span className="font-medium">Email</span>
-              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              Copy Email
             </button>
           </div>
+
+          {/* Live Clock */}
+          <span className="text-muted text-sm font-[family-name:var(--font-space-mono)] tabular-nums">
+            {time} MST
+          </span>
         </motion.div>
       </div>
     </section>
