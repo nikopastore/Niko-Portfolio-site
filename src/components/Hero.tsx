@@ -2,14 +2,11 @@
 
 import { motion } from "framer-motion";
 import PhysicsCanvas from "./PhysicsCanvas";
-import FloatingBadges from "./FloatingBadges";
 import { siteConfig } from "@/lib/data";
 
 export default function Hero() {
   return (
     <section className="relative pt-16 -mb-24">
-      {/* Floating Badges Layer */}
-      <FloatingBadges />
 
       {/* Physics Canvas Container - Full width edge to edge */}
       <div className="w-full">
