@@ -204,7 +204,7 @@ export const experiences: Experience[] = [
     years: "2024 - Present",
     type: "work",
     highlights: [
-      "Building AI-powered SaaS products for SMBs",
+      "Building AI-powered SaaS products",
       "HirePriority, PolyQuant, TeachFolio, and more",
     ],
   },
