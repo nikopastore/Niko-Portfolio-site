@@ -76,23 +76,6 @@ export const projects: Project[] = [
     metrics: "3/3 wins YTD (100% accuracy)",
   },
   {
-    id: "job-machine",
-    name: "Job Machine",
-    category: "AI Automation / Career Tools",
-    description:
-      "An automated job hunting system I built for myself. It scans 50+ job boards every 10 minutes, matches postings against my resume using semantic similarity, then tailors my resume and cover letter for each match. The tailoring isn't just keyword stuffing — it actually rewrites bullet points to emphasize relevant experience. Generates ATS-optimized PDFs ready to submit.",
-    techHighlights: [
-      "Multi-model orchestration (GLM-5 for scanning, Claude for tailoring)",
-      "Semantic job matching using embeddings",
-      "Automated resume rewriting with keyword optimization",
-      "PDF generation with WeasyPrint",
-      "Cron-based continuous scanning across 50+ sources",
-    ],
-    skills: ["Python", "Claude API", "Playwright", "YAML", "WeasyPrint", "Node.js", "Cron"],
-    image: "/screenshots/jobmachine.png",
-    metrics: "Scans 50+ job boards, tailors applications in <30 seconds",
-  },
-  {
     id: "routeware",
     name: "Routeware Data Platform",
     category: "Enterprise Data Engineering",
