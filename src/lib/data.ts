@@ -38,6 +38,19 @@ export interface Project {
   metrics?: string;
 }
 
+export interface App {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  skills: string[];
+  icon: string;
+  logo?: string;
+  screenshots?: string[];
+  url: string;
+  platforms: string[];
+}
+
 export const projects: Project[] = [
   {
     id: "hirepriority",
@@ -62,7 +75,7 @@ export const projects: Project[] = [
     name: "PolyQuant",
     category: "Quantitative Finance / Prediction Markets",
     description:
-      "A signal service for prediction markets that I built after noticing seasonal patterns in Polymarket data. The system analyzes historical event outcomes, correlates them with calendar effects, and generates trade signals. Currently 3/3 on called trades. The interesting part is the backtesting engine — I can simulate any strategy against years of prediction market history.",
+      "A signal service for prediction markets that I built after noticing seasonal patterns in Polymarket data. The system analyzes historical event outcomes, correlates them with calendar effects, and generates trade signals. The interesting part is the backtesting engine — I can simulate any strategy against years of prediction market history.",
     techHighlights: [
       "Custom backtesting engine with walk-forward optimization",
       "Seasonality decomposition using STL + Fourier analysis",
@@ -73,24 +86,6 @@ export const projects: Project[] = [
     skills: ["Python", "Pandas", "NumPy", "Scikit-learn", "Next.js", "TypeScript", "Playwright", "Vercel"],
     image: "/screenshots/polyquant.png",
     url: "https://polyquant.vercel.app/",
-    metrics: "3/3 wins YTD (100% accuracy)",
-  },
-  {
-    id: "routeware",
-    name: "Routeware Data Platform",
-    category: "Enterprise Data Engineering",
-    description:
-      "My day job. I led the migration from legacy databases to Snowflake, built the ETL pipelines that process all our operational data, and set up Sigma BI for self-serve analytics. Before this, teams waited days for reports — now they query live data themselves. The tricky part was maintaining data quality across 50+ source systems while keeping the warehouse performant.",
-    techHighlights: [
-      "Snowflake data warehouse architecture from scratch",
-      "FME + Python ETL processing 1M+ records daily",
-      "Sigma BI dashboards replacing manual Excel reports",
-      "Data quality framework with automated anomaly detection",
-      "Cost optimization — cut Snowflake spend 40% via query tuning",
-    ],
-    skills: ["Snowflake", "SQL", "Python", "FME", "Sigma BI", "dbt", "AWS", "Data Modeling"],
-    image: "/screenshots/routeware.png",
-    metrics: "1M+ records/day, 40% cost reduction, 99.9% uptime",
   },
   {
     id: "sipwiki",
@@ -141,21 +136,6 @@ export const projects: Project[] = [
     image: "/screenshots/betbezel.png",
   },
   {
-    id: "career-forge",
-    name: "Career Forge",
-    category: "AI Tools / EdTech",
-    description:
-      "An AI career coach that analyzes your resume against job descriptions and tells you exactly what's missing. Not vague advice — specific gaps like 'They want Kubernetes experience, you have Docker but no K8s mentioned.' I built this before Job Machine, and it taught me a lot about LLM-powered document analysis.",
-    techHighlights: [
-      "GPT-4 with structured output for consistent analysis",
-      "Resume parsing with custom NER model",
-      "Skill gap identification with market demand data",
-      "Interview prep question generation",
-    ],
-    skills: ["Python", "FastAPI", "OpenAI API", "NLP", "Clerk Auth", "Vercel"],
-    image: "/screenshots/careerforge.png",
-  },
-  {
     id: "social-forge",
     name: "Social Forge",
     category: "Marketing Automation",
@@ -188,6 +168,111 @@ export const projects: Project[] = [
   },
 ];
 
+export const apps: App[] = [
+  {
+    id: "docpilot",
+    name: "DocPilot",
+    category: "Document Intelligence",
+    description:
+      "AI-powered document scanner that auto-detects document types and extracts structured data. Scan receipts, invoices, contracts — get clean markdown and exportable data.",
+    skills: [
+      "Swift",
+      "SwiftUI",
+      "VisionKit",
+      "PDFKit",
+      "CoreImage",
+      "NuMarkdown API",
+      "SwiftData",
+    ],
+    icon: "📄",
+    logo: "/apps/docpilot/icon.png",
+    screenshots: [
+      "/apps/docpilot/01.png",
+      "/apps/docpilot/02.png",
+      "/apps/docpilot/03.png",
+    ],
+    url: "",
+    platforms: ["iOS"],
+  },
+  {
+    id: "ailarm",
+    name: "AiLARM",
+    category: "Productivity",
+    description:
+      "Smart alarm app with AI-powered morning briefings. Wake up to personalized weather, calendar, and motivational messages delivered in a natural voice.",
+    skills: ["Swift", "SwiftUI", "AVFoundation", "Speech Synthesis", "WeatherKit"],
+    icon: "⏰",
+    screenshots: [
+      "/apps/ailarm/01_alarm_list.png",
+      "/apps/ailarm/02_ai_briefing.png",
+      "/apps/ailarm/03_shake_dismiss.png",
+      "/apps/ailarm/04_sounds.png",
+    ],
+    url: "https://ailarm.vercel.app",
+    platforms: ["iOS"],
+  },
+  {
+    id: "supplementsync",
+    name: "SupplementSync",
+    category: "Health & Wellness",
+    description:
+      "Supplement and medication tracker with wearable integration. Syncs with Apple Health, Whoop, and Oura to show health correlations and optimize your stack.",
+    skills: ["Swift", "SwiftUI", "HealthKit", "Core Data", "Charts", "WidgetKit"],
+    icon: "💊",
+    url: "",
+    platforms: ["iOS"],
+  },
+  {
+    id: "qrsimple",
+    name: "QR Simple",
+    category: "Utilities",
+    description:
+      "Clean, fast QR code generator and scanner. Create codes for URLs, WiFi, contacts, and more. No ads, no tracking, just works.",
+    skills: ["React Native", "Expo", "NativeWind", "react-native-qrcode-svg", "expo-camera"],
+    icon: "📱",
+    logo: "/apps/qrsimple/icon.png",
+    url: "",
+    platforms: ["iOS", "Android"],
+  },
+  {
+    id: "parchment",
+    name: "Parchment",
+    category: "Journaling",
+    description:
+      "Minimalist AI journaling app with voice dictation and handwriting OCR. Speak or scan your thoughts — Parchment converts them to clean, searchable entries.",
+    skills: [
+      "React Native",
+      "Expo",
+      "ElevenLabs Scribe",
+      "Google Gemini 2.0",
+      "RevenueCat",
+      "AsyncStorage",
+    ],
+    icon: "📜",
+    logo: "/apps/parchment/icon.png",
+    url: "",
+    platforms: ["iOS", "Android"],
+  },
+  {
+    id: "mealswipe",
+    name: "MealSwipe",
+    category: "Food & Lifestyle",
+    description:
+      "Tinder for meal planning. Swipe through recipe suggestions, save favorites, and generate weekly meal plans. AI learns your preferences over time.",
+    skills: ["React Native", "Expo", "OpenAI API", "AsyncStorage", "Reanimated"],
+    icon: "🍽️",
+    logo: "/apps/mealswipe/icon.png",
+    screenshots: [
+      "/apps/mealswipe/01.png",
+      "/apps/mealswipe/02.png",
+      "/apps/mealswipe/03.png",
+      "/apps/mealswipe/04.png",
+    ],
+    url: "",
+    platforms: ["iOS", "Android"],
+  },
+];
+
 export interface Experience {
   company: string;
   role: string;
@@ -195,6 +280,7 @@ export interface Experience {
   type: "work" | "education";
   subtitle?: string;
   highlights?: string[];
+  techStack?: string[];
 }
 
 export const experiences: Experience[] = [
@@ -207,6 +293,15 @@ export const experiences: Experience[] = [
       "Building AI-powered SaaS products",
       "HirePriority, PolyQuant, TeachFolio, and more",
     ],
+    techStack: [
+      "Next.js",
+      "TypeScript",
+      "Python",
+      "OpenAI API",
+      "LangChain",
+      "PostgreSQL",
+      "Vercel",
+    ],
   },
   {
     company: "Routeware, Inc.",
@@ -217,12 +312,14 @@ export const experiences: Experience[] = [
       "Led Snowflake + Sigma BI implementation",
       "Built ETL pipelines processing 1M+ records/day",
     ],
+    techStack: ["Snowflake", "SQL", "Python", "FME", "Sigma BI", "dbt", "AWS"],
   },
   {
     company: "Routeware, Inc.",
     role: "Data Engineer Intern",
     years: "2023",
     type: "work",
+    techStack: ["SQL", "Python", "Data Modeling", "Excel"],
   },
   {
     company: "TownHub",
@@ -233,6 +330,7 @@ export const experiences: Experience[] = [
       "Built 5 community apps from scratch",
       "Handled all data infrastructure and analytics",
     ],
+    techStack: ["Python", "SQL", "Data Analytics", "Marketing Automation"],
   },
 ];
 

@@ -45,6 +45,18 @@ export default function Experience({ experiences, education }: ExperienceProps) 
                       ))}
                     </div>
                   )}
+                  {item.techStack && item.techStack.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {item.techStack.map((tech) => (
+                        <span
+                          key={tech}
+                          className="text-xs px-2.5 py-1 rounded-full bg-card/60 text-muted border border-card-border/60"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <span className="text-muted text-sm sm:text-base mt-1 sm:mt-0 shrink-0">
                   {item.years}

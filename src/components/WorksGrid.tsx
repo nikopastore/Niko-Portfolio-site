@@ -11,7 +11,7 @@ interface WorksGridProps {
 
 export default function WorksGrid({ projects }: WorksGridProps) {
   return (
-    <section id="work" className="py-20 px-6">
+    <section id="work" className="pt-32 pb-20 px-6">
       <div className="max-w-6xl mx-auto">
         <h2 className="font-[family-name:var(--font-space-grotesk)] text-4xl md:text-5xl font-bold mb-16 tracking-tight">
           SELECTED WORKS
