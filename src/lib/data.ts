@@ -44,18 +44,18 @@ export const projects: Project[] = [
     name: "HirePriority",
     category: "AI-Powered B2B SaaS",
     description:
-      "A recruiting platform I built for insurance agencies. The core feature is an AI that scores candidates against job requirements — not just keyword matching, but actually understanding fit. It pulls from multiple data sources (LinkedIn, state licensing boards, university databases) and ranks candidates with explanations recruiters can trust. Built the whole thing: auth, multi-tenant architecture, LLM pipelines, the works.",
+      "A recruiting platform I built for insurance agencies. The core feature is a custom machine learning algorithm I developed that scores candidates against job requirements — not just keyword matching, but actually understanding fit through ML-powered analysis. It pulls from multiple data sources (LinkedIn, state licensing boards, university databases) and ranks candidates with explanations recruiters can trust. Built the whole thing: auth, multi-tenant architecture, ML scoring engine, LLM pipelines, the works.",
     techHighlights: [
+      "Custom ML scoring algorithm for candidate quality ranking",
       "LangChain orchestration with GPT-4 + Claude fallback",
       "Pinecone vector DB for semantic candidate matching",
       "Real-time WebSocket updates for live scoring",
       "Multi-tenant PostgreSQL with row-level security",
-      "Playwright automation for data sourcing",
     ],
-    skills: ["Next.js", "TypeScript", "OpenAI API", "LangChain", "Pinecone", "PostgreSQL", "Clerk Auth", "Tailwind CSS"],
+    skills: ["Next.js", "TypeScript", "Python", "Scikit-learn", "OpenAI API", "LangChain", "Pinecone", "PostgreSQL"],
     image: "/screenshots/hirepriority.png",
     url: "https://hirepriority.scalepilotlabs.com/",
-    metrics: "Processing 500+ candidates/day for early customers",
+    metrics: "Processing 500+ candidates/day with ML-powered scoring",
   },
   {
     id: "polyquant",
