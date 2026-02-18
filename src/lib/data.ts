@@ -44,18 +44,18 @@ export const projects: Project[] = [
     name: "HirePriority",
     category: "AI-Powered B2B SaaS",
     description:
-      "A recruiting platform I built for insurance agencies. The core feature is a custom machine learning algorithm I developed that scores candidates against job requirements — not just keyword matching, but actually understanding fit through ML-powered analysis. It pulls from multiple data sources (LinkedIn, state licensing boards, university databases) and ranks candidates with explanations recruiters can trust. Built the whole thing: auth, multi-tenant architecture, ML scoring engine, LLM pipelines, the works.",
+      "A recruiting platform I built for insurance agencies with two core features: a custom ML algorithm that scores candidates against job requirements, and Headhunter — an automated recruiting tool that helps agents proactively find licensed professionals and university students to recruit. The ML scoring goes beyond keyword matching to actually understand fit. Headhunter pulls from state licensing boards, LinkedIn, and university databases to surface qualified candidates before they even apply. Built the whole thing: auth, multi-tenant architecture, ML scoring engine, LLM pipelines.",
     techHighlights: [
+      "Headhunter: automated candidate sourcing from licensing boards & universities",
       "Custom ML scoring algorithm for candidate quality ranking",
       "LangChain orchestration with GPT-4 + Claude fallback",
       "Pinecone vector DB for semantic candidate matching",
       "Real-time WebSocket updates for live scoring",
-      "Multi-tenant PostgreSQL with row-level security",
     ],
     skills: ["Next.js", "TypeScript", "Python", "Scikit-learn", "OpenAI API", "LangChain", "Pinecone", "PostgreSQL"],
     image: "/screenshots/hirepriority.png",
     url: "https://hirepriority.scalepilotlabs.com/",
-    metrics: "Processing 500+ candidates/day with ML-powered scoring",
+    metrics: "ML scoring + Headhunter automated recruiting",
   },
   {
     id: "polyquant",
