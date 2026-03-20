@@ -1,0 +1,76 @@
+---
+title: "Building AI Applications That Actually Ship"
+date: "2024-11-12"
+excerpt: "Practical lessons from shipping AI-powered products: start with workflow, build guardrails early, and treat prompts like code."
+tags: ["AI Product", "LLM Engineering", "Workflow"]
+readTime: "7 min read"
+---
+
+Shipping AI products looks like magic from the outside, but the work is mostly
+structuring messy human workflows into something reliable. These are the
+tactics that have saved me the most time (and rework) across recruiting tools,
+document workflows, and research copilots.
+
+## 1) Start with the workflow, not the model
+
+The model is only one part of the system. The bigger wins come from understanding
+what happens before and after the LLM response. If the user experience feels
+slow or inconsistent, the AI feels unreliable even when the output is good.
+
+<Callout variant="info">
+  Map the full workflow first: input collection, validation, retries, and how a
+  user can correct or confirm the output.
+</Callout>
+
+## 2) Guardrails beat hero prompts
+
+A single \"perfect prompt\" rarely survives production. I treat prompts like code:
+versioned, tested, and wrapped with guardrails. That means schema validation,
+hard limits, and a fallback plan when the model refuses or drifts.
+
+```ts
+const runAnalysis = async (input: string) => {
+  const response = await llm.generate({
+    system: systemPrompt,
+    user: input,
+    maxTokens: 800,
+    temperature: 0.2,
+  });
+
+  return validateSchema(response, analysisSchema);
+};
+```
+
+## 3) Latency is a feature
+
+If a response takes 20 seconds, it doesn't matter how clever it is. I prefer
+small models for the first pass, then run deeper analysis in the background
+while the user is already acting on the initial answer.
+
+## 4) Your data pipeline is the product
+
+Most AI apps fail because the data they feed the model is inconsistent or stale.
+If you can't refresh sources daily and show provenance, the trust breaks.
+
+### Checklist I keep nearby
+
+- Index raw sources and derived summaries separately.
+- Store user feedback with the exact prompt + model version.
+- Build \"diff\" views so users can see what changed.
+
+## 5) Productize the feedback loop
+
+Every AI product needs a feedback flywheel. The fastest iteration happens when
+users can correct the output in-place and you can trace that feedback back to a
+prompt, retrieval set, and model configuration.
+
+<Callout variant="success">
+  The best AI UX looks boring: clear actions, visible context, and a fast way to
+  say \"that's wrong.\"
+</Callout>
+
+## Closing thought
+
+The core promise of AI is leverage. The way to deliver that is by combining
+small technical wins across orchestration, UI, and data -- not by chasing a
+single magic prompt.

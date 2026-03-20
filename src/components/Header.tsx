@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowUpRight, Sun, Moon } from "lucide-react";
+import Link from "next/link";
 import { useTheme } from "@/context/ThemeContext";
 import { useToast } from "@/components/Toast";
 import { siteConfig } from "@/lib/data";
@@ -40,22 +41,30 @@ export default function Header() {
             </span>
           </div>
 
-          {/* Right - Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className={cn(
-              "p-2 rounded-full border border-card-border",
-              "hover:bg-card transition-colors",
-              "focus:outline-none focus:ring-2 focus:ring-foreground/20"
-            )}
-            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-          >
-            {theme === "dark" ? (
-              <Sun className="w-5 h-5" />
-            ) : (
-              <Moon className="w-5 h-5" />
-            )}
-          </button>
+          {/* Right - Blog + Theme Toggle */}
+          <div className="flex items-center gap-4">
+            <Link
+              href="/blog"
+              className="text-sm text-muted hover:text-foreground transition-colors"
+            >
+              Blog
+            </Link>
+            <button
+              onClick={toggleTheme}
+              className={cn(
+                "p-2 rounded-full border border-card-border",
+                "hover:bg-card transition-colors",
+                "focus:outline-none focus:ring-2 focus:ring-foreground/20"
+              )}
+              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            >
+              {theme === "dark" ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </header>
