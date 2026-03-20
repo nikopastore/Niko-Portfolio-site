@@ -1,0 +1,241 @@
+---
+title: "OpenClaw 101: The Complete Setup Guide I Wish I Had"
+date: "2026-03-20"
+excerpt: "From API routing to memory vaults to cron scheduling — everything I learned building a 24/7 AI assistant with OpenClaw. Skip the expensive mistakes."
+tags: ["AI", "OpenClaw", "Automation", "AI Agents", "Productivity"]
+readTime: "12 min read"
+---
+
+**TL;DR**: OpenClaw can run 20+ automated tasks, manage your memory across sessions, and become a genuine second brain. But the setup has a brutal learning curve. Here's the exact stack, memory system, and workflow patterns that actually work.
+
+![AI automation concept](/blog/images/openclaw-hero.jpg)
+
+I've spent weeks going deep into OpenClaw. And look — I consider myself reasonably tech-savvy, but this thing humbled me.
+
+The good news? I've figured out the patterns that actually work. The bad news? I burned through API credits learning what doesn't.
+
+## The Setup: Brain vs Muscles
+
+Here's what most guides miss: **you need different models for different jobs**.
+
+Think about it like this — Opus is brilliant but expensive. Using it for a background cron job that checks if your website is up? That's like hiring a surgeon to take your temperature.
+
+### Setup & Onboarding: Claude Opus
+
+For initial setup, Opus is unmatched. You can use the API directly, or explore other options (do your research on what works for your use case). The key is: your first few hours with OpenClaw set the tone for everything. Cheap out here, and you'll pay for it in frustration later.
+
+This is where you:
+- Define your bot's personality and communication style
+- Do deep Q&A about yourself, your work habits, your goals
+- Explain every workflow you want automated in detail
+
+I spent around $30-50 on Opus during setup. Worth every cent.
+
+### Daily Chat: Claude Sonnet
+
+Once you're set up, switch to Sonnet for everyday conversation. It handles orchestration, quick lookups, and planning without burning your budget.
+
+**Key rule:** Claude (Opus or Sonnet) is for **chat and orchestration only**. It plans, it reviews, it delegates. It doesn't do the grunt work.
+
+### Background Tasks & Sub-Agents: GLM-5 (Free via NVIDIA)
+
+This is the game-changer. Register for an NVIDIA API key and you get access to GLM-5 for free. I run **20+ cron jobs** entirely on GLM-5.
+
+Max 2 concurrent sub-agents (NVIDIA rate limits), but that's plenty for most workflows.
+
+### Fallback: Kimi K2.5
+
+When GLM-5 hits rate limits, fall back to Kimi. Also free via NVIDIA. Great as a backup brain for various tasks.
+
+### Coding: Codex
+
+One rule, no exceptions: **Codex does ALL code**. Claude plans and reviews. Codex executes. Trying to get Claude to write code burns context and costs more. Delegate.
+
+### Quick Research: Brave Search (Free)
+
+OpenClaw has a built-in `web_search` tool using Brave API. Use this for quick lookups instead of spawning sub-agents or burning tokens on expensive models.
+
+**My monthly cost after setup:** ~$60, and most of that is optional stuff. Core automation runs almost entirely on free NVIDIA models.
+
+---
+
+## Memory: The Part Everyone Gets Wrong
+
+![Terminal and code](/blog/images/terminal-code.jpg)
+
+This is where people rage-quit. OpenClaw doesn't warn you when context runs out — it just silently compacts and forgets mid-conversation.
+
+### The Fix: Structured Memory Vault
+
+I built a tiered memory system that survives compaction:
+
+```
+vault/
+├── daily/       → Daily logs (YYYY-MM-DD.qmd)
+├── projects/    → Project docs
+├── people/      → People notes  
+├── decisions/   → Key decisions with rationale
+├── facts/       → Immutable stuff (credentials, preferences)
+├── templates/   → QMD templates
+└── _index.qmd   → Dashboard/MOC
+```
+
+This vault is **Obsidian-compatible**. I can browse it in Obsidian with graph view, daily notes, and backlinks. The AI writes to it, I can edit it, changes sync bidirectionally.
+
+### QMD Format
+
+Every note uses Quarto Markdown with YAML frontmatter:
+
+```yaml
+---
+title: "Decision: Switched to GLM-5 for Cron Jobs"
+date: 2026-03-04
+tags: [model-routing, cost-optimization]
+status: complete
+---
+
+## Context
+Was burning $20/week on expensive models for background tasks...
+
+## Decision
+Switch all cron jobs to GLM-5 via NVIDIA (free)...
+```
+
+### Memory Tiers
+
+- **MEMORY.md**: Executive summary (~500 tokens, always loaded)
+- **facts/**: Immutable stuff — people, credentials, preferences
+- **projects/**: Active project status
+- **decisions/**: Why we made choices (invaluable for "why did we...")
+- **daily/**: Auto-decayed after 30 days
+
+The AI uses `memory_search` to find relevant context, then `memory_get` to pull specific lines. Keeps context lean.
+
+### The Golden Rules
+
+1. **One fact per line** — Optimizes vector search chunking
+2. **Date context on every entry** — "Decided X on March 4" not just "Decided X"
+3. **Write immediately** — "Mental notes" don't survive restarts. If it's important, commit it.
+4. **Terse bullets, not prose** — Save tokens, improve searchability
+
+---
+
+## Cron Jobs: Scheduling for Free-Tier Limits
+
+Here's where it gets tactical. NVIDIA free tier has rate limits. You can't just blast 20 tasks at once.
+
+### Spread the Load
+
+Schedule heavy tasks during off-hours (overnight) when you're not actively chatting with the bot. Save lightweight tasks for daytime.
+
+**Overnight (1am-6am):**
+- Data scraping jobs
+- Batch processing
+- Backup tasks
+- Report generation
+
+**Daytime:**
+- Quick health checks (every 5-20 min)
+- Uptime monitoring
+- Lightweight alerts
+
+### Sub-Agents, Not Inline
+
+Never run complex tasks inside the heartbeat cron. Instead:
+
+```
+Heartbeat spawns sub-agent → Sub-agent runs task → Reports back
+```
+
+This prevents timeouts and keeps the main agent responsive.
+
+### Cron Ideas for Inspiration
+
+| Category | Examples |
+|----------|----------|
+| **Monitoring** | Website uptime, API health checks, error log scanning |
+| **Information** | Daily news digest, weather briefing, calendar summary |
+| **Automation** | Email sorting, RSS feed processing, social media scheduling |
+| **Data** | Stock/crypto price alerts, sports scores, flight tracking |
+| **Personal** | Daily journal prompts, habit tracking, reminder sync |
+| **Research** | Competitor monitoring, job board scanning, deal alerts |
+
+All running free on NVIDIA models. 24/7.
+
+---
+
+## Build Your Own Dashboard
+
+![Dashboard analytics](/blog/images/dashboard-productivity.jpg)
+
+One approach I love: a personal dashboard that consolidates everything.
+
+The concept is simple — build a web app (or Notion page, or whatever) that pulls together:
+- Task management
+- Goal tracking
+- Calendar integration
+- Habit streaks
+- Quick notepad
+
+You can extend it with whatever APIs matter to you:
+- **Stock/crypto tracking** via Alpaca or CoinGecko
+- **World news** via RSS or news APIs
+- **Weather** via Open-Meteo
+- **GitHub activity** showing your commits
+- **Sports scores** if that's your thing
+
+The AI can update it, pull from it, and use it as context for your morning briefs. Make it yours.
+
+---
+
+## Security (Don't Skip This)
+
+You're giving an AI access to your emails, calendars, credentials, and APIs. Take it seriously:
+
+- **API keys in `.env` files**, not config
+- **Rotate keys** every 30 days
+- **All credentials in a password manager**
+- **Input validation** on email scripts — no sending without approval
+- **Rate limiting** on external API calls
+- **Use Tailscale** for remote access (no open ports)
+
+---
+
+## Real Use Cases
+
+What does my setup actually do?
+
+**20+ Automated Tasks:**
+- Job board monitoring
+- Email management and sorting
+- Daily standups with weather and calendar
+- News and research digests
+- Habit and journal tracking
+- Price alerts and monitoring
+
+**Memory That Actually Works:**
+- Remembers decisions from weeks ago
+- Pulls relevant context without me asking
+- Daily entries auto-synced
+- Human-readable in Obsidian
+
+**Delegated Coding:**
+- Codex handles all code changes
+- I describe what I want, it executes
+- Claude just orchestrates
+
+---
+
+## The Bottom Line
+
+OpenClaw isn't plug-and-play. But once it clicks, it's a genuine force multiplier.
+
+**Setup cost:** ~$30-50 (Opus for onboarding)  
+**Monthly cost:** ~$60 (optional stuff — core is free on NVIDIA)  
+**Time saved:** 15+ hours/week of grunt work
+
+The key is front-loading the setup. Build the memory vault. Structure your cron jobs. Define clear model roles. Do that, and you'll wonder how you worked without it.
+
+---
+
+*Building with AI agents? Follow for more practical guides. Questions about your setup? Drop a comment below.*
