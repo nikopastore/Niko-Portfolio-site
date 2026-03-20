@@ -15,7 +15,7 @@ function escapeXml(value: string) {
 
 export async function GET() {
   const posts = await getPosts();
-  const headersList = headers();
+  const headersList = await headers();
   const host = headersList.get("host") ?? "localhost:3000";
   const protocol = headersList.get("x-forwarded-proto") ?? "http";
   const baseUrl = `${protocol}://${host}`;

@@ -29,7 +29,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <main className="min-h-screen pt-32 pb-24 px-6">
         <div className="max-w-3xl mx-auto">
           <Link href="/blog" className="text-sm text-muted hover:text-foreground">
-            <- Back to blog
+            ← Back to blog
           </Link>
 
           <div className="mt-8">

@@ -61,7 +61,7 @@ export default async function BlogPage() {
                       href={`/blog/${post.slug}`}
                       className="text-sm text-foreground/80 hover:text-foreground"
                     >
-                      Read post ->
+                      Read post →
                     </Link>
                   </div>
                 </article>
