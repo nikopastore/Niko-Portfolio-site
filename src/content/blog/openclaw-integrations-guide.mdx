@@ -1,0 +1,137 @@
+---
+title: "The OpenClaw Integrations That Actually Save Time"
+date: "2026-03-21"
+excerpt: "There are 5,000+ skills on ClawdHub. Most are slop. These are the integrations that took OpenClaw from chatbot to genuine assistant. Tested and ranked."
+tags: ["AI", "OpenClaw", "Automation", "Productivity", "AI Agents"]
+readTime: "8 min read"
+---
+
+**TL;DR**: There are 5,700+ skills on ClawdHub. Most are duplicates, half-baked projects, or straight-up malicious. These are the integrations that actually matter, tested over weeks of daily use.
+
+![Dashboard automation](/blog/images/dashboard-productivity.jpg)
+
+The difference between an LLM and actual magic is one thing: **execution**.
+
+How well can an agent actually do what it suggested? Can it email that person, build that feature, schedule your meetings? Integrations are what make OpenClaw special. Its ability to connect with services and actually do things.
+
+But with thousands of skills available, most of it is noise. So how do you cut through and find the ones that genuinely make life easier?
+
+I spent weeks trying almost every integration. Here's what actually delivers.
+
+---
+
+## The Essentials
+
+These are non-negotiable. Install them first.
+
+### Messaging: Discord or Telegram
+
+Discord is my primary channel. Rich formatting, thread support, multiple channels for different contexts (work, personal, projects). Telegram is a solid alternative if you want mobile-first.
+
+WhatsApp and iMessage integrations exist but are flaky. Stick with Discord or Telegram.
+
+### AI Model: Claude Opus (for setup) + Free Models (for tasks)
+
+Use Opus for initial onboarding and complex reasoning. Then route background tasks to free models like GLM-5 or Kimi via NVIDIA. This keeps costs down while maintaining quality where it matters.
+
+### Email: AgentMail
+
+Easy to set up and works reliably. Your bot gets its own inbox, can send and receive emails, and handle common email workflows. Great for automated responses, email digests, and notifications.
+
+For power users, Google Workspace (gog) hits your real inbox directly but takes longer to configure.
+
+### Browser: Agent-Browser
+
+This is how your bot interacts with the web when APIs don't exist. Form filling, web scraping, screenshots, navigating sites. Essential for any automation that touches websites.
+
+Pro tip: Use the OpenClaw browser tool with `profile=openclaw` for an isolated browser, or `profile=chrome` to attach to your existing Chrome session via the extension.
+
+### Memory: Self-Improving Agent
+
+This skill captures learnings, errors, and corrections to continuously improve how the bot works for you over time. Between native memory and self-improvement, your assistant actually gets better the more you use it.
+
+Don't skip this one.
+
+---
+
+## Worthy Additions
+
+Install these once the essentials are running.
+
+### Skill Creator
+
+This one is underrated. When you find yourself explaining the same workflow repeatedly, use the skill creator to package it into a reusable skill. Your bot learns it once, executes it consistently forever.
+
+I use this for: social media posting workflows, blog publishing, lead scraping patterns, report generation. Anything repetitive becomes a skill.
+
+### GitHub Integration
+
+PR reviews formatted to your standards, issue creation from chat, CI status checks, diff parsing. If you work with code, this is a must.
+
+The `gh` CLI skill handles most GitHub operations. Pair it with the coding-agent skill for a full development workflow.
+
+### Coding Agent
+
+Delegates coding tasks to Codex, Claude Code, or other coding models via background processes. Use when building features, reviewing PRs, or refactoring. Keeps your main conversation clean while heavy coding runs in parallel.
+
+### Password Manager (Bitwarden / 1Password)
+
+Lets your bot securely access credentials it needs to log into services. Without this, you're copy-pasting passwords every time it needs to authenticate somewhere.
+
+I use Bitwarden. 1Password with biometric unlock is another solid option for extra security.
+
+### Google Workspace (gog)
+
+Takes about 30 minutes to set up, but worth it. Gmail, Calendar, Drive, Sheets, Docs, all accessible from your bot. Writes reports, manages emails, syncs calendar events.
+
+This is the power-user email option if AgentMail feels too limited.
+
+---
+
+## Nice-to-Haves
+
+Not essential, but these level up the experience.
+
+### Summarize
+
+Summarize or extract text from URLs, podcasts, YouTube videos, and local files. Skip 2-hour podcasts. Get the key points in 30 seconds.
+
+Probably the skill I use most casually. The time savings compound fast.
+
+### Weather
+
+Simple but useful. Include weather in your morning briefings, get forecasts for travel planning. No API key needed with wttr.in or Open-Meteo backends.
+
+### Apple Reminders / Things
+
+If you're on macOS, these sync with your native task management. Create reminders from chat, list your tasks, mark things done. Keeps everything in one place.
+
+### Voice: ElevenLabs or Whisper
+
+Text-to-speech for voice responses, speech-to-text for voice input. Makes the whole experience feel natural. Great for morning briefings you can listen to while making coffee.
+
+---
+
+## What to Avoid
+
+A few warnings:
+
+- **Unverified skills**: Check download counts and reviews. Many skills on ClawdHub are abandoned or low-quality.
+- **Duplicate functionality**: Don't install 5 different email integrations. Pick one and commit.
+- **Overly complex setups**: If it takes 2 hours to configure and you're not sure it works, skip it. The best integrations are quick to install and obviously useful.
+
+---
+
+## The Bottom Line
+
+You don't need 50 integrations. You need 5-10 that actually work.
+
+Start with messaging (Discord/Telegram), browser automation (agent-browser), email (AgentMail), and memory (Self-Improving Agent). Add coding tools and skill creator when you need them.
+
+Everything else is gravy.
+
+The real unlock isn't having the most integrations. It's having the right ones configured properly so your bot can actually execute on what you ask.
+
+---
+
+*What integrations are you using? Drop a comment. Always looking for hidden gems.*
