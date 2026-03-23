@@ -1,7 +1,7 @@
 ---
 title: "OpenClaw 101: The Complete Setup Guide I Wish I Had"
 date: "2026-03-20"
-excerpt: "From API routing to memory vaults to cron scheduling — everything I learned building a 24/7 AI assistant with OpenClaw. Skip the expensive mistakes."
+excerpt: "From API routing to memory vaults to cron scheduling, everything I learned building a 24/7 AI assistant with OpenClaw. Skip the expensive mistakes."
 tags: ["AI", "OpenClaw", "Automation", "AI Agents", "Productivity"]
 readTime: "12 min read"
 ---
@@ -10,7 +10,7 @@ readTime: "12 min read"
 
 ![AI automation concept](/blog/images/openclaw-hero.jpg)
 
-I've spent weeks going deep into OpenClaw. And look — I consider myself reasonably tech-savvy, but this thing humbled me.
+I've spent weeks going deep into OpenClaw. And look, I consider myself reasonably tech-savvy, but this thing humbled me.
 
 The good news? I've figured out the patterns that actually work. The bad news? I burned through API credits learning what doesn't.
 
@@ -18,7 +18,22 @@ The good news? I've figured out the patterns that actually work. The bad news? I
 
 Here's what most guides miss: **you need different models for different jobs**.
 
-Think about it like this — Opus is brilliant but expensive. Using it for a background cron job that checks if your website is up? That's like hiring a surgeon to take your temperature.
+Think about it like this. Opus is brilliant but expensive. Using it for a background cron job that checks if your website is up? That's like hiring a surgeon to take your temperature.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    MODEL ROUTING STRATEGY                    │
+├─────────────────────────────────────────────────────────────┤
+│  TASK TYPE          │  MODEL           │  COST              │
+├─────────────────────┼──────────────────┼────────────────────┤
+│  Initial Setup      │  Claude Opus     │  $30-50 one-time   │
+│  Daily Chat         │  Claude Sonnet   │  ~$40/month        │
+│  Background Tasks   │  GLM-5 (NVIDIA)  │  FREE              │
+│  Fallback           │  Kimi K2.5       │  FREE              │
+│  All Coding         │  Codex           │  Varies            │
+│  Quick Research     │  Brave Search    │  FREE              │
+└─────────────────────┴──────────────────┴────────────────────┘
+```
 
 ### Setup & Onboarding: Claude Opus
 
@@ -57,13 +72,29 @@ OpenClaw has a built-in `web_search` tool using Brave API. Use this for quick lo
 
 **My monthly cost after setup:** ~$60, and most of that is optional stuff. Core automation runs almost entirely on free NVIDIA models.
 
+```
+┌────────────────────────────────────────────────────────────┐
+│              MONTHLY COST BREAKDOWN                         │
+├────────────────────────────────────────────────────────────┤
+│                                                            │
+│  Claude Sonnet (daily chat)     ████████████████░░  ~$40   │
+│  Codex (coding tasks)           ██████░░░░░░░░░░░░  ~$15   │
+│  Optional extras                ██░░░░░░░░░░░░░░░░  ~$5    │
+│  NVIDIA models (GLM-5, Kimi)    ░░░░░░░░░░░░░░░░░░  FREE   │
+│  Brave Search                   ░░░░░░░░░░░░░░░░░░  FREE   │
+│                                                            │
+│  TOTAL                                              ~$60   │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+```
+
 ---
 
 ## Memory: The Part Everyone Gets Wrong
 
 ![Terminal and code](/blog/images/terminal-code.jpg)
 
-This is where people rage-quit. OpenClaw doesn't warn you when context runs out — it just silently compacts and forgets mid-conversation.
+This is where people rage-quit. OpenClaw doesn't warn you when context runs out. It just silently compacts and forgets mid-conversation.
 
 ### The Fix: Structured Memory Vault
 
@@ -104,19 +135,43 @@ Switch all cron jobs to GLM-5 via NVIDIA (free)...
 ### Memory Tiers
 
 - **MEMORY.md**: Executive summary (~500 tokens, always loaded)
-- **facts/**: Immutable stuff — people, credentials, preferences
+- **facts/**: Immutable stuff like people, credentials, preferences
 - **projects/**: Active project status
 - **decisions/**: Why we made choices (invaluable for "why did we...")
 - **daily/**: Auto-decayed after 30 days
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    MEMORY TIER SYSTEM                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   ┌─────────────┐                                           │
+│   │  MEMORY.md  │  ← Always loaded (~500 tokens)            │
+│   │  Executive  │                                           │
+│   └──────┬──────┘                                           │
+│          │                                                  │
+│   ┌──────┴──────────────────────────────────────┐           │
+│   │                                             │           │
+│   ▼              ▼              ▼               ▼           │
+│ ┌──────┐    ┌────────┐    ┌──────────┐    ┌───────┐        │
+│ │facts/│    │projects│    │decisions/│    │daily/ │        │
+│ │      │    │   /    │    │          │    │       │        │
+│ └──────┘    └────────┘    └──────────┘    └───────┘        │
+│ Permanent   Active work   Rationale     30-day decay       │
+│                                                             │
+│   Searched via memory_search → pulled via memory_get        │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
 
 The AI uses `memory_search` to find relevant context, then `memory_get` to pull specific lines. Keeps context lean.
 
 ### The Golden Rules
 
-1. **One fact per line** — Optimizes vector search chunking
-2. **Date context on every entry** — "Decided X on March 4" not just "Decided X"
-3. **Write immediately** — "Mental notes" don't survive restarts. If it's important, commit it.
-4. **Terse bullets, not prose** — Save tokens, improve searchability
+1. **One fact per line**: Optimizes vector search chunking
+2. **Date context on every entry**: "Decided X on March 4" not just "Decided X"
+3. **Write immediately**: "Mental notes" don't survive restarts. If it's important, commit it.
+4. **Terse bullets, not prose**: Save tokens, improve searchability
 
 ---
 
@@ -162,6 +217,27 @@ This prevents timeouts and keeps the main agent responsive.
 
 All running free on NVIDIA models. 24/7.
 
+```
+┌─────────────────────────────────────────────────────────────┐
+│                  CRON SCHEDULING STRATEGY                    │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  OVERNIGHT (1am-6am)              DAYTIME                   │
+│  Heavy tasks when idle            Lightweight tasks         │
+│                                                             │
+│  ┌─────────────────────┐          ┌─────────────────────┐   │
+│  │ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │          │ ░░░░░░░░░░░░░░░░░░ │   │
+│  │ Data scraping       │          │ Health checks       │   │
+│  │ Batch processing    │          │ Uptime monitoring   │   │
+│  │ Report generation   │          │ Quick alerts        │   │
+│  │ Backup tasks        │          │ Status pings        │   │
+│  └─────────────────────┘          └─────────────────────┘   │
+│                                                             │
+│  Why? NVIDIA rate limits. Spread load, avoid conflicts.     │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ---
 
 ## Build Your Own Dashboard
@@ -170,7 +246,7 @@ All running free on NVIDIA models. 24/7.
 
 One approach I love: a personal dashboard that consolidates everything.
 
-The concept is simple — build a web app (or Notion page, or whatever) that pulls together:
+The concept is simple. Build a web app (or Notion page, or whatever) that pulls together:
 - Task management
 - Goal tracking
 - Calendar integration
@@ -195,7 +271,7 @@ You're giving an AI access to your emails, calendars, credentials, and APIs. Tak
 - **API keys in `.env` files**, not config
 - **Rotate keys** every 30 days
 - **All credentials in a password manager**
-- **Input validation** on email scripts — no sending without approval
+- **Input validation** on email scripts (no sending without approval)
 - **Rate limiting** on external API calls
 - **Use Tailscale** for remote access (no open ports)
 
@@ -231,28 +307,11 @@ What does my setup actually do?
 OpenClaw isn't plug-and-play. But once it clicks, it's a genuine force multiplier.
 
 **Setup cost:** ~$30-50 (Opus for onboarding)  
-**Monthly cost:** ~$60 (optional stuff — core is free on NVIDIA)  
+**Monthly cost:** ~$60 (optional stuff, core is free on NVIDIA)  
 **Time saved:** 15+ hours/week of grunt work
 
 The key is front-loading the setup. Build the memory vault. Structure your cron jobs. Define clear model roles. Do that, and you'll wonder how you worked without it.
 
 ---
 
-## Ready to Go Beyond Setup?
-
-Installation is just the beginning. The real power comes from mastering AI agent orchestration, building custom skills, and connecting workflows that actually save time.
-
-I'm building a community for OpenClaw power users who want:
-- **50+ documented workflows** covering real automation patterns
-- **Custom skills library** with production-ready configurations
-- **Secure setup guidance** for safe API and credential handling
-- **Weekly office hours** to troubleshoot your specific setup
-- **A community of builders** who've gone deep on Claude Code, Cowork, and agent orchestration
-
-Free tier gets you in. Premium unlocks the full library.
-
-[Join the OpenClaw Mastery Community →](https://whop.com/openclaw-mastery/)
-
----
-
-*Have questions about your setup? Drop a comment below or ask in the community.*
+*Building with AI agents? [Join the community on Discord](DISCORD_LINK_PLACEHOLDER) for hands-on help and workflow sharing. Questions about your setup? Drop a comment below.*
