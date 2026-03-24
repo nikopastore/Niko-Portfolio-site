@@ -1,0 +1,151 @@
+---
+title: "Run IBM Granite 4.0 1B Speech Recognition on Your Mac — No API, No Cloud"
+description: "IBM's Granite 4.0 1B Speech hits #1 on OpenASR with half the parameters. Run it free on your Mac via MLX — no API, no cloud, Apache 2.0."
+publishedAt: "2026-03-23"
+tags: ["ibm-granite", "speech-recognition", "mlx", "apple-silicon", "local-ai"]
+image: "/blog/images/granite-speech-leaderboard.png"
+---
+
+**TL;DR**: IBM's Granite 4.0 1B Speech model just hit #1 on the OpenASR leaderboard with half the parameters of its predecessor. It runs locally on your Mac via MLX, supports 6 languages, and it's completely free under Apache 2.0.
+
+![Granite 4.0 1B Speech on OpenASR Leaderboard](/blog/images/granite-speech-leaderboard.png)
+
+---
+
+You don't need OpenAI's API. You don't need Whisper in the cloud. You don't even need a GPU.
+
+IBM just dropped Granite 4.0 1B Speech — a 1 billion parameter speech-to-text model that beats models twice its size on accuracy benchmarks. And it runs natively on Apple Silicon.
+
+## Why This Matters
+
+The speech recognition space has been dominated by two options:
+1. **Cloud APIs** (OpenAI Whisper API, Google Speech-to-Text) — fast but privacy-invasive and costly at scale
+2. **Local Whisper** — accurate but resource-hungry, especially the large-v3 model
+
+Granite 4.0 1B Speech changes the equation. At just 1B parameters, it:
+
+- **Ranks #1** on the HuggingFace Open ASR Leaderboard
+- **Cuts size in half** compared to granite-speech-3.3-2b while improving accuracy
+- **Supports 6 languages**: English, French, German, Spanish, Portuguese, Japanese
+- **Runs on edge devices** — including M-series Macs via MLX
+
+The Word Error Rate (WER) across benchmarks like LibriSpeech, GigaSpeech, and AMI is lower than models with 2-8x more parameters.
+
+![Granite Speech Benchmarks](/blog/images/granite-speech-benchmarks.png)
+
+## The Benchmarks
+
+Here's how Granite 4.0 1B stacks up on the Open ASR Leaderboard:
+
+| Metric | Granite 4.0 1B |
+|--------|----------------|
+| **Average WER** | 5.52 |
+| **RTFx (Speed)** | 280.02 |
+| LibriSpeech Clean | 1.42 |
+| LibriSpeech Other | 2.85 |
+| GigaSpeech | 10.14 |
+| AMI | 8.44 |
+| TED-LIUM | 3.1 |
+
+Lower WER = better accuracy. 1.42 on LibriSpeech Clean is excellent for a 1B model.
+
+## Run It Locally on Your Mac
+
+If you've got an M1/M2/M3/M4 Mac, you can run this in minutes.
+
+### Step 1: Install mlx-audio
+
+```bash
+pip install -U mlx-audio
+```
+
+### Step 2: Transcribe Audio (CLI)
+
+```bash
+python -m mlx_audio.stt.generate \
+  --model ibm-granite/granite-4.0-1b-speech \
+  --audio "your-audio.wav" \
+  --output-path "transcript" \
+  --verbose
+```
+
+That's it. No API keys. No cloud. No subscription.
+
+### Step 3: Python Integration
+
+```python
+from mlx_audio.stt.utils import load_model
+from mlx_audio.stt.generate import generate_transcription
+
+model = load_model("mlx-community/granite-4.0-1b-speech-8bit")
+transcription = generate_transcription(
+    model=model,
+    audio="audio.wav",
+    output_path="transcript.txt",
+    format="txt",
+    verbose=True,
+)
+print(transcription.text)
+```
+
+The 8-bit quantized version at `mlx-community/granite-4.0-1b-speech-8bit` cuts memory usage further — perfect for older Macs or background processing.
+
+## Keyword Biasing: The Killer Feature
+
+Here's something most speech models can't do: **keyword list biasing**.
+
+You can pass a list of names, acronyms, or domain-specific terms, and Granite will prioritize recognizing them correctly. This is huge for:
+
+- **Meeting transcription** (getting names right)
+- **Technical content** (acronyms like "MLX", "vLLM", "ASR")
+- **Medical/legal transcription** (specialized terminology)
+
+Just append `Keywords: <kw1>, <kw2>` to your prompt.
+
+## When to Use Granite vs Whisper
+
+| Use Case | Granite 4.0 1B | Whisper large-v3 |
+|----------|----------------|------------------|
+| Edge/local deployment | ✅ Excellent | ⚠️ Heavy |
+| Mac (MLX native) | ✅ Yes | ⚠️ Via whisper.cpp |
+| Multilingual (6 langs) | ✅ Yes | ✅ Yes (99 langs) |
+| Keyword biasing | ✅ Yes | ❌ No |
+| API-free | ✅ Yes | ✅ Yes |
+| Model size | 1B | 1.5B |
+| License | Apache 2.0 | MIT |
+
+If you need 99 languages or maximum coverage, Whisper still wins. But for English-focused, edge-first, privacy-conscious transcription — Granite 4.0 1B is now the better choice.
+
+![Granite Speech Architecture](/blog/images/granite-speech-architecture.png)
+
+## What Else It Does
+
+Beyond transcription, Granite 4.0 1B Speech supports:
+
+- **Speech Translation**: Transcribe French audio directly to English text (and vice versa)
+- **Speculative Decoding**: Faster inference with compatible setups
+- **vLLM Support**: Run it as an OpenAI-compatible API server locally
+
+For the translation use case:
+```python
+user_prompt = "<|audio|>translate this French speech to English"
+```
+
+## The Bottom Line
+
+IBM shipped a 1B parameter model that:
+1. Beats larger models on accuracy
+2. Runs locally on your Mac
+3. Supports keyword biasing for real-world use
+4. Is completely free (Apache 2.0)
+
+The "small models can't compete" narrative is dead. Granite 4.0 1B Speech proves that efficient architecture beats brute-force scaling.
+
+**Links:**
+- [Model Card (HuggingFace)](https://huggingface.co/ibm-granite/granite-4.0-1b-speech)
+- [MLX Quantized Version](https://huggingface.co/mlx-community/granite-4.0-1b-speech-8bit)
+- [Speculative Decoding Notebook](https://colab.research.google.com/github/ibm-granite/granite-speech-models/blob/main/notebooks/speculative_decoding_notebook.ipynb)
+
+---
+
+*Building with local AI? Follow for more practical guides on running models without the cloud.*
