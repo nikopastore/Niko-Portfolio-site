@@ -1,0 +1,271 @@
+---
+title: "Every Free LLM API in 2026: No Credit Card, No Trial Expiration"
+description: "A complete list of permanently free LLM APIs — provider APIs, inference platforms, and trial credits. All OpenAI SDK-compatible, no credit card required."
+publishedAt: "2026-03-23"
+tags: ["llm-api", "free-tier", "ai-tools", "openai-compatible", "developer-resources"]
+image: "/blog/images/free-llm-apis.jpg"
+---
+
+**TL;DR**: Here's every LLM API with a permanent free tier — no trial periods, no credit card required. Organized by provider type with rate limits and model availability.
+
+---
+
+Finding free LLM APIs that don't expire is harder than it should be. Most "free" tiers are actually trials that run out after 30 days or require a credit card "just in case."
+
+This list only includes **permanent free tiers** with no expiration. I've also included providers with trial credits at the end, clearly marked.
+
+## Provider APIs (Direct from Model Creators)
+
+These are APIs from the companies that train the models.
+
+### Google AI Studio
+🇺🇸 [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+
+| Model | Limits |
+|-------|--------|
+| Gemini 2.5 Pro | 5 RPM, 20 RPD |
+| Gemini 2.5 Flash | 5 RPM, 20 RPD |
+| Gemini 3 Flash | 5 RPM, 20 RPD |
+| Gemini 3.1 Flash-Lite | 15 RPM, 500 RPD |
+| Gemma 3 27B | 30 RPM, 14,400 RPD |
+| Gemma 3 12B | 30 RPM, 14,400 RPD |
+| Gemma 3 4B | 30 RPM, 14,400 RPD |
+
+**Note**: Data used for training when accessed outside UK/CH/EEA/EU.
+
+### Mistral AI
+🇪🇺 [console.mistral.ai/api-keys](https://console.mistral.ai/api-keys)
+
+| Model | Limits |
+|-------|--------|
+| Mistral Large 3 | 1 req/s, 1B tokens/mo |
+| Mistral Small 3.1 | 1 req/s, 1B tokens/mo |
+| Ministral 8B | 1 req/s, 1B tokens/mo |
+| Codestral | 30 RPM, 2,000 RPD |
+
+**Note**: Phone verification required.
+
+### Cohere
+🇺🇸 [dashboard.cohere.com/api-keys](https://dashboard.cohere.com/api-keys)
+
+| Model | Limits |
+|-------|--------|
+| Command A | 20 RPM, 1K req/mo |
+| Command R+ | 20 RPM, 1K req/mo |
+| Aya Expanse 32B | 20 RPM, 1K req/mo |
+| +9 more models | Shared quota |
+
+### Zhipu AI
+🇨🇳 [open.bigmodel.cn/usercenter/apikeys](https://open.bigmodel.cn/usercenter/apikeys)
+
+| Model | Limits |
+|-------|--------|
+| GLM-4.7-Flash | Undocumented |
+| GLM-4.5-Flash | Undocumented |
+| GLM-4.6V-Flash | Undocumented |
+
+---
+
+## Inference Providers (Multi-Model Platforms)
+
+These aggregate models from multiple sources behind a single API.
+
+### NVIDIA NIM
+🇺🇸 [build.nvidia.com/explore/discover](https://build.nvidia.com/explore/discover)
+
+**Limits**: 40 RPM across all models
+
+| Available Models |
+|-----------------|
+| Llama 3.3 70B |
+| Mistral Large |
+| Qwen3 235B |
+| Nemotron 3 Nano |
+| +50 more |
+
+**Note**: Experiment plan requires opting into data training. Phone verification required.
+
+### Groq
+🇺🇸 [console.groq.com/keys](https://console.groq.com/keys)
+
+Model-specific limits:
+
+| Model | RPM | RPD |
+|-------|-----|-----|
+| Llama 3.3 70B | 30 | 1,000 |
+| Llama 4 Scout | 30 | 1,000 |
+| Kimi K2 | 30 | 1,000 |
+| GPT-OSS-120B | 30 | 1,000 |
+| Whisper Large v3 | - | 2,000 |
+
+Groq's inference is **extremely fast** — often 500+ tokens/second.
+
+### Cerebras
+🇺🇸 [cloud.cerebras.ai](https://cloud.cerebras.ai)
+
+| Model | Limits |
+|-------|--------|
+| Llama 3.3 70B | 30 RPM, 14,400 RPD |
+| Qwen3 235B | 30 RPM, 14,400 RPD |
+| GPT-OSS-120B | 30 RPM, 14,400 RPD |
+
+Also extremely fast inference.
+
+### OpenRouter
+🇺🇸 [openrouter.ai/keys](https://openrouter.ai/keys)
+
+**Limits**: 20 RPM, 50 RPD (up to 1,000 RPD with $10 lifetime topup)
+
+Free models (`:free` suffix):
+- Gemma 3 27B, 12B, 4B
+- Llama 3.3 70B
+- Mistral Small 3.1
+- Nemotron 3 Nano
+- GPT-OSS-120B, 20B
+- Qwen3 4B, Qwen3 Coder
+- GLM-4.5 Air
+- +15 more
+
+### GitHub Models
+🇺🇸 [github.com/marketplace/models](https://github.com/marketplace/models)
+
+**Limits**: 10-15 RPM, 50-150 RPD (varies by Copilot tier)
+
+| Available Models |
+|-----------------|
+| GPT-5, GPT-4o, GPT-4.1 |
+| o3, o4-mini, o1 |
+| Llama 4 Scout/Maverick |
+| DeepSeek-R1 |
+| Grok 3 |
+| Phi-4 |
+| +30 more |
+
+**Best selection of proprietary models** on a free tier.
+
+### Cloudflare Workers AI
+🇺🇸 [dash.cloudflare.com/profile/api-tokens](https://dash.cloudflare.com/profile/api-tokens)
+
+**Limits**: 10,000 neurons/day
+
+| Available Models |
+|-----------------|
+| Llama 3.3 70B |
+| Llama 4 Scout |
+| GPT-OSS-120B |
+| Qwen QwQ 32B |
+| Gemma 3 12B |
+| Mistral Small 3.1 |
+| +47 more |
+
+### Hugging Face Inference
+🇺🇸 [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+
+**Limits**: $0.10/month in free credits
+
+Access to models across multiple inference providers. Limited to models <10GB (with exceptions for popular models).
+
+### Vercel AI Gateway
+🇺🇸 [vercel.com/docs/ai-gateway](https://vercel.com/docs/ai-gateway)
+
+**Limits**: $5/month free tier
+
+Routes to various supported providers with curated model selection.
+
+### LLM7.io
+🇬🇧 [token.llm7.io](https://token.llm7.io)
+
+**Limits**: 30 RPM (120 with token)
+
+| Available Models |
+|-----------------|
+| DeepSeek R1 |
+| Flash-Lite |
+| Qwen2.5 Coder |
+| +27 more |
+
+### OpenCode Zen
+🇺🇸 Via OpenCode setup
+
+Free models with data usage for improvement:
+- Big Pickle Stealth
+- MiniMax M2.5 Free
+- Arcee Large Preview Free
+
+---
+
+## Providers with Trial Credits
+
+These require sign-up but give you credits to spend — they will expire.
+
+| Provider | Credits | Duration | Notable Models |
+|----------|---------|----------|----------------|
+| **Fireworks** | $1 | Permanent | Various open models |
+| **Baseten** | $30 | Permanent | Pay by compute time |
+| **Nebius** | $1 | Permanent | Various open models |
+| **Novita** | $0.50 | 1 year | Various open models |
+| **AI21** | $10 | 3 months | Jamba family |
+| **Upstage** | $10 | 3 months | Solar Pro/Mini |
+| **NLP Cloud** | $15 | Permanent | Various (phone req.) |
+| **Alibaba Model Studio** | 1M tokens/model | Permanent | Qwen models |
+| **Modal** | $5-30/month | Monthly | Any model |
+| **Inference.net** | $1-26 | Varies | Various open models |
+| **Hyperbolic** | $1 | Permanent | DeepSeek, Llama, Qwen |
+| **SambaNova** | $5 | 3 months | DeepSeek, Llama, Qwen |
+| **Scaleway** | 1M tokens | Permanent | Mistral, Llama, DeepSeek |
+
+---
+
+## Quick Comparison: Best Free Tiers by Use Case
+
+| Use Case | Best Provider | Why |
+|----------|---------------|-----|
+| **Fastest inference** | Groq, Cerebras | 500+ tok/s |
+| **Most models** | NVIDIA NIM | 50+ models |
+| **Best proprietary access** | GitHub Models | GPT-5, o3, Grok 3 |
+| **Highest limits** | Mistral | 1B tokens/month |
+| **Most generous RPD** | Google (Gemma) | 14,400 RPD |
+| **No verification** | OpenRouter | Just sign up |
+| **EU data residency** | Mistral | EU-based |
+
+---
+
+## API Compatibility
+
+All providers listed are **OpenAI SDK-compatible**. You can use:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.provider.com/v1",
+    api_key="your-key"
+)
+
+response = client.chat.completions.create(
+    model="model-name",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+```
+
+Just change the `base_url` and `api_key` for each provider.
+
+---
+
+## The Bottom Line
+
+You can build and prototype with LLMs entirely for free in 2026. The combination of:
+- **Google AI Studio** for Gemini
+- **Groq** for fast inference
+- **GitHub Models** for proprietary access
+- **OpenRouter** for variety
+
+...gives you access to nearly every major model without spending anything.
+
+Start with OpenRouter if you want zero friction — no phone verification, no credit card, instant access.
+
+**Source**: [cheahjs/free-llm-api-resources](https://github.com/cheahjs/free-llm-api-resources) (community-maintained list)
+
+---
+
+*Building with AI APIs? Follow for more developer resources and cost optimization guides.*
