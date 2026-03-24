@@ -1,0 +1,207 @@
+---
+title: "NVIDIA Nemotron 3 Nano 4B: A 4-Billion Parameter Model With 262K Context for Edge AI"
+description: "NVIDIA's Nemotron 3 Nano 4B is a 4B parameter Mamba-hybrid model with 262K context that runs in 5GB RAM. Built for edge AI, gaming NPCs, and local assistants."
+publishedAt: "2026-03-23"
+tags: ["nvidia", "nemotron", "edge-ai", "mamba", "local-llm"]
+image: "/blog/images/nemotron-benchmark.png"
+---
+
+**TL;DR**: NVIDIA dropped Nemotron 3 Nano 4B — a hybrid Mamba-Transformer model that fits in 5GB RAM, supports 262K context, and is designed for edge devices like Jetson, GeForce RTX, and DGX Spark. It handles reasoning and tool-calling out of the box.
+
+![Nemotron 3 Nano Benchmark Comparison](/blog/images/nemotron-benchmark.png)
+
+---
+
+A week after releasing the 120B Super model, NVIDIA went the other direction: a 4-billion parameter model built for your laptop, your edge device, and your local setup.
+
+Nemotron 3 Nano 4B isn't just small — it's architecturally different. It uses a hybrid Mamba-2 and Transformer architecture that makes it faster and more memory-efficient than pure Transformer models of similar size.
+
+## Why This Model Matters
+
+Most small language models are either:
+1. **Too dumb** for real tasks (basic chat, no reasoning)
+2. **Too slow** for edge deployment (attention-heavy, memory-hungry)
+
+Nemotron 3 Nano 4B solves both problems:
+
+- **Reasoning on/off toggle**: Enable chain-of-thought reasoning via system prompt, or turn it off for faster responses
+- **262K context window**: Process long documents locally
+- **~5GB RAM at 8-bit**: Runs on consumer hardware
+- **Tool calling built-in**: Agentic capabilities without fine-tuning
+
+The hybrid architecture uses primarily Mamba-2 layers (state-space models) with just 4 Transformer attention layers. This gives you the long-context efficiency of Mamba with the reasoning capability of attention — best of both worlds.
+
+![Nemotron 3 Nano Architecture](/blog/images/nemotron-architecture.png)
+
+## Target Use Cases
+
+NVIDIA designed this specifically for edge AI:
+
+- **Gaming NPCs**: AI companions that respond in real-time
+- **Voice assistants**: Local processing without cloud latency
+- **IoT automation**: Run AI on embedded systems
+- **Agentic coding**: Tool use and function calling at the edge
+
+The model works on Jetson Thor, GeForce RTX GPUs, and DGX Spark.
+
+## How to Run It Locally
+
+### Option 1: Transformers (Python)
+
+```python
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+tokenizer = AutoTokenizer.from_pretrained("nvidia/NVIDIA-Nemotron-3-Nano-4B")
+model = AutoModelForCausalLM.from_pretrained(
+    "nvidia/NVIDIA-Nemotron-3-Nano-4B",
+    torch_dtype=torch.bfloat16,
+    trust_remote_code=True,
+    device_map="auto"
+)
+
+messages = [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "Explain quantum computing in simple terms"},
+]
+
+tokenized_chat = tokenizer.apply_chat_template(
+    messages,
+    tokenize=True,
+    add_generation_prompt=True,
+    return_tensors="pt"
+).to(model.device)
+
+outputs = model.generate(
+    tokenized_chat,
+    max_new_tokens=256,
+    temperature=0.7,
+    top_p=0.95
+)
+print(tokenizer.decode(outputs[0]))
+```
+
+### Option 2: GGUF with llama.cpp
+
+Unsloth has quantized versions ready:
+
+```bash
+# Download the GGUF
+huggingface-cli download unsloth/NVIDIA-Nemotron-3-Nano-4B-GGUF
+
+# Run with llama.cpp
+./llama-cli -m NVIDIA-Nemotron-3-Nano-4B-Q8_0.gguf -p "Hello!" --special
+```
+
+The `--special` flag is important — the model uses separate tokens that need to be preserved.
+
+### Option 3: vLLM Server
+
+For production deployments:
+
+```bash
+pip install -U "vllm>=0.15.1"
+
+vllm serve nvidia/NVIDIA-Nemotron-3-Nano-4B-BF16 \
+  --served-model-name nemotron3-nano-4B \
+  --max-num-seqs 8 \
+  --tensor-parallel-size 1 \
+  --max-model-len 262144 \
+  --port 8000 \
+  --trust-remote-code
+```
+
+Then hit it with the OpenAI-compatible API.
+
+## Reasoning Mode: On or Off
+
+The model supports two modes:
+
+**Reasoning ON (default)**: Generates a thinking trace before the final answer. Better for complex tasks.
+
+```python
+tokenized_chat = tokenizer.apply_chat_template(
+    messages,
+    tokenize=True,
+    enable_thinking=True,  # default
+    add_generation_prompt=True,
+    return_tensors="pt"
+)
+```
+
+**Reasoning OFF**: Skips the thinking trace for faster responses. Slight accuracy drop on hard prompts.
+
+```python
+tokenized_chat = tokenizer.apply_chat_template(
+    messages,
+    tokenize=True,
+    enable_thinking=False,
+    add_generation_prompt=True,
+    return_tensors="pt"
+)
+```
+
+For tool calling, NVIDIA recommends `temperature=0.6` and `top_p=0.95`. For reasoning tasks, use `temperature=1.0`.
+
+## Architecture Deep Dive
+
+Nemotron 3 Nano uses the "Nemotron-Hybrid" architecture:
+
+| Component | Details |
+|-----------|---------|
+| Base | Mamba-2 + MLP layers |
+| Attention | Only 4 Transformer layers |
+| Parameters | 3.97B |
+| Context | 262K tokens |
+| Training | 10T+ tokens |
+
+The model was compressed from the 9B Nemotron-Nano-v2 using NVIDIA's Elastic framework — so you get the knowledge of a larger model in a smaller footprint.
+
+Training data includes synthetic reasoning traces from DeepSeek R1, Qwen3-235B, and Nemotron 4 340B.
+
+![NVIDIA Nemotron Model Family](/blog/images/nemotron-family.png)
+
+## Benchmarks
+
+From the technical report, Nemotron 3 Nano 4B achieves competitive results on:
+- Agentic coding tasks
+- Tool calling / function calling
+- General chat and instruction following
+- Mathematical reasoning (with reasoning mode on)
+
+It's not going to beat GPT-4 or Claude — but for a 4B model running locally, the capability-to-size ratio is impressive.
+
+## License
+
+**NVIDIA Nemotron Open Model License** — commercial use allowed with some restrictions. Check the full license before deploying in production.
+
+## When to Use Nemotron 3 Nano vs Other Small Models
+
+| Model | Params | Context | Architecture | Best For |
+|-------|--------|---------|--------------|----------|
+| Nemotron 3 Nano | 4B | 262K | Mamba-Hybrid | Edge agentic, tool calling |
+| Phi-3 Mini | 3.8B | 128K | Transformer | General chat |
+| Qwen2.5 3B | 3B | 32K | Transformer | Multilingual |
+| Gemma 2B | 2B | 8K | Transformer | Mobile deployment |
+
+Nemotron's edge is the combination of long context (262K) with the efficient Mamba architecture. If you need to process long documents or maintain extended conversations on constrained hardware, this is your model.
+
+## The Bottom Line
+
+NVIDIA is making a serious play for edge AI. Nemotron 3 Nano 4B gives you:
+
+1. 262K context in 5GB RAM
+2. Toggleable reasoning for speed vs accuracy tradeoffs
+3. Built-in tool calling for agentic workflows
+4. Mamba-hybrid architecture for efficient inference
+
+For local AI assistants, gaming NPCs, or embedded applications — this is now a top contender.
+
+**Links:**
+- [Unsloth GGUFs](https://huggingface.co/unsloth/NVIDIA-Nemotron-3-Nano-4B-GGUF)
+- [Technical Report](https://research.nvidia.com/labs/adlr/files/NVIDIA-Nemotron-Nano-2-Technical-Report.pdf)
+- [NVIDIA Developer Page](https://developer.nvidia.com/nemotron)
+
+---
+
+*Building edge AI? Follow for more local model guides and deployment strategies.*
