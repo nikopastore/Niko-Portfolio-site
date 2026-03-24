@@ -1,0 +1,204 @@
+---
+title: "Claude Code Agent Teams: The 5-Minute Setup + Real Use Cases"
+description: "Agent Teams aren't just sub-agents with a nicer name. They're a completely different execution model. Here's the setup, the architecture, and the specific scenarios where they're worth the extra tokens."
+publishedAt: "2026-03-24"
+tags: ["claude-code", "ai-agents", "anthropic", "developer-tools", "productivity"]
+image: "/blog/images/claude-agent-teams.jpg"
+---
+
+**TL;DR**: Claude Code Agent Teams let 3-5 independent Claude instances collaborate on the same project—sharing tasks, messaging each other, and coordinating in real-time. They're not a replacement for sub-agents. They're for when your workers need to actually talk to each other.
+
+---
+
+Most people hear "Agent Teams" and think it's just sub-agents with extra steps.
+
+It's not.
+
+Sub-agents work in isolation. They spin up, do their thing, die, and only a summary comes back. Agent Teams? They share context, claim tasks from a shared list, message each other directly, and can even challenge each other's findings.
+
+That's a fundamentally different execution model.
+
+I've been running both patterns for the past few weeks. Here's what actually works.
+
+## The Setup (5 Minutes)
+
+Agent Teams are still experimental, so they're behind a feature flag.
+
+### Step 1: Update Claude Code
+
+Make sure you're on v2.1.32 or later:
+
+```bash
+claude --version
+```
+
+If you're behind, update:
+
+```bash
+npm update -g @anthropic-ai/claude-code
+```
+
+### Step 2: Enable the Feature Flag
+
+Open your settings:
+
+```bash
+code ~/.claude/settings.json
+```
+
+Add this to your global settings:
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
+```
+
+Save and restart your terminal.
+
+### Step 3: Create a Team
+
+Agent Teams activate when you explicitly ask Claude Code to create one. Example prompt:
+
+> "I'm designing a CLI tool that tracks TODO comments across a codebase. Create an agent team to explore this from different angles: one teammate on UX, one on technical architecture, one playing devil's advocate."
+
+That's it. Claude creates the team, spawns the teammates, and starts coordinating.
+
+## The Best Display Mode (Split Panes)
+
+Here's where Agent Teams really shine: watching all your agents work in parallel.
+
+The default "in-process" mode crams everything into one terminal. Fine for small teams, but you miss the magic.
+
+**For iTerm2 (macOS):**
+
+1. Install iTerm2 if you haven't
+2. Go to **Settings → General → Magic**
+3. Enable **Python API**
+4. Restart iTerm2
+
+Then launch with:
+
+```bash
+claude --teammate-mode tmux
+```
+
+This opens one pane for the team lead and separate panes for each teammate. You can click into any pane, watch what they're doing live, and even send direct messages.
+
+**For tmux users:**
+
+Same command works. It auto-detects whether you're using tmux or iTerm2.
+
+## Sub-Agents vs Agent Teams: The Real Difference
+
+This is the key insight most articles miss.
+
+| | Sub-Agents | Agent Teams |
+|---|---|---|
+| **Context** | Own context; results summarized back | Own context; fully independent |
+| **Communication** | Report back to main agent only | Message each other directly |
+| **Coordination** | Main agent manages everything | Shared task list, self-coordination |
+| **Best for** | Focused tasks where only results matter | Complex work requiring discussion |
+| **Token cost** | Lower | Higher (each is a full Claude instance) |
+
+**Use sub-agents when:** You need quick, focused workers that report back. "Go analyze this file and tell me what you find."
+
+**Use Agent Teams when:** Workers need to share findings, challenge each other, and coordinate on their own. "Investigate this bug from multiple angles and debate until you find consensus."
+
+## How It Actually Works Under the Hood
+
+Agent Teams use five internal tools that work together:
+
+1. **TeamCreate** — Sets up scaffolding (creates `.claude/teams/<team-id>/`)
+
+2. **TaskCreate** — Adds tasks as JSON files with status tracking, dependencies, and ownership. Different from the old Task tool—this specifically creates todos.
+
+3. **Task tool (upgraded)** — Same as before, but with new `name` and `team_name` params that activate team mode instead of simple sub-agent mode
+
+4. **taskUpdate** — Agents claim tasks, update status, mark things done
+
+5. **sendMessage** — The real unlock. Supports direct messages (agent → agent) and broadcasts (agent → all teammates). Messages get written to `.claude/teams/<team-id>/inbox/` and injected into each agent's conversation history.
+
+When the lead wants to shut down a teammate, it sends a `shutdown_request`. The teammate confirms with `shutdown_response`, and the session terminates cleanly.
+
+## When Agent Teams Are Actually Worth It
+
+The best use case I've found: **debugging with competing hypotheses.**
+
+From Anthropic's official docs:
+
+> "Users report the app exits after one message instead of staying connected. Spawn 5 agent teammates to investigate different hypotheses. Have them talk to each other to try to disprove each other's theories, like a scientific debate. Update the findings doc with whatever consensus emerges."
+
+That kind of collaborative, multi-angle investigation is nearly impossible with isolated sub-agents that only report back summaries.
+
+**Other strong use cases:**
+
+- **Cross-layer refactoring** — One teammate on frontend, one on backend, one on tests. They coordinate without waiting on each other.
+
+- **Research and review** — Multiple teammates investigate different aspects simultaneously, then share and challenge findings.
+
+- **New module development** — Each teammate owns a separate piece. No stepping on each other's toes.
+
+## When to Stick with Sub-Agents
+
+Agent Teams aren't always better. They add coordination overhead and burn more tokens.
+
+**Stick with sub-agents for:**
+
+- Sequential tasks where order matters
+- Same-file edits (agents will conflict)
+- Work with many dependencies
+- Simple, focused tasks where you just need the result
+
+## Best Practices
+
+**1. Require plan approval for risky work**
+
+```text
+Spawn an architect teammate to refactor the authentication module.
+Require plan approval before they make any changes.
+```
+
+The teammate plans in read-only mode until the lead approves.
+
+**2. Be explicit about team structure**
+
+```text
+Create a team with 4 teammates to refactor these modules in parallel.
+Use Sonnet for each teammate.
+```
+
+Claude will decide team size automatically, but you can override.
+
+**3. Always clean up through the lead**
+
+When you're done:
+
+```text
+Clean up the team
+```
+
+Don't try to clean up from a teammate's session—it can leave resources in an inconsistent state.
+
+**4. Use hooks for quality gates**
+
+- `TeammateIdle` — Runs when a teammate is about to go idle. Exit with code 2 to keep them working.
+- `TaskCompleted` — Runs when a task is being marked complete. Exit with code 2 to prevent completion and send feedback.
+
+## The Bottom Line
+
+Agent Teams aren't a replacement for sub-agents. They're a different tool for a different job.
+
+Sub-agents: "Go do this thing and report back."
+
+Agent Teams: "Work together, challenge each other, and figure this out as a group."
+
+If your task benefits from parallel work where agents need to communicate, Agent Teams are worth the extra tokens. If you just need focused workers that report results, sub-agents are still the move.
+
+Try them both. You'll know pretty quickly which fits your workflow.
+
+---
+
+*Want more Claude Code deep dives? Follow along as I document what works (and what doesn't) building with AI tools.*
