@@ -1,0 +1,183 @@
+---
+title: "OpenClaw Week One: 7 Mistakes That Will Cost You $50 and 5 Hours"
+description: "I've helped 50+ people fix their OpenClaw setups. The pattern is always the same: mistakes in week one that take 5 minutes to prevent but 5 hours to fix. Here's the survival guide."
+publishedAt: "2026-03-25"
+tags: ["openclaw", "ai-agents", "beginner", "tutorial", "cost-optimization"]
+image: "/blog/images/openclaw-beginner.jpg"
+---
+
+**TL;DR**: I've helped 50+ people fix their OpenClaw setups. The pattern is always the same — mistakes in week one that take 5 minutes to prevent but 5 hours to fix later. This is the survival guide.
+
+---
+
+Every week, someone DMs me with the same story:
+
+"I installed OpenClaw. It worked for a day. Then my bill was $47. Now nothing makes sense and I'm considering uninstalling."
+
+The fix is always something that would have taken 5 minutes on day one. Instead, they're debugging for hours, frustrated, ready to quit.
+
+This is everything I wish someone told me. In order. Do this before you build anything.
+
+---
+
+## Mistake #1: Running Opus by Default
+
+If you haven't touched your model setting, there's a good chance you're running Opus. Opus is the most expensive model available. It's incredible for complex work. It's also complete overkill for 90% of what you'll ask your agent to do this week.
+
+**Switch to Sonnet. Now.**
+
+```json
+{
+  "ai": {
+    "model": "claude-sonnet-4-5-20250929"
+  }
+}
+```
+
+One person I helped was spending **$47/week** without realizing it. We changed this one setting. Next week cost **$6**. Same agent, same tasks, same everything.
+
+You will not notice the difference for normal tasks. You will notice the difference on your bill.
+
+---
+
+## Mistake #2: Leaving Your Gateway Open
+
+If you're running OpenClaw on a VPS, check this immediately:
+
+```bash
+openclaw config get | grep host
+```
+
+If it says `0.0.0.0` or you don't see a host setting at all, **your agent is accessible to anyone on the internet who finds your IP**.
+
+That means a stranger could message your agent. Your agent that's about to have access to your email and calendar.
+
+**Fix it:**
+
+```json
+{
+  "gateway": {
+    "host": "127.0.0.1"
+  }
+}
+```
+
+Access through SSH tunnel: `ssh -L 18789:localhost:18789 user@your-vps`
+
+Takes 2 minutes. Do it now. Not after you set up Telegram. Now.
+
+---
+
+## Mistake #3: Skipping Your SOUL.md
+
+Your first message to your agent should NOT be a real task. It should be:
+
+> "Read BOOTSTRAP.md and walk me through it"
+
+This sets up your agent's identity. If you skip this (most people do because they're excited), your agent has zero personality and zero context about who you are. Everything will feel generic and robotic.
+
+If you already skipped it, create a SOUL.md manually:
+
+```markdown
+You are [agent name]. You assist [your name].
+
+Be direct. No filler. Match my tone.
+If I ask a question, answer it first. Then elaborate only if needed.
+Never say "absolutely", "great question", or "I'd be happy to."
+If you don't know something, say so. Don't guess.
+If a task will cost significant tokens, tell me before doing it.
+```
+
+That's it. 6 lines. Edit it over the next week whenever your agent does something annoying.
+
+**Pro tip**: "Never do X" lines work better than "try to be Y" lines. Your SOUL.md is built through irritation, not planning.
+
+---
+
+## Mistake #4: Installing Skills on Day One
+
+I know. ClaWHub has 13,000 skills and they all look cool. **Do not install any of them this week.**
+
+Here's why:
+
+- Some loop silently and burn tokens in the background. You won't know until you check your bill.
+- Some inject into every conversation and bloat your context window.
+- VirusTotal flagged hundreds as actively malicious. Infostealers, backdoors, the works.
+- You don't know what your agent can do *without* skills yet.
+
+Learn the stock capabilities first. You'll be surprised how much it handles on its own.
+
+**After week 1**, when your agent feels stable and your costs are predictable, add ONE skill. Test it for a few days. Then add another. Never more than one at a time.
+
+---
+
+## Mistake #5: Creating Multiple Agents
+
+Every new user thinks they need multiple agents. One for personal stuff, one for work, one for coding.
+
+You don't. Not yet.
+
+Every agent you create is an independent token consumer. Every agent needs its own channel binding. Every agent complicates debugging.
+
+I've seen so many people create a second agent to "fix" problems with the first one. Now they have two broken agents instead of one.
+
+**Get one agent working perfectly for 2 weeks.** Then decide if you actually need a second one. Most people don't.
+
+---
+
+## Mistake #6: Never Clearing Your Session
+
+This is the single most important thing nobody tells beginners.
+
+Every message you send in a session gets included in every future API call. After a week of chatting, you're sending thousands of tokens of old conversation with every new message. That costs money and makes your agent slower and more confused.
+
+**Type `/new` to start a fresh session.**
+
+Your agent doesn't forget anything. It still has all its memory files, SOUL.md, everything. You're just clearing the conversation buffer.
+
+Use `/new`:
+- Before any big task (research, writing, analysis)
+- When your agent starts acting weird or confused
+- At least once a day as a habit
+
+---
+
+## Mistake #7: Not Checking Your Costs Daily
+
+Run `openclaw status` or check your API provider's dashboard directly. Know what you're spending before it surprises you.
+
+If you're on Sonnet with one agent and no skills, you should be spending **$3-8/month** for moderate daily use. If you're spending more than that in your first week, something is wrong — and it's fixable.
+
+---
+
+## What Week One Should Actually Look Like
+
+**Day 1-2**: Set up SOUL.md, have normal conversations, ask it stupid questions, get comfortable.
+
+**Day 3-4**: Start using it for real tasks. Calendar, reminders, web searches, summarizing articles. The boring stuff.
+
+**Day 5-7**: Refine your SOUL.md based on what annoyed you. Check your costs. Get a feel for your daily usage.
+
+That's it. No skills. No second agent. No multi-agent orchestrator. No cron jobs. Just one agent that knows who you are and does basic tasks reliably.
+
+---
+
+## If That Feels Underwhelming, Good
+
+The people who are still using OpenClaw two months from now all started exactly like this. The people who quit started with 8 agents and 20 skills on day one.
+
+**After week 1**: If your agent feels useful, your costs are under $10, and nothing is randomly breaking — you're ready to start experimenting. Add web search if you haven't. Then a daily briefing skill. Then maybe calendar integration.
+
+Build slowly. Earn each new capability by making sure the last one is stable first.
+
+---
+
+## The Boring Truth
+
+The people who survive month one are the ones who started boring.
+
+Trust the boring.
+
+---
+
+*What mistakes did you make in week one? Drop a comment — might save someone else the headache.*
