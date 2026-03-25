@@ -1,0 +1,201 @@
+---
+title: "ServiceNow EVA: Why Accurate Voice Agents Sound Terrible (And Vice Versa)"
+description: "ServiceNow just released EVA, the first benchmark that measures both task accuracy AND conversation quality in voice agents. The finding: you can't optimize for both."
+publishedAt: "2026-03-25"
+tags: ["voice-ai", "benchmark", "servicenow", "ai-agents", "evaluation"]
+image: "/blog/images/voice-agent-benchmark.jpg"
+---
+
+**TL;DR**: ServiceNow released EVA, the first end-to-end benchmark for voice agents that measures both accuracy (did it complete the task?) and experience (was it natural to talk to?). The headline finding: there's a consistent tradeoff. Agents that nail accuracy tend to be verbose and robotic. Agents that sound great tend to cut corners on the actual task. You can't optimize for both — yet.
+
+---
+
+Voice agent benchmarks have been lying to us.
+
+Every existing framework evaluates pieces in isolation. ASR accuracy over here. TTS quality over there. LLM reasoning somewhere else. You can ace every metric and still build an agent that's genuinely terrible to talk to.
+
+ServiceNow just fixed this. Yesterday they released [EVA](https://huggingface.co/blog/ServiceNow-AI/eva) (Evaluating Voice Agents), an open-source framework that tests complete multi-turn conversations. Not transcription accuracy. Not speech synthesis quality. The whole interaction.
+
+And the results are uncomfortable.
+
+---
+
+## The Problem With Current Benchmarks
+
+Imagine you're benchmarking a customer service voice agent. Current frameworks would test:
+
+- **ASR**: Does it hear "rebook my flight" correctly?
+- **LLM**: Does it reason through the rebooking logic?
+- **TTS**: Does it pronounce "confirmation code 7X4Q" clearly?
+
+Each component passes. Ship it.
+
+But in production, the agent:
+- Reads you 47 flight options you can't skim (because it's audio)
+- Asks for your confirmation code three times because it misheard "7" as "F"
+- Has perfect timing but says things that are factually wrong
+- Completes the task but takes 8 minutes when a human would take 2
+
+None of these failures show up in component-level benchmarks. They only emerge in actual conversations.
+
+---
+
+## How EVA Works
+
+EVA runs full multi-turn conversations using a bot-to-bot architecture:
+
+1. **User Simulator** — An AI caller with a specific goal and persona
+2. **Voice Agent** — The system being tested (cascade or audio-native)
+3. **Tool Executor** — Backend systems the agent must actually call
+4. **Validators** — Automatic checks that conversations completed correctly
+5. **Metrics Suite** — Evaluation across two dimensions
+
+The key innovation: conversations run over live audio in real-time. The agent must hear, understand, reason, call tools, and speak — with all the timing, interruptions, and ambiguity that entails.
+
+---
+
+## Two Scores: EVA-A and EVA-X
+
+EVA produces two independent scores:
+
+### EVA-A (Accuracy)
+
+Did the agent actually complete the task?
+
+- **Task Completion** — Did the database end up in the correct state?
+- **Faithfulness** — Did the agent stick to policies or hallucinate?
+- **Speech Fidelity** — Did it say the right confirmation codes *out loud*?
+
+That last one is novel. EVA uses an audio language model to verify that critical entities (flight numbers, dollar amounts, confirmation codes) were actually spoken correctly — not just generated correctly.
+
+### EVA-X (Experience)
+
+Was the conversation usable?
+
+- **Conciseness** — Did the agent ramble? Phone users can't skim.
+- **Conversation Progression** — Did it avoid repetition and retain context?
+- **Turn-Taking** — Did it interrupt or leave awkward silences?
+
+Most benchmarks ignore experience entirely. EVA treats it as equally important.
+
+---
+
+## The Tradeoff That Changes Everything
+
+ServiceNow tested 20 systems — proprietary and open-source, cascade and audio-native. Here's what they found:
+
+**There's a consistent accuracy-experience tradeoff across the board.**
+
+Agents that score high on task completion:
+- Tend to be verbose (reading every option "to be thorough")
+- Sound robotic and unnatural
+- Confirm everything multiple times
+- Technically correct but exhausting to interact with
+
+Agents that score high on experience:
+- Sound natural and conversational
+- Respond quickly
+- Cut corners on verification steps
+- Miss edge cases and policy requirements
+
+**No single configuration dominated both axes.**
+
+This is a fundamental result. It means:
+
+1. You can't just "tune your prompts" to get both
+2. Accuracy and experience require different optimization strategies
+3. Commercial deployments need to pick their tradeoff point consciously
+
+---
+
+## What Breaks Voice Agents
+
+EVA surfaced specific failure modes:
+
+### Named Entity Transcription
+
+A single misheard character cascades into authentication failure. "Confirmation code 7X4Q" becomes "FX4Q" and the entire conversation derails.
+
+This is the dominant failure across all systems tested.
+
+### Multi-Step Workflows
+
+Simple tasks work. Complexity breaks things.
+
+Example: Rebooking a flight while preserving ancillary services (seat selection, baggage) is the hardest task in the benchmark. It requires the agent to:
+- Look up the original booking
+- Find alternative flights
+- Check policy constraints
+- Preserve existing upgrades
+- Execute the change
+- Confirm the new itinerary verbally
+
+Most agents fail somewhere in this chain.
+
+### Consistency
+
+Even agents that *can* complete a task often can't do so consistently. The gap between pass@3 (at least one success in 3 tries) and pass^3 (all 3 tries succeed) is substantial across all systems.
+
+For production use, you need consistency. Most current voice agents don't have it.
+
+---
+
+## What This Means For Builders
+
+If you're building voice agents commercially:
+
+**1. Measure both dimensions**
+
+Task completion alone is insufficient. An agent that completes tasks but frustrates users will fail in production.
+
+**2. Pick your tradeoff consciously**
+
+- High-stakes domains (healthcare, finance): optimize for accuracy, accept some verbosity
+- Consumer convenience: optimize for experience, accept some error rate
+- Hybrid: aggressive accuracy for critical steps, natural conversation elsewhere
+
+**3. Focus on entity handling**
+
+Confirmation codes, phone numbers, account IDs — these are where voice agents fail most catastrophically. Build robust verification loops.
+
+**4. Test end-to-end**
+
+Component-level metrics are necessary but not sufficient. Run full conversations through your system before shipping.
+
+---
+
+## The Dataset
+
+EVA ships with 50 airline scenarios covering:
+- Flight rebooking
+- Cancellations
+- Same-day standby
+- Compensation vouchers
+- IRROPS (irregular operations) handling
+
+ServiceNow says more domains are coming. The framework is open-source, so you can add your own.
+
+---
+
+## Try It
+
+- **Website**: [servicenow.github.io/eva](https://servicenow.github.io/eva)
+- **Code**: [github.com/ServiceNow/eva](https://github.com/ServiceNow/eva)
+- **Dataset**: [huggingface.co/datasets/ServiceNow-AI/eva](https://huggingface.co/datasets/ServiceNow-AI/eva)
+- **Live Demo**: Available on the website
+
+---
+
+## The Uncomfortable Truth
+
+We've been building voice agents optimized for metrics that don't capture what matters. An agent can be accurate without being usable. It can sound great without being correct.
+
+EVA forces us to measure both — and accept that we can't maximize both simultaneously. At least not yet.
+
+The teams that internalize this tradeoff early will build voice agents that actually work in production. The teams that keep optimizing accuracy in isolation will wonder why users hate their "objectively better" system.
+
+The benchmark is open. The tradeoff is real. Now we can finally measure what matters.
+
+---
+
+*Building voice agents? How are you balancing accuracy vs. experience? Drop a comment.*
