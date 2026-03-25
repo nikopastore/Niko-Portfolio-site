@@ -1,0 +1,186 @@
+---
+title: "Turn Your Old Phone Into an AI Agent (Complete 2026 Guide)"
+description: "That old Android in your drawer can become a 24/7 AI automation node. OpenClaw + MobileRun lets your agent control apps, scrape data, and execute tasks — no APIs required."
+publishedAt: "2026-03-25"
+tags: ["openclaw", "android", "ai-agents", "automation", "mobilerun"]
+image: "/blog/images/old-phone-ai-agent.jpg"
+---
+
+**TL;DR**: That old Android phone collecting dust in your drawer? It can become a 24/7 AI agent that controls apps, executes tasks, and automates workflows. OpenClaw + MobileRun lets your agent see the screen and tap buttons — no app APIs required.
+
+---
+
+What if your old phone could do more than sit in a drawer?
+
+Thanks to OpenClaw and tools like MobileRun, you can turn a forgotten Android device into an autonomous AI agent. It sees the screen, reasons about what to do, and executes multi-step tasks on its own.
+
+This isn't theoretical. TECNO is about to ship phones with OpenClaw built-in. But you don't need to wait — you can set this up today with hardware you already own.
+
+---
+
+## Why This Works (When APIs Don't)
+
+Most automation assumes apps have APIs. Most apps don't.
+
+- Uber? No public API.
+- WhatsApp? Business API costs money and requires approval.
+- Your banking app? Your food delivery app? Nothing.
+
+But every app has a screen. Buttons you can tap. Text you can read. Fields you can type into.
+
+**The insight:** Instead of calling APIs, let the AI agent look at the screen and decide what to do — exactly like a human would.
+
+---
+
+## How It Works: Accessibility Trees + LLMs
+
+Android has a built-in accessibility system designed for screen readers. This "accessibility tree" contains every UI element — buttons, text fields, labels, checkboxes — in a structured format.
+
+The agent reads this tree, sends it to an LLM (Claude, GPT, Gemini), and asks: "Here's what's on screen. What should I do next?"
+
+The LLM responds with reasoning and an action:
+
+![Terminal showing agent execution steps](/blog/images/agent-terminal-steps.jpg)
+*The agent reasons about what it sees and executes actions step by step.*
+
+```
+--- step 1/30 ---
+think: I'm on the home screen. Launching YouTube.
+action: launch (842ms)
+
+--- step 2/30 ---
+think: YouTube is open. Tapping the search icon.
+action: tap (623ms)
+
+--- step 3/30 ---
+think: Search field focused.
+action: type "lofi hip hop" (501ms)
+```
+
+This isn't a brittle script that breaks when an app updates. The agent **reasons about what it sees in real-time**. If a button moved or a modal popped up, it adapts.
+
+When the accessibility tree is empty (games, webviews, custom views), the agent falls back to vision — actually looking at the screen pixels.
+
+---
+
+## Why Old Phones Are Perfect
+
+1. **They're free** — you already own them
+2. **Nobody's using them** — run agents 24/7 without interruption
+3. **They have real hardware** — camera, GPS, sensors, cellular
+4. **Always-on** — plug into a charger, connect to Wi-Fi, forget about it
+
+Instead of collecting dust, these phones become dedicated automation nodes.
+
+---
+
+## Three Setup Options
+
+### Option 1: Droidrun Framework (Open-Source, Self-Hosted)
+
+For developers who want full control.
+
+**Requirements:**
+- Old Android phone
+- Computer with ADB installed
+- USB cable
+
+**How it works:**
+- Phone connects to your computer via USB
+- OpenClaw runs on the computer as a bridge
+- Agent executes tasks on Android via ADB commands
+
+**GitHub:** 7.8K+ stars, actively maintained
+
+**Best for:** Developers, custom workflows, maximum control
+
+---
+
+### Option 2: MobileRun Cloud (Managed, No ADB)
+
+No terminal required. Works with your personal phone.
+
+**Setup:**
+1. Create account at [cloud.mobilerun.ai](https://cloud.mobilerun.ai/)
+2. Install Portal APK on your phone
+3. Enable Accessibility permission and notifications
+4. Get API key (starts with `dr_sk_`)
+5. Long-press "Connect to MobileRun" in Portal, paste key
+
+**Best for:** Non-developers, quick setup, managed infrastructure
+
+---
+
+### Option 3: OpenClaw + MobileRun (Full AI Agent)
+
+The most powerful setup — chain phone control with web search, calendars, messaging.
+
+**Setup:**
+1. Install MobileRun skill in OpenClaw
+2. Configure API key in OpenClaw config
+3. Connect your Android device via Portal app
+4. Run OpenClaw with phone automation tasks
+
+**Now you can say:**
+- "Open Instagram and like the latest post from @natgeo"
+- "Check my WhatsApp messages and summarize them"
+- "Book an Uber to the airport for 6am tomorrow"
+- "Screenshot my bank balance and add it to my spreadsheet"
+
+**Best for:** Power users, complex multi-step workflows, integration with other OpenClaw skills
+
+---
+
+## Real Use Cases
+
+**Personal automation:**
+- Morning routine: check weather, read notifications, summarize news
+- Social media: auto-like, schedule posts, track engagement
+- Messaging: summarize unread messages, draft replies
+
+**Data collection:**
+- Price monitoring on apps without APIs
+- Screenshot dashboards and extract data
+- Track inventory or availability
+
+**Testing & QA:**
+- Automated app testing on real devices
+- Regression testing across Android versions
+- Screenshot comparison
+
+**Always-on assistant:**
+- Dedicated device for specific workflows
+- 24/7 monitoring and alerts
+- Background task execution
+
+---
+
+## What's Coming: TECNO's EllaClaw
+
+Phone manufacturer TECNO is integrating OpenClaw directly into their smart assistant, Ella. The result is "EllaClaw" — an AI assistant with OpenClaw's capabilities built into the phone.
+
+**Three permission levels:**
+1. **Basic:** Schedule events, manage files (like Gemini's agentic features)
+2. **Deep:** Access SMS, Gallery, Calendar across apps (like Pixel's Magic Cue)
+3. **Learning:** Adapt to user habits over time, increase automation
+
+Beta trial coming soon. This is where phone AI agents are headed.
+
+---
+
+## Getting Started Today
+
+1. **Find your old phone** (check that drawer)
+2. **Charge it up**, connect to Wi-Fi
+3. **Pick your approach:**
+   - Developer → Droidrun (free, open-source)
+   - Quick setup → MobileRun Cloud (Portal app)
+   - Full AI agent → OpenClaw + MobileRun skill
+4. **Start simple:** "Open Settings and tell me the Android version"
+5. **Build up:** Chain tasks, schedule automations, go wild
+
+That phone in your drawer has been waiting. Give it something to do.
+
+---
+
+*What would you automate with a dedicated phone agent? Drop a comment.*
