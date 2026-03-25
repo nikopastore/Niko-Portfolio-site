@@ -1,0 +1,252 @@
+---
+title: "42 OpenClaw Use Cases That Actually Work (With Ready-to-Use .md Files)"
+description: "Community-curated collection of 42 real OpenClaw automations — from daily digests to self-healing servers. Includes my production stack and lessons learned."
+publishedAt: "2026-03-25"
+tags: ["openclaw", "ai-agents", "automation", "productivity", "workflows"]
+image: "/blog/images/openclaw-usecases.jpg"
+---
+
+**TL;DR**: Most people install OpenClaw and use it for chat. That's like buying a Tesla to charge your phone. A community repo just dropped with 42 battle-tested use cases — each with deployable .md files. I run 15+ automations daily and validated which ones actually work. Here's the breakdown.
+
+---
+
+Most OpenClaw users hit the same wall.
+
+You install it. You connect it to Telegram or Discord. You ask it questions. It answers. Feels cool for a week. Then you wonder: *Is this it?*
+
+No. This is about 5% of what the tool can do.
+
+The gap isn't technical — it's imagination. You don't know what's possible because you haven't seen what others have built. That changed when Hesam Sheikh published [awesome-openclaw-usecases](https://github.com/hesamsheikh/awesome-openclaw-usecases), a community collection of 42 real-world setups with ready-to-deploy configuration files.
+
+I went through all of them. I already run 15+ automations myself. Here's what works, what's overhyped, and what I've built that goes further.
+
+---
+
+## The Foundation: What I Actually Run
+
+Before diving into the community list, here's my production stack that's been running for months:
+
+### Morning Standup (Daily, 6am)
+
+Weather, calendar, top priorities — delivered automatically before I check my phone. Uses GLM-5 (free via NVIDIA) for the cron job. Total cost: $0.
+
+```yaml
+schedule: "0 6 * * *"
+model: glm5
+```
+
+### Memory Vault
+
+Not on the community list, but **the #1 thing you need**. A tiered vault structure that survives compaction:
+
+- `MEMORY.md` — Executive summary (~500 tokens, always loaded)
+- `daily/` — Daily logs
+- `projects/` — Active project docs
+- `decisions/` — Why you made choices (critical for long-term context)
+- `facts/` — Immutable stuff (credentials, preferences)
+
+Without this, your agent forgets everything between sessions. [Full setup guide here.](/blog/openclaw-101-setup-guide)
+
+### Browser Task Queue
+
+Any browser automation gets queued and processed by GLM-5 workers. Claude never touches browser tasks directly — that would burn $50/week on wasted tokens.
+
+```bash
+~/browser-queue/add-task.sh "Apply to job at URL" "channel:1234"
+```
+
+### Model Routing
+
+Different models for different jobs:
+
+- **Main chat**: Claude Sonnet ($)
+- **Cron jobs**: GLM-5 (free)
+- **Sub-agents**: GLM-5, fallback to Kimi (both free)
+- **Coding**: Codex (specialized)
+
+This alone cut my monthly costs from ~$200 to ~$60.
+
+---
+
+## Community Use Cases: The Validated List
+
+Now let's look at the community collection. I've categorized them by what actually delivers value.
+
+### Tier 1: Deploy Today (Proven Value)
+
+**Daily Reddit Digest**
+
+Subscribe to your favorite subreddits. Get a summarized digest every morning. No more doomscrolling.
+
+*My take: Running this for AI news. Works great with GLM-5.*
+
+**Custom Morning Brief**
+
+Fully customized daily briefing — news, tasks, content drafts, AI-recommended actions.
+
+*My take: I built this before the community version existed. The morning-standup skill does this.*
+
+**Second Brain**
+
+Text anything to your bot to remember it. Search through all your memories in a dashboard.
+
+*My take: The Memory Vault pattern does this better. QMD files + Obsidian > custom dashboard.*
+
+**Inbox De-clutter**
+
+Newsletter overload? Summarize everything into a single digest.
+
+*My take: Running this. Saved my sanity. Pairs well with calendar integration.*
+
+**Pre-Build Idea Validator**
+
+Scan GitHub, HN, npm, PyPI, and Product Hunt before building anything new.
+
+*My take: Haven't used, but the concept is solid. Stop building things nobody wants.*
+
+---
+
+### Tier 2: Worth It For Power Users
+
+**Self-Healing Home Server**
+
+Run an always-on infrastructure agent with SSH access. It monitors your network and fixes problems.
+
+*My take: Running a lighter version — heartbeat checks + self-heal for Discord disconnects. Full SSH access is powerful but dangerous.*
+
+**Multi-Agent Content Factory**
+
+Research, writing, and thumbnail agents working in dedicated Discord channels.
+
+*My take: Overkill unless you're publishing 20+ pieces/week. I use a simpler blog queue.*
+
+**n8n Workflow Orchestration**
+
+Delegate API calls to n8n via webhooks. Agent never touches credentials.
+
+*My take: Smart architecture for credential isolation. Worth exploring if you're paranoid about API key exposure.*
+
+**Personal CRM**
+
+Track contacts from email and calendar. Natural language queries.
+
+*My take: I use a simpler `people/` folder in my vault. "Who did I meet at that conference?" works fine with memory search.*
+
+**Health & Symptom Tracker**
+
+Track food and symptoms to identify triggers.
+
+*My take: Niche but clever. If you have mysterious health issues, this is golden.*
+
+---
+
+### Tier 3: Cool But Situational
+
+**Polymarket Autopilot**
+
+Paper trading on prediction markets with backtesting.
+
+*My take: I run dedicated Python bots for this. Agent orchestration is overkill for trading.*
+
+**AI Video Editing via Chat**
+
+Edit videos by describing changes in natural language.
+
+*My take: Impressive demo. Practical? Only if you edit videos regularly.*
+
+**Event Guest Confirmation**
+
+Call a list of guests via AI voice to confirm attendance.
+
+*My take: For event organizers. Most people don't need this.*
+
+**LaTeX Paper Writing**
+
+Write and compile papers conversationally.
+
+*My take: For academics. If you're writing papers, this is a time-saver.*
+
+---
+
+## What's Missing From the List
+
+The community list is great, but here's what I run that isn't covered:
+
+**Browser Task Queue**
+
+Async processing of any browser automation. Claude queues, GLM-5 executes. Costs nothing.
+
+**Deep Research Methodology**
+
+Adapted from ByteDance's DeerFlow. Systematic multi-angle research before any content generation. [Source here.](https://github.com/bytedance/deer-flow)
+
+**Model Rotation with Fallbacks**
+
+NVIDIA rate limits at ~40 req/min. My setup auto-falls back to Kimi when GLM-5 is throttled.
+
+**Discord Channel Routing**
+
+Different channels → different behavior. Job search channel triggers job search skill. Blog channel triggers blog skill. Context-aware automation.
+
+---
+
+## The Cost Reality
+
+Before optimization:
+- All tasks on Claude Sonnet
+- Estimated: $150-200/month
+
+After optimization:
+- Chat: Claude Sonnet ($30-50)
+- Crons: GLM-5 (free)
+- Sub-agents: GLM-5/Kimi (free)
+- Coding: Codex ($20-30)
+- **Total: $50-80/month**
+
+The key insight: **Free models handle 80% of tasks.** Route aggressively.
+
+---
+
+## How to Start
+
+1. **Don't install 10 use cases on day one.** You'll burn $50 and break everything.
+
+2. **Start with Memory Vault.** Without persistent memory, everything else is useless.
+
+3. **Add Morning Standup.** Immediate daily value. Low complexity.
+
+4. **Set up model routing.** Stop paying Sonnet prices for background tasks.
+
+5. **After 2 weeks stable, add ONE use case.** Test it. Understand the failure modes. Then add another.
+
+The people still using OpenClaw after 3 months all started boring. Trust the boring.
+
+---
+
+## The Full List (Quick Reference)
+
+| Category | Use Cases |
+|----------|-----------|
+| **Content & Research** | Daily Reddit Digest, Multi-Source Tech News, arXiv Paper Reader, HF Papers Discovery |
+| **Productivity** | Second Brain, Custom Morning Brief, Inbox De-clutter, Habit Tracker, Todoist Sync |
+| **DevOps** | Self-Healing Home Server, n8n Orchestration, Project State Management |
+| **Business** | Multi-Channel Customer Service, Personal CRM, Market Research Factory, Idea Validator |
+| **Creative** | YouTube Content Pipeline, Multi-Agent Content Factory, Podcast Pipeline, AI Video Editing |
+| **Finance** | AI Earnings Tracker, Polymarket Autopilot |
+| **Personal** | Health Tracker, Family Calendar, Phone-Based Assistant |
+
+Browse the full collection: [awesome-openclaw-usecases](https://github.com/hesamsheikh/awesome-openclaw-usecases)
+
+---
+
+## What This Means
+
+The OpenClaw ecosystem is maturing past the "cool demo" phase. People aren't just chatting with AI agents — they're building persistent infrastructure that runs their businesses, manages their homes, and produces content while they sleep.
+
+The tools are there. The use cases are documented. The .md files are ready to deploy.
+
+The only question is: what are you automating?
+
+---
+
+*Running any of these? Drop a comment with your setup.*
