@@ -1,0 +1,129 @@
+---
+title: "5 OpenClaw Plugins That Actually Make It Production-Ready"
+description: "The default OpenClaw setup works for testing. These 5 plugins make it work for daily use — routing, memory, integrations, workflow automation, and observability."
+publishedAt: "2026-03-26"
+tags: ["openclaw", "plugins", "production", "ai-agents", "automation"]
+image: "/blog/images/openclaw-plugins.jpg"
+---
+
+**TL;DR**: The default OpenClaw setup works for testing. For daily use, you need better routing, memory, integrations, and observability. Here are 5 plugins that actually make a difference.
+
+---
+
+If you're using OpenClaw regularly, you start noticing patterns:
+
+- Simple tasks hit the same expensive model used for complex reasoning
+- MEMORY.md keeps growing but still misses the right context
+- Connecting tools like Slack, GitHub, or Gmail means dealing with auth and tokens
+- Sometimes the agent just stops mid-run and you have no clear trace
+
+The agent works, but the system around it feels inefficient.
+
+Most of this comes from how the default setup works. Skills are injected into the prompt on every run — which shapes behavior but increases token usage and doesn't solve routing, integrations, or observability.
+
+Plugins work differently. They run as separate processes, expose tools, and are only used when needed. No constant context overhead.
+
+After testing a bunch, these are the ones that actually made a difference:
+
+---
+
+## 1. Manifest — Smart Model Routing
+
+**What it does:** Adds a routing layer between OpenClaw and your model providers. Every request is classified and sent to the cheapest model that can handle it.
+
+**The problem it solves:** Without this, even simple tool calls go to your primary model. Want to check if a file exists? That's a $0.03 API call when it could be $0.001.
+
+**After routing:** Lightweight tasks stay cheap. Heavy reasoning still uses stronger models. Over time, this removes a lot of unnecessary spend.
+
+**GitHub:** [github.com/mnfst/manifest](https://github.com/mnfst/manifest)
+
+---
+
+## 2. Composio — Integration Management
+
+**What it does:** Handles integrations through an MCP server. Instead of managing API keys and token refresh yourself, you connect apps once.
+
+**The problem it solves:** OAuth flows, refresh cycles, and rate limits are painful. Each integration you add multiplies the complexity.
+
+**After Composio:** It manages OAuth, refresh cycles, and rate limits automatically. Each integration runs in isolation, so failures don't cascade. Multi-app workflows become stable instead of brittle.
+
+**GitHub:** [github.com/ComposioHQ/openclaw-composio](https://github.com/ComposioHQ/openclaw-composio)
+
+---
+
+## 3. Hyperspell — Knowledge Graph Memory
+
+**What it does:** Replaces the default memory system with a retrieval layer backed by a knowledge graph.
+
+**The problem it solves:** Default memory loads everything or relies on compressed memory. Both approaches miss context on longer sessions.
+
+**After Hyperspell:** It injects only the relevant context before each step. Prompts stay smaller, recall improves across longer sessions, and you don't need to manually curate what's loaded.
+
+**GitHub:** [github.com/hyperspell/hyperspell-openclaw](https://github.com/hyperspell/hyperspell-openclaw)
+
+---
+
+## 4. Foundry — Workflow Automation
+
+**What it does:** Watches how you use the agent and turns repeated workflows into tools.
+
+**The problem it solves:** You keep asking for the same sequences of actions. Each time, the agent has to reason through them from scratch.
+
+**After Foundry:** It detects patterns in your sessions and writes new tool definitions that persist across runs. These are executable tools with defined inputs and outputs — not just prompt instructions. Common workflows get faster and more reliable.
+
+**GitHub:** [github.com/lekt9/openclaw-foundry](https://github.com/lekt9/openclaw-foundry)
+
+---
+
+## 5. Opik — Observability and Tracing
+
+**What it does:** Adds structured tracing to agent runs. Captures LLM calls, tool inputs and outputs, latency, and token usage as spans.
+
+**The problem it solves:** When something goes wrong, you're reading through logs trying to figure out where the agent stopped or why.
+
+**After Opik:** You can follow the full execution path and see where things slowed down or failed. Debugging becomes tracing instead of guessing.
+
+**GitHub:** [github.com/comet-ml/opik-openclaw](https://github.com/comet-ml/opik-openclaw)
+
+---
+
+## How These Fit Together
+
+The default OpenClaw setup is designed for simplicity — one model, one memory system, manual integrations. It's great for getting started.
+
+For production use, you need:
+
+| Problem | Plugin |
+|---------|--------|
+| Cost optimization | Manifest |
+| Integrations | Composio |
+| Long-term memory | Hyperspell |
+| Repeated workflows | Foundry |
+| Debugging | Opik |
+
+Each plugin solves one specific problem. Together, they transform OpenClaw from a cool demo into something you can actually rely on daily.
+
+---
+
+## Installation Notes
+
+All five plugins follow the standard OpenClaw plugin installation pattern:
+
+1. Clone the repo to your plugins directory
+2. Add the plugin to your config
+3. Configure any required API keys or settings
+4. Restart OpenClaw
+
+Each plugin runs independently — you can add them one at a time without affecting others.
+
+---
+
+## The Bottom Line
+
+Skills shape how your agent thinks. Plugins change how your system works.
+
+For daily use, you need both — but the plugins are what make OpenClaw feel like production software instead of a prototype.
+
+---
+
+*What plugins have you added to your OpenClaw setup? Which ones made the biggest difference?*
