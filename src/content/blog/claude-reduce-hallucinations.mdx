@@ -1,0 +1,105 @@
+---
+title: "3 Claude Instructions Hidden in Anthropic's Docs That Actually Reduce Hallucinations"
+description: "Anthropic published three system prompt instructions that dramatically improve Claude's accuracy. Most developers have never seen them. Here's what they are and how to use them."
+publishedAt: "2026-03-26"
+tags: ["claude", "anthropic", "prompting", "ai", "llm"]
+image: "/blog/images/claude-hallucinations.jpg"
+---
+
+**TL;DR**: Anthropic's own documentation includes three system prompt instructions that dramatically reduce hallucinations. They're not hidden — just buried. Here's what they are and when to use them.
+
+---
+
+I kept getting confident-sounding outputs from Claude with zero sources. The kind of stuff that sounds right but you can't verify.
+
+Then I stumbled into Anthropic's "Reduce Hallucinations" documentation page. Found three system prompt instructions that changed everything.
+
+---
+
+## The Three Instructions
+
+### 1. "Allow Claude to say I don't know"
+
+Without this, Claude fills knowledge gaps with plausible fiction. With it, you actually get "I don't have enough information to answer that."
+
+Sounds simple. But the default behavior is to always give an answer, even when it shouldn't.
+
+**Add to your system prompt:**
+```
+If you don't have enough information to answer accurately, say "I don't know" or "I'm not certain." Do not guess or fill gaps with plausible-sounding information.
+```
+
+### 2. "Verify with citations"
+
+Tell Claude every claim needs a source. If it can't find one, it should retract the claim.
+
+I watched statements vanish from outputs when I turned this on. Statements that sounded authoritative before suddenly had no backing.
+
+**Add to your system prompt:**
+```
+Every factual claim must include a citation. If you cannot provide a source for a claim, retract the claim rather than stating it without evidence.
+```
+
+### 3. "Use direct quotes for factual grounding"
+
+Force Claude to extract word-for-word quotes from documents before analyzing them. This stops the paraphrase-drift where the model subtly changes meaning while summarizing.
+
+**Add to your system prompt:**
+```
+When referencing documents or sources, extract direct quotes before providing analysis. Use the exact wording from the source material rather than paraphrasing.
+```
+
+---
+
+## Each One Helps. All Three Together Transform Output Quality.
+
+Individually, these instructions improve accuracy. Combined, they fundamentally change how Claude handles uncertainty and evidence.
+
+**Before:** Confident statements that sound authoritative but can't be verified.
+
+**After:** Hedged statements with sources, or honest admissions of uncertainty.
+
+---
+
+## The Tradeoff
+
+There's a cost. A paper (arXiv 2307.02185) found that citation constraints reduce creative output.
+
+These instructions make Claude more accurate but less generative. You don't want them on all the time.
+
+**Solution: Build a toggle.**
+
+- **Research mode:** All three instructions active. Use for fact-checking, research, analysis.
+- **Default mode:** Instructions off. Use for brainstorming, creative writing, exploration.
+
+Someone already built this as a CLI tool: [github.com/assafkip/research-mode](https://github.com/assafkip/research-mode)
+
+---
+
+## The Combined System Prompt
+
+For research and fact-checking tasks, add all three to your system prompt:
+
+```
+ACCURACY INSTRUCTIONS:
+
+1. If you don't have enough information to answer accurately, say "I don't know" or "I'm not certain." Do not guess or fill gaps with plausible-sounding information.
+
+2. Every factual claim must include a citation. If you cannot provide a source for a claim, retract the claim rather than stating it without evidence.
+
+3. When referencing documents or sources, extract direct quotes before providing analysis. Use the exact wording from the source material rather than paraphrasing.
+```
+
+---
+
+## Why This Matters
+
+The weird part: this is published on Anthropic's own platform docs. Not hidden. But most people building on Claude have never seen it.
+
+**Source:** [docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/reduce-hallucinations](https://docs.anthropic.com/en/docs/test-and-evaluate/strengthen-guardrails/reduce-hallucinations)
+
+If you're using Claude for anything where accuracy matters — research, analysis, fact-checking, professional work — these three instructions should be in your toolkit.
+
+---
+
+*What prompting techniques have you found that improved Claude's accuracy? Drop a comment.*
