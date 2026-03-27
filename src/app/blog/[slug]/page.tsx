@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Comments from "@/components/Comments";
 import { Prose } from "@/components/mdx/Prose";
 import { formatDate, getPost, getPosts } from "@/lib/blog";
 
@@ -58,6 +59,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
           <div className="mt-10">
             <Prose>{post.content}</Prose>
+          </div>
+
+          <div className="mt-14">
+            <Comments postSlug={post.slug} />
           </div>
         </div>
       </main>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import NewsletterSignup from "@/components/NewsletterSignup";
 import { formatDate, getPosts } from "@/lib/blog";
 
 export default async function BlogPage() {
@@ -68,6 +69,11 @@ export default async function BlogPage() {
               ))}
             </div>
           )}
+
+          {/* Newsletter signup */}
+          <div className="mt-16 max-w-xl">
+            <NewsletterSignup />
+          </div>
         </div>
       </main>
       <Footer />
