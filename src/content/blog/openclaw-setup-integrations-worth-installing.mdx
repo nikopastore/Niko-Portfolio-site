@@ -1,0 +1,253 @@
+---
+title: "My OpenClaw Setup After 3 Months: The Integrations Worth Installing"
+description: "After months testing OpenClaw skills, here are the integrations worth installing - from model selection to browser automation to morning briefings."
+publishedAt: "2026-03-27"
+tags: ["openclaw", "ai-agents", "automation", "productivity", "integrations"]
+image: "/blog/images/openclaw-integrations-hero.jpg"
+---
+
+**TL;DR**: OpenClaw has 6,000+ skills on ClawHub. Most are garbage. After months of daily use, these are the integrations that took my AI assistant from "fancy chatbot" to something that genuinely runs parts of my life.
+
+---
+
+The difference between an LLM and magic isn't the model - it's execution. Can it actually send that email? Schedule the meeting? Research that topic while you sleep?
+
+Integrations are what make OpenClaw special. The ability to connect with real services and *do things*. But ClawHub has become a dumping ground - duplicates, abandoned projects, and as of last month, 200+ confirmed malicious packages.
+
+I've been running OpenClaw daily since early 2026. These are the integrations worth your time.
+
+---
+
+## Choosing Your Models
+
+Before you install skills, you need to pick your models. This is where most people overspend or underperform. Here's my setup after months of optimization:
+
+### Main Agent: Claude Opus 4
+`anthropic/claude-opus-4-5`
+
+This is the brain. For your primary agent - the one you chat with, that orchestrates tasks, that needs to understand nuance - Opus is worth every penny. The reasoning quality is noticeably better than Sonnet for complex multi-step tasks.
+
+**Setup:**
+```bash
+openclaw config
+# Select Anthropic as provider
+# Enter your API key
+# Choose claude-opus-4-5 as default model
+```
+
+### Budget Alternative: MiniMax
+If Opus is too expensive for your use case, MiniMax offers surprisingly good quality at a fraction of the cost. It handles most day-to-day tasks well - drafting emails, summarizing content, basic research.
+
+**Setup via OpenRouter:**
+```bash
+# In openclaw.json, add to models.providers:
+"openrouter": {
+  "baseUrl": "https://openrouter.ai/api/v1",
+  "apiKey": "your-openrouter-key"
+}
+# Then set model to: openrouter/minimax/minimax-01
+```
+
+### Sub-agents: NVIDIA API (Free!)
+Here's the secret weapon. NVIDIA offers several models for free through their API - and they're *good*. I use these for background tasks, browser automation, and anything that doesn't need Opus-level reasoning.
+
+**GLM-5** - My go-to for sub-agents. Fast, capable, handles tool use well.
+**Kimi K2.5** - Great for UI/UX work and anything requiring visual understanding.
+**Gemma 3** - Lightweight, fast responses for simple tasks.
+
+**Setup NVIDIA models:**
+```bash
+# 1. Get free API key at build.nvidia.com
+# 2. Add to ~/.openclaw/openclaw.json under models.providers:
+"nvidia": {
+  "baseUrl": "https://integrate.api.nvidia.com/v1",
+  "apiKey": "nvapi-your-key-here",
+  "auth": "api-key",
+  "api": "openai-completions",
+  "models": [
+    {
+      "id": "z-ai/glm5",
+      "name": "GLM-5 (NVIDIA)",
+      "reasoning": true,
+      "cost": { "input": 0, "output": 0 }
+    },
+    {
+      "id": "moonshotai/kimi-k2.5",
+      "name": "Kimi K2.5 (NVIDIA)",
+      "reasoning": true,
+      "cost": { "input": 0, "output": 0 }
+    }
+  ]
+}
+```
+
+**Create a sub-agent using NVIDIA models:**
+```bash
+# Create agent config at ~/.openclaw/agents/browser-worker/agent.yaml
+name: browser-worker
+description: Browser automation agent
+model: nvidia/z-ai/glm5
+tools:
+  - exec
+  - read
+  - write
+```
+
+### Local Models: Ollama
+For truly private tasks or when you want zero API costs, run models locally via Ollama.
+
+**Setup:**
+```bash
+# 1. Install Ollama: brew install ollama
+# 2. Pull models: ollama pull gemma3:12b
+# 3. Add to openclaw.json:
+"ollama": {
+  "baseUrl": "http://127.0.0.1:11434",
+  "models": [
+    { "id": "gemma3:12b", "name": "Gemma 3 12B" },
+    { "id": "qwen3:8b", "name": "Qwen 3 8B" }
+  ]
+}
+```
+
+### My Model Strategy
+
+| Use Case | Model | Why |
+|----------|-------|-----|
+| Main chat & orchestration | Claude Opus | Best reasoning, worth the cost |
+| Sub-agents & background tasks | GLM-5 (NVIDIA) | Free, fast, reliable |
+| Browser automation | GLM-5 (NVIDIA) | Handles tool use well |
+| UI/UX tasks | Kimi K2.5 (NVIDIA) | Good visual understanding |
+| Sensitive/private tasks | Gemma 3 (local) | Never leaves your machine |
+
+**Rate limit tip:** NVIDIA's free tier has limits (~40 req/min). Run max 2 sub-agents simultaneously and add delays between requests if you're doing heavy automation.
+
+---
+
+## The Essentials (Install These First)
+
+### Discord or Telegram
+Start with one messaging channel. Discord is more powerful (threads, reactions, rich embeds), but Telegram is simpler to set up. WhatsApp and iMessage integrations exist but are flaky.
+
+I use Discord because threading lets me keep different projects separated - one channel for research, another for calendar, another for writing.
+
+### Google Workspace (gog)
+`clawhub.ai/steipete/gog`
+
+This took 30 minutes to configure but was worth every second. Gmail, Calendar, Drive, Sheets - all accessible. My agent writes email drafts, schedules meetings, and pulls documents without me touching a browser.
+
+**Pro tip**: Create a separate Google account specifically for your agent. This keeps your personal inbox clean and gives you better control over what the agent can access. You can forward specific emails to this account or grant it calendar access to your main account.
+
+Alternative: AgentMail is easier to set up but requires using a whole new inbox. If you're already drowning in email, adding another address isn't ideal.
+
+I gave my agent both.
+
+### Bitwarden or 1Password
+`clawhub.ai/skills/bitwarden` or `clawhub.ai/skills/1password`
+
+Your agent needs credentials to log into services. Without a password manager integration, you're copy-pasting passwords every time it needs to authenticate.
+
+1Password with biometric unlock is the safest - requires physical confirmation for every secret read. Bitwarden works great if you're already in that ecosystem.
+
+### Memory + Self-Improvement
+OpenClaw's native memory is solid, but pair it with the Self-Improving Agent skill (`clawhub.ai/pskoett/self-improving-agent`). It captures errors, corrections, and patterns to get better over time.
+
+The difference after 30 days is noticeable - fewer clarifying questions, better anticipation of what you actually want.
+
+---
+
+## Workflow Power-Ups
+
+### Browser Automation (agent-browser)
+`clawhub.ai/TheSethRose/agent-browser`
+
+![Browser automation workflow](/blog/images/agent-browser-workflow.jpg)
+
+This is the skill that unlocks everything else. Vercel's browser CLI gives you a full headless browser - navigates sites, fills forms, scrapes data, handles JavaScript-heavy pages. It uses snapshot refs (@e1, @e2) instead of DOM selectors, which means 90% fewer tokens and way more reliable automation.
+
+Use cases I run weekly:
+- Research aggregation (pull data from multiple sources)
+- Form submissions
+- Price monitoring
+- Content extraction from sites I subscribe to
+
+Browserbase is the hosted alternative - easier setup, but capped at 60 minutes/month. For serious use, run agent-browser locally. No rate limits, no API costs.
+
+### GitHub Ops
+`clawhub.ai/skills/github`
+
+If you code, this is mandatory. PR reviews formatted to your standards, issue creation from chat, diff parsing, CI status checks.
+
+I have it configured to summarize overnight PRs every morning. No more opening 15 tabs to see what changed.
+
+### Deep Research (Tavily + SearXNG)
+Web search is table stakes, but *how* you search matters. Tavily gives you clean extraction from JS-heavy pages. SearXNG (self-hosted) gives you unlimited searches without API costs.
+
+My setup: SearXNG for volume searches, Tavily for when I need to extract specific content from complex pages.
+
+---
+
+## Quality of Life
+
+### Morning Heartbeats
+This changed how I use OpenClaw. A proactive daily briefing that runs before I check my phone:
+- Weather (with what to wear)
+- Today's calendar
+- Overnight email digest
+- Market moves (if you care about that)
+
+Configure once, it just delivers. This is when it stops feeling like a chatbot.
+
+### Apple Reminders / Things Integration
+If you're on macOS or iOS, connect your task manager. I use Apple Reminders - the integration creates a seamless loop between my agent and my phone.
+
+Here's how it works: I tell my agent "remind me to call the contractor tomorrow at 2pm." It adds the reminder to my Apple Reminders app. Later, I check off the item from my phone. The agent sees it's completed and removes it from its internal list - so it doesn't show up in future daily standups asking me if I did it yet.
+
+Natural language in, organized tasks out, synced across all devices.
+
+---
+
+## Additional (Powerful) Use Cases
+
+Once you have the essentials running, here's where OpenClaw really shines:
+
+### Voice Interaction (ElevenLabs)
+`clawhub.ai/steipete/sag`
+
+TTS and voice synthesis across all channels. Voice responses instead of walls of text. Some people love this for a more natural experience - I personally prefer text for easy reference, but it's impressive tech.
+
+### Image Generation
+The DALL-E and Midjourney integrations work well for on-demand image creation. Useful for content creators or anyone who needs quick visuals without opening another app.
+
+### Sports Alerts
+Configure alerts for teams, players, and events you care about. My setup pings me for Champions League matches, UFC title fights, and any game involving certain players. Never miss a can't-miss game.
+
+### Trading/Market Monitoring
+These exist but require careful configuration. You can set up alerts for price movements, portfolio summaries, or market news. Keep your agent *read-only* on financial accounts unless you really know what you're doing.
+
+### Automated Content Pipelines
+Chain skills together: research a topic → draft content → format for platform → queue for posting. I have workflows for blog drafts, social media, and newsletter content that run with minimal input.
+
+### Lead Monitoring & CRM Updates
+If you run a business, connect your CRM or lead sources. The agent can monitor for new inquiries, categorize them, and draft responses - all before you wake up.
+
+### Health & Habit Tracking
+Connect with Apple Health, fitness apps, or habit trackers. Morning briefings can include yesterday's steps, sleep quality, or streak status.
+
+---
+
+## The Real Value
+
+![OpenClaw memory improvement](/blog/images/openclaw-memory-improvement.jpg)
+
+After months of use, here's what I've learned: the best integrations aren't the flashiest ones. They're the ones that remove friction from things you already do.
+
+Email, calendar, task management, research - boring stuff. But automating boring stuff is how you get your time back.
+
+Start with the essentials. Add one integration at a time. Let the self-improvement skill learn your preferences.
+
+In 30 days, you'll wonder how you worked without it.
+
+---
+
+*What integrations are you running? Drop a comment - always looking for new setups to try.*
