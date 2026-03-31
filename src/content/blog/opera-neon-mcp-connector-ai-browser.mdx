@@ -1,0 +1,131 @@
+---
+title: "Opera Neon + MCP: Why This Changes Everything for AI Automation"
+description: "Opera Neon's new MCP Connector lets AI tools like Claude and ChatGPT connect directly to your live browser session. Here's what it means for automation."
+publishedAt: "2026-03-31"
+tags: ["opera neon", "mcp", "ai agents", "browser automation", "claude"]
+---
+
+**TL;DR**: Opera Neon just shipped MCP Connector, letting Claude, ChatGPT, and OpenClaw connect directly to your live browser session. No more copy-pasting context or re-explaining what you're looking at. Your AI can now see your tabs, fill forms, and take actions inside the browser you're already using.
+
+---
+
+## The Context Problem is Dead
+
+Every AI workflow has the same friction point: context transfer.
+
+You're on a website. You want your AI to help. So you copy the URL, paste it into Claude, explain what you're looking at, maybe grab a screenshot. By the time you've recreated the context, you've lost the momentum.
+
+Opera just killed that workflow.
+
+With MCP Connector, your AI client — Claude, ChatGPT, OpenClaw, n8n, Lovable — connects directly to your live browser session. It sees what you see. Your open tabs. The content on screen. Your logged-in sessions.
+
+This isn't a simulation. It's your real browser.
+
+---
+
+## What MCP Actually Is
+
+MCP stands for Model Context Protocol. Anthropic introduced it in late 2024 as an open standard for AI tools to communicate with external services.
+
+Before MCP, every integration was custom. Want Claude to talk to Notion? Build an integration. Want it to talk to Slack? Another integration. Every combination meant more code.
+
+MCP standardizes this. Any AI tool that supports the protocol can connect to any MCP server instantly. No custom builds required.
+
+Opera just exposed an MCP endpoint for its Neon browser. That means:
+
+- **Claude** can browse inside your session
+- **ChatGPT** can fill out forms on sites you're logged into
+- **OpenClaw** can automate workflows across authenticated pages
+- **n8n** can trigger browser-based actions in automation flows
+- **Lovable** can prototype against live interfaces
+
+One standard. Infinite use cases.
+
+---
+
+## What Your AI Can Actually Do
+
+Once connected, external AI clients can:
+
+- **Navigate pages** — Go to URLs, click links, scroll
+- **Extract information** — Pull text, data, structured content from any page
+- **Fill out forms** — Complete inputs on sites where you're already logged in
+- **Capture screenshots** — Visual context for design or debugging
+- **Open new tabs** — Expand research without manual clicking
+- **Run searches** — Execute queries directly in the browser
+
+The key difference: **authenticated context**. Your AI isn't scraping a public page — it's operating inside your logged-in session.
+
+That means filling out forms on your banking site. Extracting data from your company's internal tools. Automating workflows on platforms that require auth.
+
+---
+
+## Why This Matters for OpenClaw Users
+
+If you run OpenClaw, this is a direct upgrade to your browser automation stack.
+
+Currently, browser automation with OpenClaw requires one of:
+- Playwright/Puppeteer (simulated, headless)
+- agent-browser (local CDP, but isolated sessions)
+- Manual browser extension bridges
+
+MCP Connector changes the architecture:
+
+1. **Real session, real auth** — No more cookie injection or session recreation
+2. **Live context** — AI sees exactly what you see, when you see it
+3. **Bi-directional** — AI can both read and act within the browser
+4. **Standard protocol** — Works with Claude, ChatGPT, and any MCP-compatible client
+
+For workflows like:
+- Scraping authenticated dashboards
+- Filling multi-step forms across sites
+- Researching while logged into paywalled content
+- Testing web apps in real browser conditions
+
+This removes entire categories of setup friction.
+
+---
+
+## The Agentic Browser Wars Are Heating Up
+
+Opera isn't alone here. The browser-as-AI-execution-layer thesis is everywhere now:
+
+- **Perplexity** launched Comet
+- **OpenAI** launched Atlas
+- **Norton** shipped Neo (yes, the antivirus company)
+- **Opera** has Neon with Browser Operator since 2025
+
+But Opera is the first to flip the model: instead of just embedding AI *into* the browser, they're letting AI tools reach *into* the browser from outside.
+
+That's a fundamentally different bet. They're saying: the browser isn't the AI — the browser is the *execution layer* for AI.
+
+---
+
+## How to Get Started
+
+MCP Connector is available today for Opera Neon subscribers.
+
+1. Subscribe to Opera Neon (paid tier)
+2. Enable MCP Connector in settings
+3. Connect your AI client (Claude, ChatGPT, OpenClaw, etc.) via the MCP endpoint
+4. Your AI now has live browser access
+
+Opera mentioned they'll bring a simplified version to Opera One and Opera GX later.
+
+---
+
+## The Real Unlock
+
+The shift here isn't technical — it's conceptual.
+
+We've been treating AI as a thing you *go to*. Copy context, paste into chat, get response, copy back.
+
+MCP Connector inverts this. The AI comes to *you*. It sees your workspace. It acts where you're already working.
+
+"The browser is where workflows live, but AI has been disconnected from it," said Monika Kurczyńska, Opera's Director of R&D for browser AI. "With Opera Neon, we connect popular AI clients directly to an agentic browser, so they can operate where users already work."
+
+This is what agentic AI looks like when it stops being a chatbot and starts being infrastructure.
+
+---
+
+*Building with AI agents? [Follow for more on the tools that actually work.](/)*
