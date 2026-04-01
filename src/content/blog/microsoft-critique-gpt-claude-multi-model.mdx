@@ -1,0 +1,134 @@
+---
+title: "Microsoft Made GPT and Claude Work Together — And It Beats Everything"
+description: "Microsoft's new Critique and Council features pair GPT and Claude for research tasks. The result beat every single-model system by 14%. Here's what it means."
+publishedAt: "2026-03-31"
+tags: ["microsoft copilot", "multi-model ai", "gpt", "claude", "ai research"]
+---
+
+**TL;DR**: Microsoft shipped Critique and Council — two features that make GPT and Claude work together on the same research task. On the DRACO benchmark, this combo scored 14% higher than the best single-model system. The lesson: orchestration beats raw intelligence.
+
+---
+
+## Why Pick One When You Can Have Both?
+
+Every AI company wants you to believe their model is the best researcher. OpenAI says GPT. Anthropic says Claude. Google says Gemini. They're all competing for the same "smartest in the room" crown.
+
+Microsoft just stepped back and asked: What if we used both?
+
+On Monday, they announced **Critique** and **Council** — two new modes for Copilot's Researcher tool that pair GPT and Claude on the same research task. The result beats every other AI research system tested on the industry standard benchmark.
+
+Not by a little. By 14%.
+
+---
+
+## What's Actually Happening
+
+### Critique: Collaboration Mode
+
+In Critique mode, the models work in sequence:
+
+1. **GPT drafts** — Plans the research, gathers sources, writes an initial report
+2. **Claude critiques** — Reviews for factual accuracy, citation quality, structural issues
+3. **Final output** — Only reaches the user after the review pass
+
+This solves the core problem with single-model research: no one's checking the work. When GPT hallucinates a citation or makes a weak claim, Claude catches it. When the structure is confusing, Claude restructures it.
+
+One model generates. The other validates. Neither operates alone.
+
+### Council: Competition Mode
+
+Council takes a different approach:
+
+1. **GPT and Claude run simultaneously** — Both produce full reports on the same question
+2. **A third "judge" model compares** — Reads both reports side by side
+3. **Summary output** — Shows where they agreed, where they diverged, and unique insights from each
+
+This gives you the best of both models without having to manually compare them yourself.
+
+---
+
+## The Benchmark Results
+
+Microsoft tested Critique against the DRACO benchmark — 100 complex research tasks across 10 domains including medicine, law, and technology.
+
+| System | Score |
+|--------|-------|
+| Copilot with Critique | **57.4** |
+| Claude Opus 4.6 (best single model) | 42.7 |
+| Perplexity Deep Research | ~50 |
+
+Critique beat the best single-model system by **+14.7 points** (35% relative improvement).
+
+The biggest gains came from:
+- **Breadth of analysis** — More comprehensive coverage
+- **Presentation quality** — Better structure and clarity
+- **Factual accuracy** — Fewer hallucinations and bad citations
+
+---
+
+## Why This Matters
+
+### 1. Orchestration > Single Model Intelligence
+
+The AI industry has been obsessed with making models smarter. More parameters. Better training data. Longer context windows.
+
+Microsoft just proved that *how* you use models matters as much as *which* model you use. Two good models working together beat one great model working alone.
+
+This is the thesis OpenClaw users already understand: the value is in the workflow, not the model.
+
+### 2. Specialization Wins
+
+GPT and Claude have different strengths:
+- **GPT**: Fast, comprehensive, good at synthesis
+- **Claude**: Careful, precise, good at critique and nuance
+
+Critique plays to both strengths. GPT does what it's good at (broad research). Claude does what it's good at (careful review). Neither is asked to do everything.
+
+### 3. The Model Wars Are Ending
+
+This is a signal that the "which model is best" debate is becoming irrelevant. The future isn't picking a winner — it's building orchestration layers that combine multiple models for different tasks.
+
+Amazon, Google, and other cloud providers will follow. Multi-model workflows are becoming the standard.
+
+---
+
+## What This Means for Your Workflows
+
+If you're building AI workflows (with OpenClaw or otherwise), the lesson is clear:
+
+**Don't bet on one model. Build pipelines.**
+
+Examples:
+- Use a fast model for drafting, a careful model for review
+- Run multiple models in parallel and synthesize the results
+- Route different task types to different model specialists
+
+The era of "just use GPT-4 for everything" is ending. The era of model orchestration is here.
+
+---
+
+## How to Access Critique and Council
+
+Currently available to:
+- Microsoft 365 Copilot subscribers ($30/user/month)
+- Enrolled in Microsoft's Frontier early access program
+
+Critique is the default mode. Council requires selecting "Model Council" from the picker.
+
+No word yet on when it'll hit general availability.
+
+---
+
+## The Bigger Picture
+
+Microsoft's bet is clear: the value isn't in owning the best model. It's in building the orchestration layer that knows when to use which model.
+
+"No single model stays on top for long," is the implicit message. The real moat is in the routing intelligence — knowing when GPT is better, when Claude is better, and when both together beat either alone.
+
+For Microsoft, this hedges their OpenAI dependency. For users, it means better research with less hallucination.
+
+For the industry, it's a signal: the model wars are giving way to the orchestration wars.
+
+---
+
+*Building multi-model workflows? [Follow for more on what's actually working.](/)*
