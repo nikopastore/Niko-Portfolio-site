@@ -1,0 +1,283 @@
+---
+title: "The Claude Code Leak: Undercover Mode, Anti-Distillation, and 512K Lines of Source"
+description: "Anthropic accidentally shipped Claude Code's entire source to npm. Inside: KAIROS autonomous mode, Undercover Mode, anti-competitor countermeasures, memory limits, model codenames, and 44 unreleased features."
+publishedAt: "2026-04-01"
+tags: ["anthropic", "claude code", "security", "ai agents", "source leak"]
+---
+
+**TL;DR**: Anthropic accidentally shipped their entire Claude Code source to npm. No hack — a missing `.npmignore` entry exposed 512,000 lines of TypeScript. Inside: an autonomous daemon called KAIROS, Undercover Mode that hides AI attribution, anti-competitor countermeasures, 44 unreleased feature flags, undocumented hard limits, and internal model codenames. A clean-room rewrite hit 50K GitHub stars in 2 hours — likely the fastest-growing repo in history.
+
+---
+
+## How It Happened
+
+On March 31, 2026, Anthropic released Claude Code version 2.1.88 to npm. Buried inside: a 59.8 MB source map containing their entire codebase.
+
+The cause? A build configuration oversight. Claude Code is built on Bun (which Anthropic acquired in late 2025). Bun generates source maps by default. Someone forgot to add `*.map` to `.npmignore` or configure the `files` field in `package.json` to exclude debugging artifacts.
+
+The `cli.js.map` file contained a `sourcesContent` array with every original TypeScript file — 1,900 files, readable, commented, complete.
+
+Security researcher Chaofan Shou spotted it at 4:23 AM ET and posted a download link on X. The tweet hit 21 million views. Extraction was trivial:
+
+```bash
+npm pack @anthropic-ai/claude-code@2.1.88
+# untar the archive, read the map
+```
+
+The source map also referenced a ZIP archive on Anthropic's own Cloudflare R2 bucket — downloadable by anyone with the URL.
+
+Within hours, the code was mirrored, dissected, and rewritten in Python and Rust by thousands of developers.
+
+---
+
+## The Complete Feature List
+
+The discoveries read like a product roadmap Anthropic never intended to publish. The codebase contained **44 feature flags** gating over 20 unshipped capabilities.
+
+### 🤖 KAIROS: Always-On Autonomous Daemon
+
+Referenced 150+ times in the source, KAIROS is an unreleased autonomous mode where Claude operates as a persistent background agent:
+
+- Receives periodic `<tick>` prompts to decide whether to act proactively
+- `PROACTIVE` flag for "surfacing something the user hasn't asked for and needs to see now"
+- Maintains append-only daily log files
+- Subscribes to GitHub webhooks for real-time monitoring
+
+### 💭 autoDream: Memory Consolidation
+
+A background memory process that runs while you're idle:
+- Forked subagent merges observations
+- Removes contradictions from memory
+- Converts vague insights into absolute facts
+- Gets read-only bash access during consolidation
+
+### 🧠 ULTRAPLAN: Deep Planning Mode
+
+Offloads complex planning to a remote cloud session:
+- Runs Opus 4.6 with up to **30 minutes** of dedicated think time
+- For tasks too complex for real-time reasoning
+- Separate from main context window
+
+### 👥 COORDINATOR_MODE: Multi-Agent Swarms
+
+A structured multi-agent system with:
+- Research phase agents
+- Synthesis phase agents
+- Implementation phase agents
+- Coordinated handoffs between phases
+
+### 🕵️ Undercover Mode
+
+The most controversial discovery: `undercover.ts` (~90 lines).
+
+It injects a system prompt instructing Claude to:
+- Never mention it's an AI
+- Strip all `Co-Authored-By` attribution when contributing to external repos
+- Never include in commits: internal model codenames, unreleased version numbers, internal repo names, Slack channels, or any AI attribution
+- Stay undercover if not confident it's operating in an internal repo
+
+The mode activates for Anthropic employees (`USER_TYPE === 'ant'`). No force-off switch.
+
+One highly upvoted Hacker News comment: "If a tool is willing to conceal its own identity in commits, what else is it willing to conceal?"
+
+### 🛡️ Anti-Distillation Countermeasures
+
+Two mechanisms designed to poison competitor training data:
+
+**1. Fake Tool Injection (`ANTI_DISTILLATION_CC`)**
+- Injects decoy tool definitions into API requests
+- If competitors record API traffic to train models, they ingest garbage tool schemas
+- Requires: compile-time flag + `cli` entrypoint + first-party API + GrowthBook flag
+
+**2. Reasoning Summarization with Cryptographic Signatures**
+- Summarizes assistant reasoning between tool calls
+- Eavesdroppers capture summaries, not full chain-of-thought
+- Signatures verify authenticity
+
+**3. Client Attestation**
+- Binary cryptographically proves it's the real Claude Code client
+- DRM-like protection against third-party tools using internal APIs
+
+The Hacker News crowd noted all are easily defeated by stripping fields via proxy. One commenter joked: competitors might actually build real versions of the fake tools.
+
+### 🐾 Buddy: Terminal Tamagotchi
+
+A Tamagotchi-style companion system with:
+- **18 species**: duck, axolotl, chonk, and more
+- **Rarity tiers**: common (60%), uncommon, rare, legendary (1%)
+- **Shiny variants**
+- **Stats**: DEBUGGING, PATIENCE, CHAOS, WISDOM, SNARK
+
+Originally planned as an April 1 teaser (yes, the date is suspicious) with a May full launch.
+
+---
+
+## Internal Model Codenames
+
+The source exposed model codenames never publicly documented:
+
+| Codename | Model |
+|----------|-------|
+| **Capybara** | Claude 4.6 |
+| **Fennec** | Opus 4.6 |
+| **Numbat** | Unreleased model |
+| **Tengu** | Referenced in anti-distillation flags |
+
+---
+
+## Undocumented Hard Limits
+
+The source revealed constraints Anthropic never publicly documented:
+
+| Limit | Value | Behavior |
+|-------|-------|----------|
+| Memory cap | 200 lines | Silent truncation |
+| Context auto-compaction | ~167,000 tokens | Destroys context |
+| File read ceiling | 2,000 lines | Agent hallucinates beyond |
+| Model downgrade | After server errors | Silent switch from Opus to Sonnet |
+
+### Memory Architecture
+
+Claude Code's memory uses a 3-layer design:
+1. **MEMORY.md** — Index to other knowledge (always loaded, cheap)
+2. **Topic files** — Loaded on demand when relevant
+3. **Full session transcripts** — Searchable, never loaded directly
+
+Context window treated as scarce resource.
+
+### Employee-Only Quality Gates
+
+Internal comments revealed:
+- **29-30% false claims rate** on Capybara v8 (regression from 16.7% in v4)
+- Verification loops that check if generated code actually compiles — **gated behind employee-only flag**
+- They built the fix and kept it for themselves
+
+---
+
+## Code Quality Findings
+
+The leak revealed what happens when AI writes 100% of its own codebase:
+
+| Metric | Value |
+|--------|-------|
+| Total lines | 512,000 |
+| Test coverage | **Zero** |
+| Longest function | 3,167 lines (`print.ts`) |
+| Cyclomatic complexity | 486 (that single function) |
+| Tool call failure rate | 16.3% (6-day period) |
+| Idle memory growth | Up to 15GB |
+| Wasted API calls | **250,000/day** (autocompact failures) |
+
+Also discovered: a frustration detection regex matching swear words. "The world's most expensive company using regex for sentiment analysis."
+
+---
+
+## Architecture (Actually Impressive)
+
+Beyond the controversy, the architecture earned genuine respect:
+
+- **Modular system prompt** with cache-aware boundaries
+- **~40 tools** in a plugin architecture
+- **46,000-line query engine**
+- **React + Ink** terminal rendering using game-engine techniques
+- **KV cache fork-join model** for subagents — they share full context without repeating work
+- **Multi-agent orchestration** that fits in a prompt, not a framework
+
+One commenter: "This makes LangChain and LangGraph look like solutions in search of a problem."
+
+---
+
+## The Claw-Code Phenomenon
+
+Korean developer Sigrid Jin (profiled by WSJ for consuming 25 billion Claude Code tokens in a year) woke at 4 AM to the news.
+
+Concerned about legal exposure from hosting proprietary code, Jin took a different approach: a **clean-room Python rewrite** using AI tools. The result: `instructkr/claw-code`.
+
+The numbers are staggering:
+- **50,000 stars in ~2 hours** (likely fastest-growing repo in GitHub history)
+- 55,800+ stars and 58,200+ forks by April 1
+- Now being rewritten in Rust on a separate branch
+
+The clean-room approach creates a legal puzzle. If Anthropic claims the AI-generated rewrite infringes copyright, it undermines their own defense in training-data cases — the argument that AI outputs from copyrighted inputs are fair use.
+
+---
+
+## Security Implications
+
+### Known CVEs
+
+With full source access, researchers can now audit at a fundamentally different level:
+
+| CVE | Description | CVSS |
+|-----|-------------|------|
+| Code injection | Via untrusted directories | 8.7 |
+| API key exfiltration | From malicious repos | 5.3 |
+
+The permission system (2,500 lines of bash validation) and four-stage context management pipeline are now fully visible.
+
+### Coinciding Supply Chain Attack
+
+The leak coincided with a **completely separate** supply-chain attack on the `axios` npm package. Malicious versions containing a Remote Access Trojan were published between 00:21 and 03:29 UTC on March 31.
+
+Anyone installing Claude Code via npm during that window could have been compromised by unrelated malware.
+
+---
+
+## Two Leaks in Five Days
+
+This was Anthropic's **second major exposure in one week**.
+
+On March 26, a CMS misconfiguration leaked draft blog posts about Claude Mythos — their unreleased next-gen model with "step change" capabilities.
+
+The irony: Anthropic built Undercover Mode specifically to prevent internal information from leaking. Then they leaked everything through a `.npmignore` oversight.
+
+As one viral comment put it: "Nothing says 'agentic future' like shipping the source by accident."
+
+---
+
+## What This Means
+
+### For Anthropic
+
+The strategic damage exceeds the code damage:
+
+- **Feature flag names** reveal product strategy
+- **Model codenames** expose the roadmap
+- **Anti-distillation flags** confirm competitive concerns
+- **Employee-only quality gates** raise trust questions
+
+You can refactor code in a week. You can't un-leak a roadmap.
+
+The timing is brutal. Anthropic reportedly generates **$2.5B in ARR** (80% enterprise) and is preparing for an IPO. Two leaks in one week undermines the "safety-first" brand that's their core differentiator.
+
+### For the Ecosystem
+
+The leak accelerates a shift already underway:
+
+- **Architecture patterns are transferable** — this is now the only fully documented production-grade AI agent implementation
+- **Open-source can build on battle-tested patterns** instead of guessing
+- **Differentiation moves entirely to model capabilities**
+
+Multiple voices argued the CLI should have been open source from the start. Google's Gemini CLI and OpenAI's Codex already are. The models are the moat, not the shell around them.
+
+### For Developers
+
+If you're building AI agents or using Claude Code:
+
+- **The architecture is worth studying** — regardless of controversy, this is production-grade infrastructure
+- **The hard limits are now documented** — 200-line memory cap, 2,000-line file ceiling, auto-compaction behavior
+- **Security researchers have full access** — expect more CVEs to surface
+
+---
+
+## The Bottom Line
+
+512,000 lines of production source from a tool generating billions in revenue — exposed by a missing line in a config file.
+
+The technical revelations are fascinating: autonomous dreaming agents, DRM-like client attestation, a multi-agent framework that fits in a prompt. But the lasting impact is strategic, not technical.
+
+The code can be refactored. The trust deficit cannot.
+
+---
+
+*Following AI agent development? [Subscribe for more breakdowns on what's actually shipping.](/)*
