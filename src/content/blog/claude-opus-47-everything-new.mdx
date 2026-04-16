@@ -1,0 +1,104 @@
+---
+title: "Claude Opus 4.7: Everything New and What Actually Matters"
+description: "Anthropic dropped Opus 4.7 today with a 13% coding benchmark gain, a new xhigh effort tier, and high-resolution vision. Here is what changed, what the benchmarks actually show, and whether you should care."
+publishedAt: "2026-04-16"
+tags: ["anthropic", "claude", "opus-47", "llm", "ai-models", "benchmark"]
+image: "/blog/images/opus47-hero.png"
+---
+
+# Claude Opus 4.7: Everything New and What Actually Matters
+
+**TL;DR**: Anthropic released Opus 4.7 today. Coding benchmarks are up 13%. There is a new effort tier. Vision is better. Pricing stayed the same. Here is what changed, what the benchmarks actually show, and whether you should upgrade your stack.
+
+---
+
+Anthropic dropped Claude Opus 4.7 today. I have been reading the benchmarks, the testimonials from early testers, and the Reddit threads where people are already complaining it is slower than 4.6. Here is what you actually need to know.
+
+![Claude Opus 4.7 Benchmark Chart](/blog/images/opus47-bench-chart.png)
+
+## What Dropped
+
+Opus 4.7 is available now on the Claude API, Amazon Bedrock, Google Vertex AI, and Microsoft Foundry. Pricing is unchanged: $5 per million input tokens, $25 per million output tokens.
+
+The model is a notable improvement on Opus 4.6 in advanced software engineering, according to Anthropic. The claims:
+
+- 13% gain on internal coding benchmarks over 4.6
+- Better vision at higher resolution
+- New "xhigh" effort tier between high and max
+- Improved agentic workflows and long-running task handling
+- Cyber safeguards (this is the first model from the Project Glasswing lineage, meaning it has the cybersecurity protections Anthropic developed for Mythos)
+
+On paper, this sounds like a meaningful upgrade. Here is what the benchmarks actually say.
+
+## The Benchmark Picture
+
+Anthropic released a benchmark chart showing Opus 4.7 versus Opus 4.6 across a range of evaluations. The gains are real but uneven.
+
+Coding benchmarks show the biggest jump. OnSWE-bench Pro and Verified, Opus 4.7 resolves more issues than 4.6. One tester reported solving four tasks that neither Opus 4.6 nor Sonnet 4.6 could handle.
+
+Agentic benchmarks show strong gains too. On research-agent benchmarks, Opus 4.7 scored 0.715 overall, tying for top, and delivered the most consistent long-context performance of any model tested.
+
+The testimonial from Hex is telling: low-effort Opus 4.7 is roughly equivalent to medium-effort Opus 4.6. That is a meaningful efficiency jump. If you are paying for max effort on 4.6 today, you might get the same output from high effort on 4.7 at lower cost.
+
+## What Is Actually Different
+
+### The New xhigh Effort Tier
+
+Between high and max, there is now xhigh. Anthropic says token usage across all effort levels is more predictable in 4.7, which should help with cost estimation. This matters if you are running agentic pipelines where effort level affects your per-task cost.
+
+### Vision Improvements
+
+Opus 4.7 sees images at higher resolution. For tasks that involve reading documents, diagrams, or screenshots, this matters. One tester (Solve Intelligence) is using it for life sciences patent workflows, reading chemical structures and interpreting complex technical diagrams.
+
+### The Cyber Safeguards
+
+This is the interesting part. Opus 4.7 is the first model released from Anthropic's Project Glasswing work. It has cybersecurity capabilities that are intentionally reduced compared to Mythos Preview, but it has automatic safeguards that detect and block requests for high-risk cybersecurity uses.
+
+If you are doing legitimate security research, there is a Cyber Verification Program to get access to the unblocked version.
+
+## What Reddit Is Saying
+
+The reactions are mixed.
+
+One thread points out that on long-context benchmarks, Opus 4.7 actually regressed compared to 4.6 on MRCR, dropping from 78% at 1M context to 32%. Anthropic says they are phasing out MRCR in favor of Graphwalks because they think it is a better measure, but that is cold comfort if you were relying on long-context performance.
+
+Another user ran Opus 4.7 on their own internal evaluations for their SaaS and Opus 4.6 beat it on all counts. The benchmarks that matter are your own.
+
+A third complaint is speed. Some users report Opus 4.7 is slower than 4.6. That tracks with the pattern: more capable models tend to be slower unless specifically optimized for latency.
+
+## Should You Upgrade
+
+If you are running Opus 4.6 and doing significant coding work or agentic pipelines, yes. The efficiency gains are real and the benchmark improvements are meaningful.
+
+If you are doing pure long-context retrieval tasks, test carefully. The regression on MRCR is documented and might affect your use case.
+
+If you are on Sonnet and wondering if you should skip to Opus 4.7, the price jump is significant (Sonnet is much cheaper). The upgrade makes sense for complex, multi-step workflows where the extra capability pays for itself.
+
+## The Bottom Line
+
+Opus 4.7 is a real improvement on 4.6, not a paper launch. The coding gains are legitimate, the efficiency improvements matter for production use, and the vision upgrades will open new workflows.
+
+But benchmarks are not your workload. If you have internal evals, run them against 4.7 before committing. The users reporting that 4.6 beats 4.7 on their specific tasks are not wrong. Models optimize for what they are measured on.
+
+The upgrade is worth testing. Just do not take the benchmark chart as gospel.
+
+---
+
+**Next read:** The 5 Layers Every Production AI System Needs
+
+Or: follow for more on building AI systems that survive the real world.
+
+---
+
+**Join the AI Agent Mastery Discord**
+
+I run a free Discord community where I post AI agent setups, automations, and real-world workflows that do not make it to the blog.
+
+Free access includes:
+- Setup guides and configuration templates
+- Chat with other AI power users
+- Early access to new tools and prompts
+
+Want more? The paid membership gives you direct access to me, custom automations for your stack, and weekly deep-dive sessions on building production AI systems.
+
+[Join free on Discord](https://discord.gg/ai-agent-mastery) or [upgrade to Premium/Elite](https://whop.com/ai-agent-mastery) for full access.
