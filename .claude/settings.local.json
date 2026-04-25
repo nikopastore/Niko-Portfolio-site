@@ -9,7 +9,8 @@
       "Bash(node capture-screenshots.js:*)",
       "Bash(npm run build:*)",
       "Bash(npx next build)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(claude mcp *)"
     ]
   }
 }
