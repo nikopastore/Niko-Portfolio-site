@@ -127,7 +127,8 @@ export async function getPost(slug: string): Promise<BlogPostWithContent | null>
       frontmatter,
       content: compiled.content,
     };
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error(`[getPost] Failed to compile MDX for slug "${slug}":`, error instanceof Error ? error.message : error);
     return null;
   }
 }
