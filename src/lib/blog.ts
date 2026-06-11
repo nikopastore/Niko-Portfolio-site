@@ -9,9 +9,18 @@ import { mdxComponents } from "@/components/mdx/components";
 export interface BlogFrontmatter {
   title: string;
   date: string;
+  publishedAt: string;
+  updatedAt?: string;
   excerpt: string;
+  description: string;
   tags: string[];
   readTime: string;
+  image?: string;
+  category?: string;
+  tldr?: string;
+  keyTakeaways: string[];
+  faq: Array<{ question: string; answer: string }>;
+  canonicalUrl?: string;
 }
 
 export interface BlogPost {
@@ -31,29 +40,64 @@ function estimateReadTime(content: string) {
   return `${minutes} min read`;
 }
 
+function asString(value: unknown) {
+  return typeof value === "string" ? value : undefined;
+}
+
+function asStringArray(value: unknown) {
+  return Array.isArray(value) ? value.map((item) => String(item)).filter(Boolean) : [];
+}
+
+function normalizeFaq(value: unknown): Array<{ question: string; answer: string }> {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+      const record = item as Record<string, unknown>;
+      const question = asString(record.question) ?? asString(record.q);
+      const answer = asString(record.answer) ?? asString(record.a);
+      return question && answer ? { question, answer } : null;
+    })
+    .filter((item): item is { question: string; answer: string } => Boolean(item));
+}
+
+function firstParagraph(content: string) {
+  return (
+    content
+      .split("\n")
+      .map((line) => line.trim())
+      .find((line) => line.length > 0 && !line.startsWith("#") && !line.startsWith("!") && !line.startsWith("<")) ?? ""
+  );
+}
+
 function normalizeFrontmatter(
   data: Record<string, unknown>,
   content: string,
   slug: string
 ): BlogFrontmatter {
-  const title = typeof data.title === "string" ? data.title : slug;
-  const date = typeof data.date === "string" ? data.date : new Date().toISOString();
-  const excerpt =
-    typeof data.excerpt === "string"
-      ? data.excerpt
-      : content.split("\n").find((line) => line.trim().length > 0) ?? "";
-  const tags = Array.isArray(data.tags)
-    ? data.tags.map((tag) => String(tag))
-    : [];
-  const readTime =
-    typeof data.readTime === "string" ? data.readTime : estimateReadTime(content);
+  const title = asString(data.title) ?? slug;
+  const publishedAt = asString(data.publishedAt) ?? asString(data.date) ?? new Date().toISOString();
+  const description =
+    asString(data.description) ?? asString(data.excerpt) ?? firstParagraph(content).replace(/^\*\*TL;DR\*\*:?\s*/i, "");
+  const tags = asStringArray(data.tags);
+  const keyTakeaways = asStringArray(data.keyTakeaways);
+  const readTime = asString(data.readTime) ?? asString(data.reading_time) ?? estimateReadTime(content);
 
   return {
     title,
-    date,
-    excerpt,
+    date: publishedAt,
+    publishedAt,
+    updatedAt: asString(data.updatedAt) ?? asString(data.modifiedAt),
+    excerpt: description,
+    description,
     tags,
     readTime,
+    image: asString(data.image) ?? asString(data.cover),
+    category: asString(data.category) ?? tags[0],
+    tldr: asString(data.tldr) ?? asString(data.summary),
+    keyTakeaways,
+    faq: normalizeFaq(data.faq),
+    canonicalUrl: asString(data.canonicalUrl) ?? asString(data.canonical),
   };
 }
 
@@ -131,4 +175,17 @@ export async function getPost(slug: string): Promise<BlogPostWithContent | null>
     console.error(`[getPost] Failed to compile MDX for slug "${slug}":`, error instanceof Error ? error.message : error);
     return null;
   }
+}
+
+export function getRelatedPosts(current: BlogPost, posts: BlogPost[], limit = 3) {
+  const currentTags = new Set(current.frontmatter.tags.map((tag) => tag.toLowerCase()));
+  return posts
+    .filter((post) => post.slug !== current.slug)
+    .map((post) => ({
+      post,
+      score: post.frontmatter.tags.filter((tag) => currentTags.has(tag.toLowerCase())).length,
+    }))
+    .sort((a, b) => b.score - a.score || new Date(b.post.frontmatter.date).getTime() - new Date(a.post.frontmatter.date).getTime())
+    .slice(0, limit)
+    .map(({ post }) => post);
 }

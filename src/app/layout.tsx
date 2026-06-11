@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk, Space_Mono } from "next/font/google";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { ToastProvider } from "@/components/Toast";
 import SmoothScroll from "@/components/SmoothScroll";
+import { siteConfig } from "@/lib/data";
 import "./globals.css";
 
 const inter = Inter({
@@ -25,23 +26,42 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Niko Pastore | Data & Full Stack Engineer",
+  metadataBase: new URL(siteConfig.url),
+  title: "Niko Pastore | Data Engineer & AI Product Builder",
   description:
-    "Portfolio of Niko Pastore - Data Engineer specializing in ETL pipelines, cloud data warehousing, and full-stack development.",
+    "Portfolio and high-intent field notes from Niko Pastore on data engineering, AI agents, automation, and production software.",
   keywords: [
     "Data Engineer",
+    "AI Agents",
     "Full Stack Developer",
     "Python",
     "Next.js",
-    "PostgreSQL",
-    "Cloud Architecture",
+    "Snowflake",
+    "ETL Pipelines",
+    "AI Automation",
   ],
-  authors: [{ name: "Niko Pastore" }],
+  authors: [{ name: "Niko Pastore", url: siteConfig.url }],
+  creator: "Niko Pastore",
+  alternates: {
+    canonical: siteConfig.url,
+    types: {
+      "application/rss+xml": `${siteConfig.url}/blog/feed.xml`,
+    },
+  },
   openGraph: {
-    title: "Niko Pastore | Data & Full Stack Engineer",
+    title: "Niko Pastore | Data Engineer & AI Product Builder",
     description:
-      "Portfolio of Niko Pastore - Data Engineer specializing in ETL pipelines, cloud data warehousing, and full-stack development.",
+      "Portfolio and high-intent field notes on data engineering, AI agents, automation, and production software.",
+    url: siteConfig.url,
+    siteName: "Niko Pastore",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    creator: "@nikopastore",
+    title: "Niko Pastore | Data Engineer & AI Product Builder",
+    description:
+      "Portfolio and high-intent field notes on data engineering, AI agents, automation, and production software.",
   },
 };
 

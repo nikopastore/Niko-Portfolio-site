@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
-export default function NewsletterSignup() {
+export default function NewsletterSignup({ variant = "default" }: { variant?: "default" | "compact" | "inline" }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -32,40 +33,50 @@ export default function NewsletterSignup() {
     }
   };
 
+  const compact = variant === "compact";
+
   return (
-    <div className="bg-card/30 rounded-lg p-6 border border-card-border">
-      <h4 className="text-lg font-semibold mb-2">Subscribe to the Newsletter</h4>
-      <p className="text-sm text-muted mb-4">
-        Get new posts, AI insights, and automation tips delivered to your inbox.
-      </p>
+    <div
+      className={cn(
+        "rounded-3xl border border-card-border bg-card/60 p-6",
+        compact && "lg:ml-auto lg:max-w-md",
+        variant === "inline" && "my-10"
+      )}
+    >
+      <div className="mb-4">
+        <p className="text-xs uppercase tracking-[0.25em] text-muted">Newsletter</p>
+        <h4 className="mt-2 text-xl font-semibold">Get the practical AI systems memo.</h4>
+        <p className="mt-2 text-sm text-muted">
+          One focused note on AI agents, data engineering, and automation. No mass-produced slop, no generic prompt lists.
+        </p>
+      </div>
 
       {status === "success" ? (
-        <div className="text-green-400 py-2">
-          Thanks for subscribing! 🎉
+        <div className="rounded-2xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-500">
+          You&apos;re in. I&apos;ll send the useful stuff. 🎉
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        <form onSubmit={handleSubmit} className={cn("flex gap-2", !compact && "sm:flex-row", "flex-col sm:flex-row")}>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="your@email.com"
             required
-            className="flex-1 bg-background border border-card-border rounded-lg px-4 py-2 text-foreground focus:outline-none focus:border-foreground/50"
+            className="min-w-0 flex-1 rounded-full border border-card-border bg-background px-4 py-3 text-foreground focus:outline-none focus:border-foreground/50"
           />
           <button
             type="submit"
             disabled={status === "loading"}
-            className="px-4 py-2 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 disabled:opacity-50 transition-colors whitespace-nowrap"
+            className="rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background transition hover:bg-foreground/90 disabled:opacity-50"
           >
-            {status === "loading" ? "..." : "Subscribe"}
+            {status === "loading" ? "Joining..." : "Subscribe"}
           </button>
         </form>
       )}
 
-      {status === "error" && (
-        <div className="text-red-400 text-sm mt-2">{errorMsg}</div>
-      )}
+      {status === "error" && <div className="mt-2 text-sm text-red-400">{errorMsg}</div>}
+      <p className="mt-3 text-xs text-muted">Built for builders. Easy unsubscribe.</p>
     </div>
   );
 }

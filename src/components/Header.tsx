@@ -4,6 +4,7 @@ import { ArrowUpRight, Sun, Moon } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "@/context/ThemeContext";
 import { useToast } from "@/components/Toast";
+import { SocialIcon } from "@/components/SocialIcons";
 import { siteConfig } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -19,17 +20,15 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          {/* Left - Email */}
+        <div className="flex items-center justify-between gap-4">
           <button
             onClick={copyEmail}
-            className="text-sm text-muted hover:text-foreground transition-colors hidden sm:block cursor-pointer"
+            className="text-sm text-muted hover:text-foreground transition-colors hidden lg:block cursor-pointer"
           >
             {siteConfig.email}
           </button>
 
-          {/* Center - Role & Location */}
-          <div className="flex flex-col items-center text-center">
+          <Link href="/" className="flex flex-col items-start lg:items-center text-left lg:text-center">
             <div className="flex items-center gap-2">
               <ArrowUpRight className="w-4 h-4 text-foreground" />
               <span className="text-sm font-medium tracking-wide">
@@ -39,16 +38,42 @@ export default function Header() {
             <span className="text-xs text-muted tracking-wider">
               {siteConfig.location}
             </span>
-          </div>
+          </Link>
 
-          {/* Right - Blog + Theme Toggle */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Link
               href="/blog"
               className="text-sm text-muted hover:text-foreground transition-colors"
             >
               Blog
             </Link>
+            <a
+              href={siteConfig.discord}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-2 rounded-full border border-card-border px-3 py-2 text-sm text-muted transition hover:text-foreground hover:border-foreground/40"
+            >
+              <SocialIcon platform="discord" />
+              Discord
+            </a>
+            <a
+              href={siteConfig.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full border border-card-border text-muted transition hover:text-foreground hover:border-foreground/40"
+            >
+              <SocialIcon platform="linkedin" />
+            </a>
+            <a
+              href={siteConfig.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X"
+              className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full border border-card-border text-muted transition hover:text-foreground hover:border-foreground/40"
+            >
+              <SocialIcon platform="x" />
+            </a>
             <button
               onClick={toggleTheme}
               className={cn(

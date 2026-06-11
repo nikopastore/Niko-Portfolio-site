@@ -26,6 +26,10 @@ const PHYSICS_TAGS: PhysicsTag[] = [
   { id: "circle-2", text: "→", width: 65, height: 65, isCircle: true, icon: "arrow" },
 ];
 
+interface MatterMouseWithWheel extends Matter.Mouse {
+  mousewheel?: EventListenerOrEventListenerObject;
+}
+
 // Create a Map for O(1) tag lookups instead of .find() on every frame
 const PHYSICS_TAGS_MAP = new Map(PHYSICS_TAGS.map(tag => [tag.id, tag]));
 
@@ -178,7 +182,7 @@ export default function PhysicsCanvas() {
     render.mouse = mouse;
 
     // Allow page scrolling over the canvas
-    const wheelHandler = (mouse as any).mousewheel;
+    const wheelHandler = (mouse as MatterMouseWithWheel).mousewheel;
     if (wheelHandler) {
       mouse.element.removeEventListener("wheel", wheelHandler);
       mouse.element.removeEventListener("mousewheel", wheelHandler);
@@ -321,6 +325,7 @@ export default function PhysicsCanvas() {
   }, [cleanup, initPhysics]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsClient(true);
   }, []);
 

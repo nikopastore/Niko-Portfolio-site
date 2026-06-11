@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Zap } from "lucide-react";
 import { Project } from "@/lib/data";
@@ -30,7 +31,7 @@ export default function WorksGrid({ projects }: WorksGridProps) {
               return (
                 <motion.div
                   key={project.id}
-                  initial={{ opacity: 0, y: 40 }}
+                  initial={{ opacity: 1, y: 0 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.2 }}
                   transition={{ duration: 0.6, delay: 0.1 }}
@@ -56,10 +57,12 @@ export default function WorksGrid({ projects }: WorksGridProps) {
                       <div className="group bg-card border border-card-border rounded-2xl overflow-hidden hover:border-muted transition-all duration-300">
                         {/* Image */}
                         <div className="relative w-full aspect-video overflow-hidden">
-                          <img
+                          <Image
                             src={project.image}
                             alt={project.name}
-                            className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                            fill
+                            sizes="(min-width: 768px) 50vw, 100vw"
+                            className="object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
 

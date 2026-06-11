@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * Screenshot capture script for portfolio projects
  * Run: node capture-screenshots.js

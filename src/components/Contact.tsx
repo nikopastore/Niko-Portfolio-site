@@ -2,13 +2,16 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { Mail } from "lucide-react";
 import { siteConfig } from "@/lib/data";
 import { useToast } from "@/components/Toast";
+import { SocialIcon, type SocialPlatform } from "@/components/SocialIcons";
 
-const socials = [
-  { name: "GitHub", url: siteConfig.github },
-  { name: "LinkedIn", url: siteConfig.linkedin },
-  { name: "Email", url: `mailto:${siteConfig.email}` },
+const socials: Array<{ name: string; url: string; platform: SocialPlatform }> = [
+  { name: "GitHub", url: siteConfig.github, platform: "github" },
+  { name: "LinkedIn", url: siteConfig.linkedin, platform: "linkedin" },
+  { name: "X", url: siteConfig.twitter, platform: "x" },
+  { name: "Discord", url: siteConfig.discord, platform: "discord" },
 ];
 
 export default function Contact() {
@@ -45,12 +48,10 @@ export default function Contact() {
           viewport={{ once: true }}
           className="flex flex-col md:flex-row md:items-center md:justify-between gap-6"
         >
-          {/* CTA */}
           <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl md:text-2xl font-bold tracking-wide">
-            LET'S GET IN TOUCH
+            LET&apos;S GET IN TOUCH
           </h2>
 
-          {/* Social Pills */}
           <div className="flex flex-wrap gap-3">
             {socials.map((social) => (
               <a
@@ -58,20 +59,21 @@ export default function Contact() {
                 href={social.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-5 py-2 border border-card-border rounded-full text-sm font-medium hover:bg-foreground hover:text-background transition-all duration-200"
+                className="inline-flex items-center gap-2 px-5 py-2 border border-card-border rounded-full text-sm font-medium hover:bg-foreground hover:text-background transition-all duration-200"
               >
+                <SocialIcon platform={social.platform} />
                 {social.name}
               </a>
             ))}
             <button
               onClick={copyEmail}
-              className="px-5 py-2 border border-card-border rounded-full text-sm font-medium hover:bg-foreground hover:text-background transition-all duration-200 cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2 border border-card-border rounded-full text-sm font-medium hover:bg-foreground hover:text-background transition-all duration-200 cursor-pointer"
             >
+              <Mail className="h-4 w-4" />
               Copy Email
             </button>
           </div>
 
-          {/* Live Clock */}
           <span className="text-muted text-sm font-[family-name:var(--font-space-mono)] tabular-nums">
             {time} MST
           </span>
