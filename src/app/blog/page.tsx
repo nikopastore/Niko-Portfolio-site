@@ -48,7 +48,9 @@ export default async function BlogPage() {
                 ))}
               </div>
             </div>
-            <NewsletterSignup variant="compact" />
+            {siteConfig.enableNewsletter ? (
+              <NewsletterSignup variant="compact" />
+            ) : null}
           </section>
 
           {featured ? (

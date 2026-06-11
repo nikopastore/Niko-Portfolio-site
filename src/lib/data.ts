@@ -9,6 +9,8 @@ export const siteConfig = {
   discord: "https://discord.gg/ai-agent-mastery",
   rss: "https://nikopastore-portfolio.vercel.app/blog/feed.xml",
   url: "https://nikopastore-portfolio.vercel.app",
+  enableDiscord: false,
+  enableNewsletter: false,
 };
 
 export const skillTags = [

@@ -47,15 +47,17 @@ export default function Header() {
             >
               Blog
             </Link>
-            <a
-              href={siteConfig.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden sm:inline-flex items-center gap-2 rounded-full border border-card-border px-3 py-2 text-sm text-muted transition hover:text-foreground hover:border-foreground/40"
-            >
-              <SocialIcon platform="discord" />
-              Discord
-            </a>
+            {siteConfig.enableDiscord ? (
+              <a
+                href={siteConfig.discord}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:inline-flex items-center gap-2 rounded-full border border-card-border px-3 py-2 text-sm text-muted transition hover:text-foreground hover:border-foreground/40"
+              >
+                <SocialIcon platform="discord" />
+                Discord
+              </a>
+            ) : null}
             <a
               href={siteConfig.linkedin}
               target="_blank"

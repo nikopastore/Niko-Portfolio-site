@@ -21,7 +21,9 @@ export default function Footer() {
           <SocialLogoButton platform="linkedin" href={siteConfig.linkedin} />
           <SocialLogoButton platform="x" href={siteConfig.twitter} />
           <SocialLogoButton platform="github" href={siteConfig.github} />
-          <SocialLogoButton platform="discord" href={siteConfig.discord} />
+          {siteConfig.enableDiscord ? (
+            <SocialLogoButton platform="discord" href={siteConfig.discord} />
+          ) : null}
           <SocialLogoButton platform="rss" href="/blog/feed.xml" label="RSS feed" />
         </div>
       </div>

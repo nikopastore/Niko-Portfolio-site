@@ -7,12 +7,21 @@ import { siteConfig } from "@/lib/data";
 import { useToast } from "@/components/Toast";
 import { SocialIcon, type SocialPlatform } from "@/components/SocialIcons";
 
-const socials: Array<{ name: string; url: string; platform: SocialPlatform }> = [
+const socialsBase: Array<{ name: string; url: string; platform: SocialPlatform }> = [
   { name: "GitHub", url: siteConfig.github, platform: "github" },
   { name: "LinkedIn", url: siteConfig.linkedin, platform: "linkedin" },
   { name: "X", url: siteConfig.twitter, platform: "x" },
-  { name: "Discord", url: siteConfig.discord, platform: "discord" },
 ];
+
+const discordSocial: { name: string; url: string; platform: SocialPlatform } = {
+  name: "Discord",
+  url: siteConfig.discord,
+  platform: "discord",
+};
+
+const socials = siteConfig.enableDiscord
+  ? [...socialsBase, discordSocial]
+  : socialsBase;
 
 export default function Contact() {
   const [time, setTime] = useState("");

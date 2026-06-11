@@ -19,11 +19,11 @@ export async function GET() {
         `- [${post.frontmatter.title}](${siteConfig.url}/blog/${post.slug}): ${post.frontmatter.excerpt} Tags: ${post.frontmatter.tags.join(", ")}.`
     ),
     "",
-    "## Social",
+    `## Social`,
     `- LinkedIn: ${siteConfig.linkedin}`,
     `- X: ${siteConfig.twitter}`,
     `- GitHub: ${siteConfig.github}`,
-    `- Discord: ${siteConfig.discord}`,
+    siteConfig.enableDiscord ? `- Discord: ${siteConfig.discord}` : "- Discord: coming soon",
   ];
 
   return new Response(lines.join("\n"), {

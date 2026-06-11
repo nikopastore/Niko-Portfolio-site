@@ -159,27 +159,31 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <Prose>{post.content}</Prose>
           </div>
 
-          <section className="mt-14 rounded-3xl border border-card-border bg-foreground text-background p-7">
-            <p className="text-xs uppercase tracking-[0.25em] opacity-70">Community</p>
-            <h2 className="mt-3 text-2xl font-[family-name:var(--font-space-grotesk)] font-bold">
-              Join the AI Agent Mastery Discord
-            </h2>
-            <p className="mt-3 max-w-2xl text-background/75">
-              I share agent setups, automation breakdowns, and the implementation details that do not always make it into public posts.
-            </p>
-            <a
-              href={siteConfig.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-5 inline-flex rounded-full bg-background px-5 py-2.5 text-sm font-medium text-foreground"
-            >
-              Join free on Discord →
-            </a>
-          </section>
+          {siteConfig.enableDiscord ? (
+            <section className="mt-14 rounded-3xl border border-card-border bg-foreground text-background p-7">
+              <p className="text-xs uppercase tracking-[0.25em] opacity-70">Community</p>
+              <h2 className="mt-3 text-2xl font-[family-name:var(--font-space-grotesk)] font-bold">
+                Join the AI Agent Mastery Discord
+              </h2>
+              <p className="mt-3 max-w-2xl text-background/75">
+                I share agent setups, automation breakdowns, and the implementation details that do not always make it into public posts.
+              </p>
+              <a
+                href={siteConfig.discord}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-5 inline-flex rounded-full bg-background px-5 py-2.5 text-sm font-medium text-foreground"
+              >
+                Join free on Discord →
+              </a>
+            </section>
+          ) : null}
 
-          <div className="mt-10">
-            <NewsletterSignup variant="inline" />
-          </div>
+          {siteConfig.enableNewsletter ? (
+            <div className="mt-10">
+              <NewsletterSignup variant="inline" />
+            </div>
+          ) : null}
 
           {related.length > 0 ? (
             <section className="mt-14">
