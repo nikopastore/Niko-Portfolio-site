@@ -11,6 +11,7 @@ export const siteConfig = {
   url: "https://nikopastore-portfolio.vercel.app",
   enableDiscord: false,
   enableNewsletter: false,
+  enableTraining: true,
 };
 
 export const skillTags = [
@@ -357,5 +358,52 @@ export const education: Experience[] = [
     years: "",
     type: "education",
     subtitle: "Rady School of Management",
+  },
+];
+
+export interface Training {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  bullets: string[];
+  url?: string;
+  cta: string;
+  // "discord" renders the existing Discord logo; "whop" renders an inline Whop wordmark; "custom" uses a 2-letter chip
+  iconStyle: "discord" | "whop" | "custom";
+  iconInitials?: string;
+}
+
+export const training: Training[] = [
+  {
+    id: "ai-agent-mastery-discord",
+    name: "AI Agent Mastery",
+    category: "FREE COMMUNITY",
+    description:
+      "Discord community for builders shipping real AI agents in production. Daily setups, peer reviews, and teardowns.",
+    bullets: [
+      "Daily agent setups and configuration templates",
+      "Peer review of agent architecture and prompts",
+      "Live teardowns of new models, tools, and releases",
+    ],
+    url: "https://discord.gg/ai-agent-mastery",
+    cta: "Join free on Discord",
+    iconStyle: "discord",
+  },
+  {
+    id: "field-notes-blog",
+    name: "Field Notes Blog",
+    category: "OPEN KNOWLEDGE BASE",
+    description:
+      "High-intent writeups on AI agents, data engineering, and production systems. Implementation details most tutorials skip.",
+    bullets: [
+      "35+ field notes on real builds, models, and tooling",
+      "Answer-first structure for humans and AI agents",
+      "Linked to the source: diagrams, code, and tradeoffs",
+    ],
+    url: "/blog",
+    cta: "Read the field notes",
+    iconStyle: "custom",
+    iconInitials: "FN",
   },
 ];
