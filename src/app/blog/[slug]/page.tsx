@@ -72,14 +72,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   const related = getRelatedPosts(post, posts, 3);
   const canonicalUrl = `${siteConfig.url}/blog/${post.slug}`;
-  const takeaways =
+  const fallbackFirst =
+    post.frontmatter.tldr ||
+    post.frontmatter.excerpt ||
+    post.frontmatter.description ||
+    "Practical notes on AI systems, data engineering, and automation.";
+  const takeaways = (
     post.frontmatter.keyTakeaways.length > 0
       ? post.frontmatter.keyTakeaways
       : [
-          post.frontmatter.tldr ?? post.frontmatter.excerpt,
+          fallbackFirst,
           "The goal is practical implementation: clear constraints, real tradeoffs, and examples a builder can reuse.",
           "AI visibility improves when the answer, examples, diagrams, and source structure are easy for both humans and agents to parse.",
-        ];
+        ]
+  ).filter((t): t is string => Boolean(t && t.trim()));
 
   return (
     <>
