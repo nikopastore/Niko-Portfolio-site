@@ -59,7 +59,13 @@ export default function TrainingSection({ items }: TrainingSectionProps) {
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div
+          className={
+            visibleItems.length === 1
+              ? "grid grid-cols-1"
+              : "grid gap-6 md:grid-cols-2"
+          }
+        >
           {visibleItems.map((item, index) => {
             const isComingSoon = !item.url;
             const Wrapper = isComingSoon ? "div" : "a";
