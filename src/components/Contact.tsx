@@ -52,7 +52,7 @@ export default function Contact() {
     <section id="contact" className="py-16 px-6 border-t border-card-border">
       <div className="max-w-7xl mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 0 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="flex flex-col md:flex-row md:items-center md:justify-between gap-6"

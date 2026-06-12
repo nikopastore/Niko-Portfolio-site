@@ -7,19 +7,37 @@ interface AppsSectionProps {
 }
 
 export default function AppsSection({ apps }: AppsSectionProps) {
-  if (apps.length === 0) {
+  const visibleApps = apps.filter((app) => app.url);
+
+  if (visibleApps.length === 0) {
     return null;
   }
+
+  const gridClass =
+    visibleApps.length === 1
+      ? "grid grid-cols-1"
+      : visibleApps.length === 2
+        ? "grid gap-6 md:grid-cols-2"
+        : "grid gap-6 md:grid-cols-2 lg:grid-cols-3";
 
   return (
     <section id="apps" className="py-20 px-6">
       <div className="max-w-6xl mx-auto">
-        <h2 className="font-[family-name:var(--font-space-grotesk)] text-4xl md:text-5xl font-bold mb-12 tracking-tight">
-          APPS
-        </h2>
+        <div className="mb-12 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <span className="text-sm text-muted tracking-[0.3em]">APPS</span>
+            <h2 className="mt-3 font-[family-name:var(--font-space-grotesk)] text-4xl md:text-5xl font-bold tracking-tight">
+              Shipped utilities worth opening.
+            </h2>
+          </div>
+          <p className="max-w-md text-base text-foreground/70">
+            I only show app cards here once there is a real public surface to click.
+            Concepts stay out of the portfolio until they ship.
+          </p>
+        </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {apps.map((app) => (
+        <div className={gridClass}>
+          {visibleApps.map((app) => (
             <div
               key={app.id}
               className="bg-card border border-card-border rounded-2xl p-6 flex flex-col gap-5 hover:border-muted transition-colors"
