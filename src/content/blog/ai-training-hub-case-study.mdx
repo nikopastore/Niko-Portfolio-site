@@ -1,0 +1,157 @@
+---
+title: "AI Training Hub: A Gamified Tracker for the Top AI Courses of 2026"
+description: "I built a zero-dependency, vanilla JS web app to keep myself accountable while learning the modern AI/ML stack. 60 curated courses, S/A/B/C quality tiers, real XP/levels/streaks, 15 achievements, 74 tests, GitHub Pages. Here's the design."
+publishedAt: "2026-06-12"
+tags: ["side-project", "vanilla-js", "gamification", "personal-knowledge-management", "static-site", "anthropic"]
+image: "/blog/images/ai-training-hub-hero.png"
+---
+
+**TL;DR**: I built a single-page web app to keep myself accountable while learning the modern AI/ML stack. **60 hand-curated courses** across 3 tiers (Learn / Build / Ship), **27 current Anthropic Skilljar courses**, **S/A/B/C quality grading**, real gamification (XP, 99 levels, streaks, **15 achievements**), pure vanilla JS, **zero dependencies**, **74 passing tests**, deploys to GitHub Pages. Open source at [github.com/nikopastore/ai-training-hub](https://github.com/nikopastore/ai-training-hub), live at [nikopastore.github.io/ai-training-hub](https://nikopastore.github.io/ai-training-hub/).
+
+![AI Training Hub — main view showing 60-course counter, S/A/B/C quality tier breakdown, and Top Picks](/blog/images/ai-training-hub-hero.png)
+
+## The problem
+
+Like a lot of engineers, my "learn AI" list lived in about six different places at once: a Notion page, a Trello board, a spreadsheet, browser bookmarks, an email draft, and a few Slack DMs to myself. None of those places actually *told* me what to do next. None of them celebrated when I finished something. None of them made the *meta-skill* of fluency — the long, unglamorous work of building a real foundation — feel rewarding.
+
+Worse: most course lists are either **unfiltered** ("here are 200 AI courses, good luck") or **ungraded** ("here are 5 must-take picks, the other 200 are fine I guess"). I wanted a single page where the top-tier material is *visually* obvious, the rest is honestly ranked, and finishing a course feels like a real, small win.
+
+So I built the tool I wanted. **AI Training Hub** is a single-page web app that tracks my progress through 60 hand-curated courses — every current Anthropic Skilljar course, the DeepLearning.AI classics, the Stanford NLP track, the Hugging Face LLM course — and turns the act of finishing them into a satisfying loop.
+
+## What's inside
+
+- **60 courses** across 3 tiers: **Learn** (foundations), **Build** (hands-on engineering), **Ship** (production mastery)
+- **S / A / B / C quality tiers** — 16 S-tier, 37 A-tier, 7 B-tier, 0 C-tier. Tiers are *visible on every card* so the highest-signal material is obvious at a glance.
+- **27 Anthropic Skilljar courses**, all current as of June 2026 — including Claude Code, MCP, Cowork, Agent Skills, and Subagents tracks
+- **33 partner courses** from DeepLearning.AI, Hugging Face, fast.ai, Stanford, Google, AWS, NVIDIA, Kaggle, O'Reilly, and others
+- **15 achievements** that unlock as you progress — including the very satisfying "Anthropic Scholar" for finishing all 27 Anthropic courses
+- **XP, 99 levels, streaks** — quadratic XP curve (`100 * level^1.5`) tuned to feel rewarding early and grind-worthy later
+- **Daily-rotating "Anthropic Pick"** — every page load surfaces one random uncompleted Anthropic course as a nudge
+- **Live search** across course names, providers, descriptions, and tags
+- **In-progress state** — gold-bordered cards for courses you've started but not finished
+- **localStorage persistence** — your progress follows you across devices (and is fully exportable as JSON)
+- **Top Picks** — the 5 highest-grade S-tier courses pinned to the top of the catalog
+
+## Architecture
+
+The whole project is small enough to read in an afternoon:
+
+```
+ai-training-hub/
+├── index.html              # 80 lines, no framework
+├── styles.css              # 700 lines, hand-rolled CSS
+├── app.js                  # ~800 lines, vanilla gamification engine
+├── data/courses.json       # 60 course entries (the source of truth)
+├── tests/gamification.test.mjs  # 74 tests, zero deps
+└── scripts/scrape-skilljar.mjs  # optional Anthropic catalog sync
+```
+
+I deliberately chose vanilla over a framework. Three reasons:
+
+1. **The catalog is small and bounded.** 60 courses, 15 achievements, 3 tiers, 4 quality grades. A framework would buy me component composition, but I don't have components — I have one card template and one modal.
+2. **The render cost is bounded.** `render()` rebuilds the entire DOM in single-digit milliseconds at this size. There is no perceivable jank. There will never be.
+3. **The deploy story is trivial.** No build step. No node_modules. `git push` to GitHub Pages → live in 60 seconds. Anywhere I go, the app goes with me.
+
+The interesting design decision is that the course catalog is the **source of truth** (`data/courses.json`), and the gamification engine is a **pure-function layer** on top. XP math, level thresholds, achievement checks — all of them are exposed on `window.AITrainingHub` for testing, none of them touch the DOM. The state object is one flat JSON blob in `localStorage`. The render function is one ~200-line function that rebuilds the page.
+
+This makes the codebase *boring* in the best sense. There's nothing tricky in it. Any engineer could read it top-to-bottom in 20 minutes and know exactly how it works. That's the goal.
+
+## Quality tier system
+
+The most useful feature is also the simplest: **every course has an S, A, B, or C grade**, and the grade is visible on the card. No hover tooltips, no "premium" gates.
+
+| Grade | Courses | Total XP | What it means |
+|-------|--------:|---------:|---------------|
+| **S** | 16 | 5,090 | Top-tier. Take these first. Most signal per hour. |
+| **A** | 37 | 9,150 | Strong. Real depth, clear teaching, current as of 2026. |
+| **B** | 7  | 1,750 | Solid but dated, niche, or redundant with an S-tier. |
+| **C** | 0  | 0       | Listed but not recommended. (None currently meet the bar.) |
+
+I update grades by hand when a course changes (Anthropic deprecates one, DeepLearning.AI launches a new track, a Stanford series gets a refresh). The grading is opinionated and personal — your mileage will vary — but the *infrastructure* (grade → XP weight → visual badge → sort order) is what makes the catalog useful.
+
+XP weights are 50 / 100 / 200 by tier:
+- **50 XP** — quick wins under 1 hour (Claude 101, AI Capabilities)
+- **100 XP** — standard 1–4 hour courses (Claude Code 101, MCP Intro, prompt engineering)
+- **200 XP** — multi-week deep dives (AI Fluency Framework, CS224N)
+
+S-tier courses weigh 200 XP, A-tier 100, B-tier 50. The total XP available across the catalog is **15,990** — enough that reaching the level cap (Level 99) requires finishing essentially everything.
+
+## Gamification design
+
+The XP curve is `100 * level^1.5`, capped at level 99:
+
+| Level | XP to reach | Cumulative |
+|------:|------------:|-----------:|
+| 1 | 0 | 0 |
+| 2 | 100 | 100 |
+| 3 | 283 | 383 |
+| 5 | 800 | 1,703 |
+| 10 | 2,720 | 11,139 |
+| 25 | 7,524 | 78,176 |
+| 50 | 19,748 | 510,102 |
+| 99 | 53,892 | 1,948,716 |
+
+**Why this curve?** Quadratic-ish. Fast early — finishing your first 2–3 courses gets you to Level 2, which feels great. Hard late — to reach Level 10 you need ~11K XP, which means doing most of the S-tier catalog. To reach Level 50 you need ~510K XP, which is *the whole catalog plus a chunk of streak bonuses and achievement XP*. The 99-level cap is essentially a "you completed everything" badge.
+
+The 15 achievements:
+
+| Icon | Name | Trigger |
+|------|------|---------|
+| 👣 | First Step | Complete 1 course |
+| 🅰️ | Anthropic Apprentice | Complete 1 Anthropic course |
+| 🔺 | Anthropic Adept | Complete 5 Anthropic courses |
+| ⭐ | Anthropic Expert | Complete 10 Anthropic courses |
+| 🎓 | Anthropic Scholar | Complete all 27 Anthropic courses |
+| 📚 | Lifelong Learner | Finish the entire Learn tier |
+| 🛠️ | Builder | Finish the entire Build tier |
+| 🚀 | Ship Captain | Finish the entire Ship tier |
+| ✨ | Rising Star | Reach Level 3 |
+| ⚡ | Power User | Reach Level 10 |
+| 👑 | AI Grandmaster | Reach Level 50 |
+| 🔥 | On Fire | 3-day streak |
+| 💎 | Unstoppable | 7-day streak |
+| 🏔️ | Halfway There | 50% of all courses |
+| 🏆 | Completionist | Complete every course |
+
+Achievement checks are *re-evaluated* when you uncomplete a course. If you drop below the threshold, the achievement is removed and the +25 XP is clawed back. This keeps the state model honest — no achievement you don't currently deserve.
+
+## Why I didn't use React (or any framework)
+
+I get asked this a lot. The honest answer is: **at this scale, a framework would be 3× the code with no perceptible benefit.**
+
+What a framework gives you:
+- Component composition → I have one card template
+- Declarative re-renders → I have imperative `render()` calls, which is fine when the render is 5ms
+- A build step → I have zero build, and `python3 -m http.server` deploys the site
+
+What a framework costs you:
+- 100–500ms of framework overhead on initial load
+- A `node_modules` directory larger than my entire codebase
+- A mental model of the framework's reconciler, hooks lifecycle, state model, etc.
+- A deployment story that requires a bundler
+
+For a project this size, the trade is wrong. If the catalog grew to 1,000 courses, or if the gamification logic became genuinely stateful (e.g. with animations driven by per-card state), I'd reach for a framework. Today, vanilla wins.
+
+## What I learned
+
+1. **Gamification is just state + a feedback loop.** The XP/level math is ~20 lines. The hard part is making the *feedback* feel good — animations, toasts, progress bars — without being annoying.
+2. **Pure-vanilla web apps are underrated** for projects under 2K LOC. The cost of a framework exceeds the cost of writing careful DOM code.
+3. **Data structure is the product.** Once the `COURSES` array and the `state` object are right, every UI feature falls out trivially. The `courses.json` is the single source of truth — change it and the UI updates.
+4. **Real production polish = 10% code, 90% CSS.** The `transition: all 200ms cubic-bezier(...)` on every interactive element does more for perceived quality than any feature.
+5. **Quality grading is the highest-leverage editorial decision.** A list of 200 undifferentiated courses is useless. The same list, with 16 marked S-tier and the rest honestly ranked, becomes a *plan*.
+
+## The design language
+
+I went with a warm cream + terracotta + forest palette — the opposite of the usual "AI cold tech" aesthetic. Soft radial gradient backgrounds, glassmorphism stat cards with gradient top accents, pulsing featured badges, a flickering 🔥 flame on the streak counter. It feels like a cozy productivity app, not a chrome extension.
+
+The Featured badge pulses (subtle box-shadow animation) to draw the eye to the highest-signal courses. The Anthropic Pick rotates every page load — same pattern that makes mobile games feel like they have a "today's mission." And the achievements panel slides in from the right with a smooth transition.
+
+## Open source
+
+The full project is on GitHub: [github.com/nikopastore/ai-training-hub](https://github.com/nikopastore/ai-training-hub). MIT licensed. PRs welcome — especially for adding new courses or fixing broken links. See [CONTRIBUTING.md](https://github.com/nikopastore/ai-training-hub/blob/main/.github/CONTRIBUTING.md) for the workflow.
+
+If you want to fork it and use it for your own learning path, please do. The `data/courses.json` is just a JSON file — replace the contents with your own curriculum and the rest of the app adapts automatically.
+
+---
+
+**Live**: [nikopastore.github.io/ai-training-hub](https://nikopastore.github.io/ai-training-hub/) · **Code**: [github.com/nikopastore/ai-training-hub](https://github.com/nikopastore/ai-training-hub) · **Tests**: 74/74 passing

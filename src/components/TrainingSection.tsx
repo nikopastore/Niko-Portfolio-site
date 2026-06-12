@@ -76,6 +76,9 @@ export default function TrainingSection({ items }: TrainingSectionProps) {
                   target: "_blank",
                   rel: "noopener noreferrer",
                 };
+            const secondaryLink =
+              !isComingSoon && item.caseStudyUrl ? item.caseStudyUrl : null;
+            const secondaryCta = item.caseStudyCta ?? "Read the case study";
 
             return (
               <motion.div
@@ -116,7 +119,7 @@ export default function TrainingSection({ items }: TrainingSectionProps) {
                     </ul>
                   ) : null}
 
-                  <div className="mt-auto pt-2">
+                  <div className="mt-auto flex flex-wrap items-center gap-3 pt-2">
                     {isComingSoon ? (
                       <span className="inline-flex items-center gap-2 rounded-full border border-card-border px-4 py-2 text-sm font-medium text-muted">
                         Coming soon
@@ -127,6 +130,18 @@ export default function TrainingSection({ items }: TrainingSectionProps) {
                         <ArrowUpRight className="h-4 w-4" />
                       </span>
                     )}
+                    {secondaryLink ? (
+                      <a
+                        href={secondaryLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(event) => event.stopPropagation()}
+                        className="inline-flex items-center gap-2 rounded-full border border-card-border px-4 py-2 text-sm font-medium text-foreground/80 transition-colors hover:border-foreground/50 hover:text-foreground"
+                      >
+                        {secondaryCta}
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                      </a>
+                    ) : null}
                   </div>
                 </Wrapper>
               </motion.div>

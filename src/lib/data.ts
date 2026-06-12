@@ -372,6 +372,9 @@ export interface Training {
   // "discord" renders the existing Discord logo; "whop" renders an inline Whop wordmark; "custom" uses a 2-letter chip
   iconStyle: "discord" | "whop" | "custom";
   iconInitials?: string;
+  // Optional secondary link surfaced as a quieter pill on the card (e.g. case study)
+  caseStudyUrl?: string;
+  caseStudyCta?: string;
 }
 
 export const training: Training[] = [
@@ -390,6 +393,8 @@ export const training: Training[] = [
     cta: "Open AI Training Hub",
     iconStyle: "custom",
     iconInitials: "AI",
+    caseStudyUrl: "/blog/ai-training-hub-case-study",
+    caseStudyCta: "Read the case study",
   },
   {
     id: "ai-agent-mastery-discord",
