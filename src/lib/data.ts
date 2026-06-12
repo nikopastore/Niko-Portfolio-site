@@ -376,6 +376,22 @@ export interface Training {
 
 export const training: Training[] = [
   {
+    id: "ai-training-hub",
+    name: "AI Training Hub",
+    category: "AI LEARNING PROJECT",
+    description:
+      "A gamified personal AI fluency tracker I built to stay accountable across 60 curated AI, ML, agent, and cloud courses. It turns the curriculum into XP, levels, streaks, quality tiers, and a daily learning loop.",
+    bullets: [
+      "60-course catalog across Learn, Build, and Ship tracks",
+      "S/A/B/C quality tiers, XP, streaks, progress state, and Top Picks",
+      "Open-source vanilla HTML/CSS/JS app deployed on GitHub Pages",
+    ],
+    url: "https://nikopastore.github.io/ai-training-hub/",
+    cta: "Open AI Training Hub",
+    iconStyle: "custom",
+    iconInitials: "AI",
+  },
+  {
     id: "ai-agent-mastery-discord",
     name: "AI Agent Mastery",
     category: "FREE COMMUNITY",
