@@ -23,7 +23,10 @@ export const metadata: Metadata = {
 
 export default async function BlogPage() {
   const posts = await getPosts();
-  const [featured, ...rest] = posts;
+  const projectCaseStudy = posts.find((post) => post.slug === "ai-training-hub-case-study");
+  const featured = projectCaseStudy ?? posts[0];
+  const featuredIsTrainingHub = featured?.slug === "ai-training-hub-case-study";
+  const rest = posts.filter((post) => post.slug !== featured?.slug);
   const tags = Array.from(new Set(posts.flatMap((post) => post.frontmatter.tags))).slice(0, 10);
 
   return (
@@ -54,10 +57,7 @@ export default async function BlogPage() {
           </section>
 
           {featured ? (
-            <Link
-              href={`/blog/${featured.slug}`}
-              className="group mb-10 grid overflow-hidden rounded-3xl border border-card-border bg-card/70 transition hover:border-foreground/35 lg:grid-cols-[1.05fr_0.95fr]"
-            >
+            <article className="group mb-10 grid overflow-hidden rounded-3xl border border-card-border bg-card/70 transition hover:border-foreground/35 lg:grid-cols-[1.05fr_0.95fr]">
               <div className="relative min-h-[260px] bg-card">
                 {featured.frontmatter.image ? (
                   <Image
@@ -74,7 +74,7 @@ export default async function BlogPage() {
               </div>
               <div className="p-7 md:p-9">
                 <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-wider text-muted">
-                  <span>Featured</span>
+                  <span>{featuredIsTrainingHub ? "Featured project" : "Featured"}</span>
                   <span className="h-1 w-1 rounded-full bg-muted" />
                   <span>{formatDate(featured.frontmatter.date)}</span>
                   <span className="h-1 w-1 rounded-full bg-muted" />
@@ -84,11 +84,38 @@ export default async function BlogPage() {
                   {featured.frontmatter.title}
                 </h2>
                 <p className="mt-4 text-foreground/70">{featured.frontmatter.excerpt}</p>
-                <div className="mt-7 inline-flex rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background">
-                  Read the field note →
+                <div className="mt-7 flex flex-wrap items-center gap-3">
+                  {featuredIsTrainingHub ? (
+                    <>
+                      <a
+                        href="https://nikopastore.github.io/ai-training-hub/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition hover:opacity-90"
+                      >
+                        Open AI Training Hub →
+                      </a>
+                      <Link
+                        href={`/blog/${featured.slug}`}
+                        className="inline-flex rounded-full border border-card-border px-4 py-2 text-sm font-medium text-foreground/80 transition-colors hover:border-foreground/50 hover:text-foreground"
+                      >
+                        Read the case study →
+                      </Link>
+                      <span className="inline-flex rounded-full border border-card-border px-4 py-2 text-xs font-medium uppercase tracking-wider text-muted">
+                        60 courses · 74 tests · S/A/B/C tiers
+                      </span>
+                    </>
+                  ) : (
+                    <Link
+                      href={`/blog/${featured.slug}`}
+                      className="inline-flex rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition hover:opacity-90"
+                    >
+                      Read the field note →
+                    </Link>
+                  )}
                 </div>
               </div>
-            </Link>
+            </article>
           ) : null}
 
           {posts.length === 0 ? (
