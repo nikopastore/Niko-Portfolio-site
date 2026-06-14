@@ -74,7 +74,7 @@ export const projects: Project[] = [
     skills: ["Next.js", "TypeScript", "Python", "Scikit-learn", "OpenAI API", "LangChain", "PostgreSQL", "Vercel"],
     image: "/screenshots/hirepriority.png",
     url: "https://hirepriority.scalepilotlabs.com/",
-    metrics: "ML scoring + automated recruiting",
+    metrics: "ML scoring that speeds top-talent hiring",
   },
   {
     id: "sdhomepros",
@@ -91,7 +91,7 @@ export const projects: Project[] = [
     skills: ["Next.js", "TypeScript", "Local SEO", "Marketplace UX", "Community Growth", "Vercel"],
     image: "/screenshots/sdhomepros.png",
     url: "https://sdhomepros.app/",
-    metrics: "13.6K+ community members",
+    metrics: "13.6K+ members in one local home-pro network",
   },
   {
     id: "sipwiki",
@@ -124,7 +124,7 @@ export const projects: Project[] = [
     skills: ["Next.js", "TypeScript", "Creator Commerce", "SEO", "Tailwind CSS", "Vercel"],
     image: "/screenshots/elementarystateofmind.png",
     url: "https://www.elementarystateofmind.com/",
-    metrics: "Owned storefront for Zoe's teacher-resource brand",
+    metrics: "Shopfront for Zoe’s teacher-resource brand",
   },
   {
     id: "national-planning-group",
@@ -141,7 +141,7 @@ export const projects: Project[] = [
     skills: ["Next.js", "TypeScript", "Conversion UX", "Real Estate Ops", "SEO", "Vercel"],
     image: "/screenshots/nationalplanninggroup.png",
     url: "https://nationalplanninggroup.com/",
-    metrics: "Investor assessment funnel + property ops positioning",
+    metrics: "Investor-ready funnel that clarifies property ops",
   },
   {
     id: "flood-prediction",
@@ -157,7 +157,7 @@ export const projects: Project[] = [
     ],
     skills: ["Python", "Scikit-learn", "XGBoost", "Pandas", "GeoPandas", "GIS", "Matplotlib"],
     image: "/screenshots/flood.png",
-    metrics: "87% accuracy, 48-hour advance warning",
+    metrics: "87% accuracy with 48-hour flood warnings",
   },
 ];
 

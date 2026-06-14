@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import { rateLimit } from "@/lib/rateLimit";
 
-const COMMENTS_FILE = path.join(process.cwd(), "data", "comments.json");
-const NEWSLETTER_FILE = path.join(process.cwd(), "data", "newsletter.json");
+// Data is intentionally written to a runtime folder that is gitignored.
+// This keeps subscriber emails and pending comments out of the repo
+// (and out of git history for the people who have already cloned it).
+const COMMENTS_FILE = path.join(process.cwd(), "data", "runtime", "comments.json");
+const NEWSLETTER_FILE = path.join(process.cwd(), "data", "runtime", "newsletter.json");
 
 interface Comment {
   postSlug: string;
@@ -61,6 +65,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const rl = rateLimit(request, "comments-post");
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec ?? 60) } }
+    );
+  }
   try {
     const body = await request.json();
     const { postSlug, name, email, comment, subscribed } = body;

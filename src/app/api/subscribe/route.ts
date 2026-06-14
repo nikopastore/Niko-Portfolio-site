@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import { rateLimit } from "@/lib/rateLimit";
 
-const NEWSLETTER_FILE = path.join(process.cwd(), "data", "newsletter.json");
+// Newsletter persistence lives in a gitignored runtime folder so subscriber
+// emails are never committed to source control.
+const NEWSLETTER_FILE = path.join(process.cwd(), "data", "runtime", "newsletter.json");
 
 export async function POST(request: NextRequest) {
+  const rl = rateLimit(request, "subscribe-post");
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec ?? 60) } }
+    );
+  }
   try {
     const body = await request.json();
     const { email } = body;

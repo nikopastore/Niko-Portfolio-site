@@ -8,6 +8,7 @@ import AppsSection from "@/components/AppsSection";
 import Experience from "@/components/Experience";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import HireNikoCTA from "@/components/HireNikoCTA";
 import { projects, experiences, education, apps, training } from "@/lib/data";
 
 export default function Home() {
@@ -23,6 +24,7 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
+      <HireNikoCTA />
     </>
   );
 }
