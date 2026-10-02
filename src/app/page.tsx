@@ -9,11 +9,13 @@ import Experience from "@/components/Experience";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import HireNikoCTA from "@/components/HireNikoCTA";
+import { PersonJsonLd } from "@/components/PersonJsonLd";
 import { projects, experiences, education, apps, training } from "@/lib/data";
 
 export default function Home() {
   return (
     <>
+      <PersonJsonLd />
       <Header />
       <main className="min-h-screen">
         <Hero />
