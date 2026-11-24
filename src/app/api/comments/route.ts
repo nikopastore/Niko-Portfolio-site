@@ -8,6 +8,12 @@ import { rateLimit } from "@/lib/rateLimit";
 // (and out of git history for the people who have already cloned it).
 const COMMENTS_FILE = path.join(process.cwd(), "data", "runtime", "comments.json");
 const NEWSLETTER_FILE = path.join(process.cwd(), "data", "runtime", "newsletter.json");
+const RUNTIME_DIR = path.dirname(COMMENTS_FILE);
+
+const MAX_NAME_LENGTH = 80;
+const MAX_EMAIL_LENGTH = 320;
+const MAX_COMMENT_LENGTH = 5_000;
+const MAX_SLUG_LENGTH = 120;
 
 interface Comment {
   postSlug: string;
@@ -29,6 +35,7 @@ async function readComments(): Promise<Comment[]> {
 }
 
 async function writeComments(comments: Comment[]): Promise<void> {
+  await fs.mkdir(RUNTIME_DIR, { recursive: true });
   await fs.writeFile(COMMENTS_FILE, JSON.stringify(comments, null, 2));
 }
 
@@ -44,6 +51,7 @@ async function addToNewsletter(email: string): Promise<void> {
   const normalizedEmail = email.toLowerCase().trim();
   if (!subscribers.includes(normalizedEmail)) {
     subscribers.push(normalizedEmail);
+    await fs.mkdir(RUNTIME_DIR, { recursive: true });
     await fs.writeFile(NEWSLETTER_FILE, JSON.stringify(subscribers, null, 2));
   }
 }
@@ -76,18 +84,48 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { postSlug, name, email, comment, subscribed } = body;
 
-    if (!postSlug || !name || !email || !comment) {
+    if (
+      typeof postSlug !== "string" ||
+      typeof name !== "string" ||
+      typeof email !== "string" ||
+      typeof comment !== "string"
+    ) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
+    const normalizedSlug = postSlug.trim();
+    const normalizedName = name.trim();
+    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedComment = comment.trim();
+
+    if (!normalizedSlug || !normalizedName || !normalizedEmail || !normalizedComment) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    if (
+      normalizedSlug.length > MAX_SLUG_LENGTH ||
+      normalizedName.length > MAX_NAME_LENGTH ||
+      normalizedEmail.length > MAX_EMAIL_LENGTH ||
+      normalizedComment.length > MAX_COMMENT_LENGTH ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)
+    ) {
+      return NextResponse.json(
+        { error: "Please check the length and format of your submission" },
+        { status: 400 }
+      );
+    }
+
     const newComment: Comment = {
-      postSlug,
-      name: name.trim(),
-      email: email.toLowerCase().trim(),
-      comment: comment.trim(),
+      postSlug: normalizedSlug,
+      name: normalizedName,
+      email: normalizedEmail,
+      comment: normalizedComment,
       timestamp: new Date().toISOString(),
       subscribed: Boolean(subscribed),
       approved: false,
@@ -99,7 +137,7 @@ export async function POST(request: NextRequest) {
 
     // Add to newsletter if subscribed
     if (subscribed) {
-      await addToNewsletter(email);
+      await addToNewsletter(normalizedEmail);
     }
 
     return NextResponse.json({ success: true });

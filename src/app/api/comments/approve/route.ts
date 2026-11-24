@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
 
-const COMMENTS_FILE = path.join(process.cwd(), "data", "comments.json");
+const COMMENTS_FILE = path.join(process.cwd(), "data", "runtime", "comments.json");
 
 interface Comment {
   postSlug: string;

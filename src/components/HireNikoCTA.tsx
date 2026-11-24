@@ -44,6 +44,8 @@ export default function HireNikoCTA() {
     setOpen(false);
   };
 
+  const close = () => setOpen(false);
+
   const buildMailto = (f: IntakeForm) => {
     const subject = `Hire: ${f.role || "open role"} (${f.timeline || "no timeline"})`;
     const body = [
@@ -97,7 +99,7 @@ export default function HireNikoCTA() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
-            onClick={() => setOpen(false)}
+            onClick={close}
           >
             <motion.div
               initial={{ scale: 0.96, y: 8, opacity: 0 }}
@@ -108,19 +110,19 @@ export default function HireNikoCTA() {
               className="w-full max-w-lg rounded-2xl border border-card-border bg-background p-6 shadow-2xl"
               role="dialog"
               aria-modal="true"
-              aria-label="Hire Niko intake form"
+              aria-labelledby="hire-niko-title"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Briefcase className="h-5 w-5" />
-                  <h3 className="text-lg font-bold font-[family-name:var(--font-space-grotesk)]">
+                  <h3 id="hire-niko-title" className="text-lg font-bold font-[family-name:var(--font-space-grotesk)]">
                     Hire Niko
                   </h3>
                 </div>
                 <button
-                  onClick={dismiss}
+                  onClick={close}
                   className="rounded-full p-1 hover:bg-card transition-colors"
-                  aria-label="Dismiss"
+                  aria-label="Close hire form"
                 >
                   <X className="h-5 w-5" />
                 </button>

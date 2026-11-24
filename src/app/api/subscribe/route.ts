@@ -6,6 +6,7 @@ import { rateLimit } from "@/lib/rateLimit";
 // Newsletter persistence lives in a gitignored runtime folder so subscriber
 // emails are never committed to source control.
 const NEWSLETTER_FILE = path.join(process.cwd(), "data", "runtime", "newsletter.json");
+const RUNTIME_DIR = path.dirname(NEWSLETTER_FILE);
 
 export async function POST(request: NextRequest) {
   const rl = rateLimit(request, "subscribe-post");
@@ -47,6 +48,7 @@ export async function POST(request: NextRequest) {
 
     // Add new subscriber
     subscribers.push(normalizedEmail);
+    await fs.mkdir(RUNTIME_DIR, { recursive: true });
     await fs.writeFile(NEWSLETTER_FILE, JSON.stringify(subscribers, null, 2));
 
     return NextResponse.json({ success: true });
