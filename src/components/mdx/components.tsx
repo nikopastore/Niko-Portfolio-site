@@ -63,7 +63,7 @@ function KeyTakeaway({ children }: { children: ReactNode }) {
 function MdxTable(props: ComponentProps<"table">) {
   return (
     <div className="my-6 w-full overflow-x-auto rounded-2xl border border-card-border">
-      <table {...props} className="w-full border-collapse text-left text-sm" />
+      <table {...props} className="w-full min-w-[540px] border-collapse text-left text-sm" />
     </div>
   );
 }

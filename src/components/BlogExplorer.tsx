@@ -61,21 +61,40 @@ function PostCard({ post }: { post: BlogPostSummary }) {
   );
 }
 
+function normalizeTag(tag: string): string {
+  return tag.trim().toLowerCase().replace(/[\s_]+/g, "-");
+}
+
 export default function BlogExplorer({ posts, featuredSlug, aiTrainingHubUrl }: BlogExplorerProps) {
   const [query, setQuery] = useState("");
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedTag, setSelectedTag] = useState<{ key: string; label: string } | null>(null);
 
   const topTags = useMemo(() => {
-    const counts = new Map<string, number>();
+    const groups = new Map<string, { count: number; variants: Map<string, number> }>();
     for (const post of posts) {
-      for (const tag of post.tags) {
-        counts.set(tag, (counts.get(tag) ?? 0) + 1);
+      const seenInPost = new Set<string>();
+      for (const rawTag of post.tags) {
+        const key = normalizeTag(rawTag);
+        if (!key) continue;
+        let entry = groups.get(key);
+        if (!entry) {
+          entry = { count: 0, variants: new Map() };
+          groups.set(key, entry);
+        }
+        if (!seenInPost.has(key)) {
+          entry.count += 1;
+          seenInPost.add(key);
+        }
+        entry.variants.set(rawTag, (entry.variants.get(rawTag) ?? 0) + 1);
       }
     }
-    return Array.from(counts.entries())
-      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    return Array.from(groups.entries())
+      .sort((a, b) => b[1].count - a[1].count || a[0].localeCompare(b[0]))
       .slice(0, 12)
-      .map(([tag]) => tag);
+      .map(([key, { variants }]) => {
+        const bestLabel = Array.from(variants.entries()).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0][0];
+        return { key, label: bestLabel };
+      });
   }, [posts]);
 
   const normalizedQuery = query.trim().toLowerCase();
@@ -84,7 +103,7 @@ export default function BlogExplorer({ posts, featuredSlug, aiTrainingHubUrl }: 
   const filteredPosts = useMemo(() => {
     if (!isFiltering) return posts;
     return posts.filter((post) => {
-      if (selectedTag && !post.tags.includes(selectedTag)) {
+      if (selectedTag && !post.tags.some((tag) => normalizeTag(tag) === selectedTag.key)) {
         return false;
       }
       if (!normalizedQuery) return true;
@@ -154,10 +173,10 @@ export default function BlogExplorer({ posts, featuredSlug, aiTrainingHubUrl }: 
             All ({posts.length})
           </button>
           {topTags.map((tag) => {
-            const active = selectedTag === tag;
+            const active = selectedTag?.key === tag.key;
             return (
               <button
-                key={tag}
+                key={tag.key}
                 type="button"
                 aria-pressed={active}
                 onClick={() => setSelectedTag(active ? null : tag)}
@@ -167,7 +186,7 @@ export default function BlogExplorer({ posts, featuredSlug, aiTrainingHubUrl }: 
                     : "border-card-border bg-card/60 text-muted hover:border-foreground/40 hover:text-foreground"
                 }`}
               >
-                {tag}
+                {tag.label}
               </button>
             );
           })}
@@ -177,7 +196,7 @@ export default function BlogExplorer({ posts, featuredSlug, aiTrainingHubUrl }: 
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-card-border bg-card/40 px-4 py-3 text-sm">
             <span className="text-foreground/80">
               Showing {filteredPosts.length} of {posts.length} field notes
-              {selectedTag ? ` tagged "${selectedTag}"` : ""}
+              {selectedTag ? ` tagged "${selectedTag.label}"` : ""}
               {normalizedQuery ? ` matching "${query.trim()}"` : ""}
             </span>
             <button

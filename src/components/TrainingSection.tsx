@@ -79,12 +79,14 @@ function TrainingCard({ item, featured = false }: { item: Training; featured?: b
         </div>
 
         <div className={featured ? "relative" : "relative flex h-full flex-col gap-5"}>
-          <div className="flex flex-wrap items-center gap-3">
-            {featured ? <TrainingIcon item={item} /> : null}
-            <span className="rounded-full border border-card-border bg-background/40 px-3 py-1 text-xs uppercase tracking-wider text-muted">
-              {featured ? "Featured AI training project" : item.category}
-            </span>
-          </div>
+          {featured ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <TrainingIcon item={item} />
+              <span className="rounded-full border border-card-border bg-background/40 px-3 py-1 text-xs uppercase tracking-wider text-muted">
+                Featured AI training project
+              </span>
+            </div>
+          ) : null}
 
           <div>
             <h3 className={`font-[family-name:var(--font-space-grotesk)] font-bold leading-tight ${featured ? "mt-5 text-3xl md:text-5xl" : "text-2xl"}`}>
