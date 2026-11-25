@@ -75,7 +75,7 @@ function firstParagraph(content: string) {
   );
 }
 
-function normalizeFrontmatter(
+export function normalizeFrontmatter(
   data: Record<string, unknown>,
   content: string,
   slug: string
