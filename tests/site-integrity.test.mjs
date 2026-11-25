@@ -39,6 +39,8 @@ test("every blog MDX file has valid slug, metadata, and existing local images", 
   const files = fs.readdirSync(BLOG_DIR).filter((file) => file.endsWith(".mdx"));
   assert.ok(files.length > 0, "Expected blog MDX files");
 
+  let aeoPillarCount = 0;
+
   for (const file of files) {
     const slug = file.replace(/\.mdx$/, "");
     assert.match(slug, /^[a-z0-9-]+$/, `Invalid blog slug format: ${slug}`);
@@ -53,6 +55,15 @@ test("every blog MDX file has valid slug, metadata, and existing local images", 
     assert.equal(typeof dateVal, "string", `${file} is missing publishedAt/date`);
     assert.ok(!Number.isNaN(new Date(dateVal).getTime()), `${file} has invalid date: ${dateVal}`);
 
+    if (Array.isArray(data.keyTakeaways) && data.keyTakeaways.length > 0 && Array.isArray(data.faq) && data.faq.length > 0) {
+      for (const item of data.faq) {
+        assert.equal(typeof item.question, "string", `${file} faq entry missing question`);
+        assert.equal(typeof item.answer, "string", `${file} faq entry missing answer`);
+        assert.ok(item.question.trim().length > 0 && item.answer.trim().length > 0, `${file} has empty faq fields`);
+      }
+      aeoPillarCount += 1;
+    }
+
     const cover = data.image ?? data.cover;
     if (typeof cover === "string" && cover.startsWith("/")) {
       assert.ok(publicFileExists(cover), `${file} references missing cover image: ${cover}`);
@@ -65,18 +76,26 @@ test("every blog MDX file has valid slug, metadata, and existing local images", 
       assert.ok(publicFileExists(match[1]), `${file} references missing JSX image: ${match[1]}`);
     }
   }
+
+  assert.ok(aeoPillarCount >= 10, `Expected >= 10 pillar posts with keyTakeaways + faq, found ${aeoPillarCount}`);
 });
 
-test("security headers and hardened blog/RSS configuration are in place", () => {
+test("security headers, contact API, analytics CSP, and hardened blog/RSS configuration are in place", () => {
   const nextConfig = fs.readFileSync(path.join(ROOT, "next.config.ts"), "utf8");
-  for (const header of [
+  for (const token of [
     "Content-Security-Policy",
     "X-Content-Type-Options",
     "X-Frame-Options",
     "Referrer-Policy",
+    "va.vercel-scripts.com",
+    "vitals.vercel-insights.com",
   ]) {
-    assert.ok(nextConfig.includes(header), `next.config.ts must define ${header}`);
+    assert.ok(nextConfig.includes(token), `next.config.ts must include ${token}`);
   }
+
+  const contactRoute = fs.readFileSync(path.join(ROOT, "src", "app", "api", "contact", "route.ts"), "utf8");
+  assert.ok(contactRoute.includes("rateLimit"), "contact route must apply rateLimit");
+  assert.ok(contactRoute.includes("website"), "contact route must check honeypot field");
 
   const blogLib = fs.readFileSync(path.join(ROOT, "src", "lib", "blog.ts"), "utf8");
   assert.ok(blogLib.includes("remark-gfm"), "src/lib/blog.ts must enable remark-gfm");

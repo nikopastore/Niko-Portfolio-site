@@ -6,6 +6,15 @@ excerpt: "From API routing to memory vaults to cron scheduling, everything I lea
 image: "/blog/generated/openclaw-101-setup-guide.png"
 tags: ["AI", "OpenClaw", "Automation", "AI Agents", "Productivity"]
 readTime: "12 min read"
+keyTakeaways:
+  - "Separate the \"brain\" from the \"muscles\": use Claude Opus for initial onboarding, Claude Sonnet (~$40/mo) for daily orchestration, Codex for coding, and free NVIDIA GLM-5 / Kimi K2.5 for 20+ cron jobs."
+  - "Avoid silent context compaction losses by maintaining an Obsidian-compatible tiered vault (MEMORY.md, facts/, projects/, decisions/, daily/) using structured QMD YAML notes."
+  - "Offload quick lookups to built-in Brave Search instead of spawning sub-agents, keeping total monthly operating costs around ~$60."
+faq:
+  - question: "What model routing strategy works best for OpenClaw?"
+    answer: "Use Claude Opus once for initial onboarding, Claude Sonnet for daily chat orchestration, Codex for code execution, Brave Search for quick lookups, and free GLM-5 (with Kimi K2.5 fallback) via NVIDIA for background cron jobs."
+  - question: "How much does it cost to run a 24/7 OpenClaw setup with 20+ cron tasks?"
+    answer: "After a ~$30–50 one-time onboarding pass with Opus, routing cron jobs and sub-agents to free NVIDIA models keeps ongoing monthly costs around ~$60 (~$40 Sonnet, ~$15 Codex, ~$5 extras)."
 ---
 
 **TL;DR**: OpenClaw can run 20+ automated tasks, manage your memory across sessions, and become a genuine second brain. But the setup has a brutal learning curve. Here's the exact stack, memory system, and workflow patterns that actually work.

@@ -6,6 +6,15 @@ excerpt: "Practical lessons from shipping AI-powered products: start with workfl
 image: "/blog/generated/building-ai-applications.png"
 tags: ["AI Product", "LLM Engineering", "Workflow"]
 readTime: "7 min read"
+keyTakeaways:
+  - "Start by mapping input collection, validation, retries, and human correction flows before tuning prompts or swapping models."
+  - "Treat prompts like production code with schema validation, token limits, and deterministic fallbacks instead of chasing a single hero prompt."
+  - "Pair fast small models for initial responses with fresh data pipelines and in-place user feedback loops."
+faq:
+  - question: "What causes most AI applications to fail in production?"
+    answer: "Most failures stem from messy workflows, missing schema guardrails, high latency, or stale, unindexed source data rather than raw model capability."
+  - question: "How do you keep AI application latency low without sacrificing depth?"
+    answer: "Use a fast, smaller model for the immediate first-pass answer while running deeper background analysis asynchronously."
 ---
 
 Shipping AI products looks like magic from the outside, but the work is mostly

@@ -14,8 +14,20 @@ const fs = require('fs');
 
 const websites = [
   {
+    url: 'https://nikopastore.github.io/agent-memory-site/',
+    filename: 'agentmemorysite.png',
+  },
+  {
     url: 'https://sdhomepros.app/',
     filename: 'sdhomepros.png',
+  },
+  {
+    url: 'https://www.nationalplanninggroup.com/',
+    filename: 'nationalplanninggroup.png',
+  },
+  {
+    url: 'https://trysitepilot.com/',
+    filename: 'sitepilot.png',
   },
   {
     url: 'https://sipwiki.app/',
@@ -25,16 +37,11 @@ const websites = [
     url: 'https://www.elementarystateofmind.com/',
     filename: 'elementarystateofmind.png',
   },
-  {
-    url: 'https://www.nationalplanninggroup.com/',
-    filename: 'nationalplanninggroup.png',
-  },
 ];
 
 async function captureScreenshots() {
   const screenshotsDir = path.join(__dirname, 'public', 'screenshots');
 
-  // Ensure screenshots directory exists
   if (!fs.existsSync(screenshotsDir)) {
     fs.mkdirSync(screenshotsDir, { recursive: true });
   }
@@ -42,8 +49,8 @@ async function captureScreenshots() {
   const browser = await puppeteer.launch({
     headless: 'new',
     defaultViewport: {
-      width: 1920,
-      height: 1080,
+      width: 1440,
+      height: 810,
     },
   });
 
@@ -53,20 +60,17 @@ async function captureScreenshots() {
     const page = await browser.newPage();
 
     try {
-      // Navigate to the page
       await page.goto(site.url, {
         waitUntil: 'networkidle0',
         timeout: 30000,
       });
 
-      // Wait a bit for any animations to complete
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Take screenshot
       const screenshotPath = path.join(screenshotsDir, site.filename);
       await page.screenshot({
         path: screenshotPath,
-        fullPage: false, // Just capture the viewport (above the fold)
+        fullPage: false,
         type: 'png',
       });
 

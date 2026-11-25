@@ -5,6 +5,17 @@ publishedAt: "2026-06-12"
 tags: ["side-project", "vanilla-js", "gamification", "personal-knowledge-management", "static-site", "anthropic"]
 category: "Project case study"
 image: "/blog/images/ai-training-hub-hero.png"
+keyTakeaways:
+  - "AI Training Hub organizes 60 curated AI/ML courses across Learn, Build, and Ship tracks with explicit S/A/B/C quality tiers."
+  - "Pure-function gamification math (quadratic 100 * level^1.5 XP curve, 99 levels, streaks, 15 achievements) stays separated from a single-file DOM render loop and 74 zero-dependency tests."
+  - "Vanilla HTML/CSS/JS with courses.json as source of truth eliminated bundler overhead and ships straight to GitHub Pages."
+faq:
+  - question: "Why did AI Training Hub use vanilla JavaScript instead of React?"
+    answer: "With a bounded catalog of 60 courses and one primary card template, a full render takes under 5ms in vanilla JS and avoids bundler complexity or framework overhead."
+  - question: "How are courses graded and weighted in AI Training Hub?"
+    answer: "Courses are graded S (200 XP), A (100 XP), B (50 XP), or C across Learn, Build, and Ship tracks, totaling 15,990 base XP across 16 S-tier, 37 A-tier, and 7 B-tier courses."
+  - question: "How is progress stored and tested?"
+    answer: "Progress persists locally in browser localStorage with JSON export support, and all XP, level, and achievement checks are covered by 74 unit tests in tests/gamification.test.mjs."
 ---
 
 **TL;DR**: I built a single-page web app to keep myself accountable while learning the modern AI/ML stack. **60 hand-curated courses** across 3 tiers (Learn / Build / Ship), **27 current Anthropic Skilljar courses**, **S/A/B/C quality grading**, real gamification (XP, 99 levels, streaks, **15 achievements**), pure vanilla JS, **zero dependencies**, **74 passing tests**, deploys to GitHub Pages. Open source at [github.com/nikopastore/ai-training-hub](https://github.com/nikopastore/ai-training-hub), live at [nikopastore.github.io/ai-training-hub](https://nikopastore.github.io/ai-training-hub/).

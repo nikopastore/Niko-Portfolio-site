@@ -4,6 +4,15 @@ description: "Most AI projects fail not because the model is bad, because the st
 publishedAt: "2026-04-16"
 tags: ["ai", "llm", "production-ai", "architecture", "llm-stack", "ai-systems"]
 image: "/blog/images/stop-building-ai-demos-hero.png"
+keyTakeaways:
+  - "The model call is only ~10% of a shipped AI product; reliability depends on five surrounding layers: ingestion, orchestration, evaluation, guardrails, and monitoring."
+  - "Silent ingestion failures (such as scanned image PDFs) and unmonitored chunking changes cause subtle accuracy regressions that users rarely report."
+  - "Treat orchestration as a state machine with retries and escalation, backed by automated CI evals on every prompt or model change."
+faq:
+  - question: "What are the 5 layers required for a production AI system?"
+    answer: "Ingestion (parsing, chunking, deduplication), Orchestration (stateful multi-step retries and fallbacks), Evaluation (golden datasets and regression suites), Guardrails (PII redaction, cost limits, safety filters), and Monitoring (latency, error rates, and drift alerts)."
+  - question: "Why do RAG demos fail when real customers upload documents?"
+    answer: "Demo datasets are clean and uniform, whereas production uploads include scanned PDFs, bad encodings, nested tables, and permission boundaries that fail silently without a resilient ingestion pipeline."
 ---
 
 # Stop Building AI Demos: The 5 Layers Every Production AI System Needs

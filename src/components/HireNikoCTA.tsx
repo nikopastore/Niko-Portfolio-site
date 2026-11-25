@@ -13,9 +13,18 @@ interface IntakeForm {
   budget: string;
   links: string;
   email: string;
+  website: string;
 }
 
-const empty: IntakeForm = { role: "", problem: "", timeline: "", budget: "", links: "", email: "" };
+const empty: IntakeForm = {
+  role: "",
+  problem: "",
+  timeline: "",
+  budget: "",
+  links: "",
+  email: "",
+  website: "",
+};
 
 function buildSubject(f: IntakeForm) {
   return `Hire: ${f.role || "open role"} (${f.timeline || "no timeline"})`;
@@ -48,6 +57,7 @@ export default function HireNikoCTA() {
   });
   const [form, setForm] = useState<IntakeForm>(empty);
   const [sending, setSending] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
@@ -59,7 +69,7 @@ export default function HireNikoCTA() {
     const dialog = dialogRef.current;
     const focusTimer = window.setTimeout(() => {
       const firstInput = dialog?.querySelector<HTMLElement>(
-        "input, textarea, button:not([disabled]), [tabindex]:not([tabindex='-1'])"
+        "input:not([type='hidden']):not(.hidden), textarea, button:not([disabled]), [tabindex]:not([tabindex='-1'])"
       );
       firstInput?.focus();
     }, 20);
@@ -72,7 +82,7 @@ export default function HireNikoCTA() {
       if (e.key === "Tab" && dialog) {
         const focusables = Array.from(
           dialog.querySelectorAll<HTMLElement>(
-            "a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex='-1'])"
+            "a[href], button:not([disabled]), input:not([disabled]):not(.hidden), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex='-1'])"
           )
         );
         if (focusables.length === 0) return;
@@ -109,7 +119,10 @@ export default function HireNikoCTA() {
     setOpen(false);
   };
 
-  const close = () => setOpen(false);
+  const close = () => {
+    setErrorMsg("");
+    setOpen(false);
+  };
 
   const buildMailto = (f: IntakeForm) =>
     `mailto:${siteConfig.email}?subject=${encodeURIComponent(buildSubject(f))}&body=${encodeURIComponent(buildBody(f))}`;
@@ -124,17 +137,43 @@ export default function HireNikoCTA() {
     }
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
-    const url = buildMailto(form);
-    window.location.href = url;
-    setTimeout(() => {
-      setSending(false);
-      setOpen(false);
+    setErrorMsg("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok) {
+        setForm(empty);
+        setOpen(false);
+        showToast("Inquiry sent! Niko will reply to your email.");
+        return;
+      }
+
+      if (data?.fallback === "mailto") {
+        window.location.href = buildMailto(form);
+        setForm(empty);
+        setOpen(false);
+        showToast("Opening your email client — or use Copy brief for webmail.");
+        return;
+      }
+
+      setErrorMsg(data?.error || "Please check your details and try again.");
+    } catch {
+      window.location.href = buildMailto(form);
       setForm(empty);
-      showToast("Email draft opened. Hit send in your mail client.");
-    }, 600);
+      setOpen(false);
+      showToast("Opening your email client — or use Copy brief for webmail.");
+    } finally {
+      setSending(false);
+    }
   };
 
   if (dismissed) return null;
@@ -146,7 +185,10 @@ export default function HireNikoCTA() {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2, duration: 0.5 }}
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setErrorMsg("");
+          setOpen(true);
+        }}
         className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 px-5 py-3 rounded-full bg-foreground text-background shadow-lg hover:scale-105 transition-transform cursor-pointer"
         aria-label="Open hire Niko form"
       >
@@ -193,7 +235,17 @@ export default function HireNikoCTA() {
               </div>
 
               <form onSubmit={submit} className="space-y-3">
-                <Field label="Role" value={form.role} onChange={(v) => setForm({ ...form, role: v })} placeholder="Senior Data Engineer" />
+                <input
+                  type="text"
+                  name="website"
+                  value={form.website}
+                  onChange={(e) => setForm({ ...form, website: e.target.value })}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="hidden"
+                />
+                <Field label="Role" value={form.role} onChange={(v) => setForm({ ...form, role: v })} placeholder="Senior Data Engineer" required />
                 <Textarea label="Problem" value={form.problem} onChange={(v) => setForm({ ...form, problem: v })} placeholder="What problem are you trying to solve?" />
                 <div className="grid grid-cols-2 gap-3">
                   <Field label="Timeline" value={form.timeline} onChange={(v) => setForm({ ...form, timeline: v })} placeholder="6 weeks" />
@@ -201,6 +253,12 @@ export default function HireNikoCTA() {
                 </div>
                 <Field label="Your email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} placeholder="you@company.com" required />
                 <Field label="Relevant links" value={form.links} onChange={(v) => setForm({ ...form, links: v })} placeholder="job spec, repo, brief" />
+
+                {errorMsg ? (
+                  <p role="alert" className="text-sm text-red-400">
+                    {errorMsg}
+                  </p>
+                ) : null}
 
                 <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
                   <button
@@ -224,12 +282,12 @@ export default function HireNikoCTA() {
                     className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-full bg-foreground text-background hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
                   >
                     {sending ? <Check className="h-4 w-4" /> : <Send className="h-4 w-4" />}
-                    {sending ? "Opening..." : "Send"}
+                    {sending ? "Sending..." : "Send"}
                   </button>
                 </div>
               </form>
               <p className="mt-3 text-xs text-muted">
-                Opens your mail client with the details pre-filled, or copy the brief to send from webmail. No data is stored.
+                Sends directly to Niko, or falls back to your mail client / Copy brief for webmail.
               </p>
             </motion.div>
           </motion.div>

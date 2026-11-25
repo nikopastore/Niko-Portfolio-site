@@ -4,6 +4,15 @@ description: "Anthropic published three system prompt instructions that dramatic
 publishedAt: "2026-03-26"
 tags: ["claude", "anthropic", "prompting", "ai", "llm"]
 image: "/blog/images/claude-hallucinations.jpg"
+keyTakeaways:
+  - "Anthropic's documentation highlights three accuracy-focused system instructions: allow Claude to say \"I don't know\", require citations for every factual claim, and extract word-for-word quotes before analyzing sources."
+  - "Requiring citations forces unsupported claims to be retracted instead of silently filled with plausible-sounding fiction."
+  - "Because strict grounding reduces creative output (arXiv 2307.02185), toggle these instructions on for research mode and off for brainstorming."
+faq:
+  - question: "Which three system prompt instructions reduce hallucinations in Claude?"
+    answer: "Tell Claude to say \"I don't know\" instead of guessing, require a citation for every factual claim (retracting unsupported claims), and extract direct quotes from source documents before summarizing or analyzing."
+  - question: "Should you leave strict anti-hallucination prompts on for all tasks?"
+    answer: "No. Strict citation and grounding constraints reduce creative generation, so keep them enabled for research, fact-checking, and document analysis while turning them off for brainstorming or creative writing."
 ---
 
 **TL;DR**: Anthropic's own documentation includes three system prompt instructions that dramatically reduce hallucinations. They're not hidden — just buried. Here's what they are and when to use them.

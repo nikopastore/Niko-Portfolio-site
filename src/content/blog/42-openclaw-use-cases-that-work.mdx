@@ -4,6 +4,15 @@ description: "Community-curated collection of 42 real OpenClaw automations — f
 publishedAt: "2026-03-25"
 tags: ["openclaw", "ai-agents", "automation", "productivity", "workflows"]
 image: "/blog/images/openclaw-usecases.jpg"
+keyTakeaways:
+  - "High-leverage OpenClaw setups pair a tiered Obsidian-compatible Memory Vault (MEMORY.md, daily/, projects/, decisions/, facts/) with scheduled crons and isolated browser queues."
+  - "Model routing cut monthly token costs from ~$200 to ~$60 by keeping Claude Sonnet on interactive chat and delegating cron jobs and sub-agents to free GLM-5 / Kimi models."
+  - "Daily Reddit digests, custom morning standups, inbox de-cluttering, and pre-build idea validation deliver reliable Tier 1 value with minimal setup."
+faq:
+  - question: "How do you prevent OpenClaw from forgetting context across sessions?"
+    answer: "Use a tiered Markdown memory vault with a compact ~500-token MEMORY.md summary always loaded alongside dedicated facts/, projects/, decisions/, and daily/ folders."
+  - question: "How do you keep OpenClaw API costs low when running 15+ automations?"
+    answer: "Route interactive main chat to Claude Sonnet, coding tasks to Codex, and scheduled cron jobs or browser-queue workers to free models like GLM-5 or Kimi via NVIDIA."
 ---
 
 **TL;DR**: Most people install OpenClaw and use it for chat. That's like buying a Tesla to charge your phone. A community repo just dropped with 42 battle-tested use cases — each with deployable .md files. I run 15+ automations daily and validated which ones actually work. Here's the breakdown.

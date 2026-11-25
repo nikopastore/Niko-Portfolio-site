@@ -43,6 +43,23 @@ export interface App {
 
 export const projects: Project[] = [
   {
+    id: "agent-memory-site",
+    name: "Agent Memory Site",
+    category: "AI Tooling / Open Source",
+    description:
+      "A local-first CLI that compiles a Markdown knowledge vault into a portable, browsable agent memory bundle. One build outputs a static search dashboard, retrieval-ready JSONL chunks with content hashes, a live MCP server, and context files for Claude, Codex, and Cursor.",
+    techHighlights: [
+      "Compiles Markdown notes into chunks.jsonl, search-index.json, and static HTML",
+      "Generates AGENTS.md, CLAUDE.md, .cursorrules, llms.txt, and agent-card.json",
+      "Built-in MCP server runtime for Claude Desktop, Claude Code, Codex, and Cursor",
+      "Privacy filtering and redacted-link placeholders between private and public modes",
+    ],
+    skills: ["TypeScript", "Node.js", "MCP", "RAG / JSONL", "Static Search", "GitHub Pages"],
+    image: "/screenshots/agentmemorysite.png",
+    url: "https://nikopastore.github.io/agent-memory-site/",
+    metrics: "One Markdown build for Claude, Codex, Cursor & MCP",
+  },
+  {
     id: "sdhomepros",
     name: "SDHomePros",
     category: "Local Marketplace / Home Services",
@@ -58,6 +75,40 @@ export const projects: Project[] = [
     image: "/screenshots/sdhomepros.png",
     url: "https://sdhomepros.app/",
     metrics: "13.6K+ members in one local home-pro network",
+  },
+  {
+    id: "national-planning-group",
+    name: "National Planning Group",
+    category: "Real Estate / Property Management",
+    description:
+      "An investor-first property management site for real estate owners. The site positions NPG around protected cash flow, reduced vacancy, transparent reporting, and operational workflows that make property performance visible instead of opaque.",
+    techHighlights: [
+      "Investor-focused landing page and free assessment funnel",
+      "Operational dashboard storytelling for revenue, vacancy, and maintenance",
+      "Clear service architecture for property management conversion",
+      "Trust-forward copy and reporting narrative for owner acquisition",
+    ],
+    skills: ["Next.js", "TypeScript", "Conversion UX", "Real Estate Ops", "SEO", "Vercel"],
+    image: "/screenshots/nationalplanninggroup.png",
+    url: "https://www.nationalplanninggroup.com/",
+    metrics: "Investor-ready funnel that clarifies property ops",
+  },
+  {
+    id: "sitepilot",
+    name: "SitePilot",
+    category: "Developer Tools / Web Audits",
+    description:
+      "A free instant website audit tool that analyzes SEO, performance, accessibility, and security in 60 seconds with no signup required. Generates overall and category scores alongside prioritized, step-by-step fix recommendations and exportable reports.",
+    techHighlights: [
+      "100+ automated checks across Performance, SEO, Accessibility, and Security",
+      "Core Web Vitals, structured data, WCAG compliance, and header diagnostics",
+      "Prioritized remediation list with step-by-step fix instructions",
+      "PDF report export and email delivery for team sharing",
+    ],
+    skills: ["Next.js", "TypeScript", "Technical SEO", "Core Web Vitals", "Web Security", "Vercel"],
+    image: "/screenshots/sitepilot.png",
+    url: "https://trysitepilot.com/",
+    metrics: "100+ audit checks in 60 seconds, zero signup",
   },
   {
     id: "sipwiki",
@@ -93,23 +144,6 @@ export const projects: Project[] = [
     metrics: "Shopfront for Zoe’s teacher-resource brand",
   },
   {
-    id: "national-planning-group",
-    name: "National Planning Group",
-    category: "Real Estate / Property Management",
-    description:
-      "An investor-first property management site for real estate owners. The site positions NPG around protected cash flow, reduced vacancy, transparent reporting, and operational workflows that make property performance visible instead of opaque.",
-    techHighlights: [
-      "Investor-focused landing page and free assessment funnel",
-      "Operational dashboard storytelling for revenue, vacancy, and maintenance",
-      "Clear service architecture for property management conversion",
-      "Trust-forward copy and reporting narrative for owner acquisition",
-    ],
-    skills: ["Next.js", "TypeScript", "Conversion UX", "Real Estate Ops", "SEO", "Vercel"],
-    image: "/screenshots/nationalplanninggroup.png",
-    url: "https://www.nationalplanninggroup.com/",
-    metrics: "Investor-ready funnel that clarifies property ops",
-  },
-  {
     id: "flood-prediction",
     name: "Flood Prediction Model",
     category: "Data Science / Climate Tech",
@@ -128,109 +162,7 @@ export const projects: Project[] = [
   },
 ];
 
-export const apps: App[] = [
-  {
-    id: "docpilot",
-    name: "DocPilot",
-    category: "Document Intelligence",
-    description:
-      "AI-powered document scanner that auto-detects document types and extracts structured data. Scan receipts, invoices, contracts — get clean markdown and exportable data.",
-    skills: [
-      "Swift",
-      "SwiftUI",
-      "VisionKit",
-      "PDFKit",
-      "CoreImage",
-      "NuMarkdown API",
-      "SwiftData",
-    ],
-    icon: "📄",
-    logo: "/apps/docpilot/icon.png",
-    screenshots: [
-      "/apps/docpilot/01.png",
-      "/apps/docpilot/02.png",
-      "/apps/docpilot/03.png",
-    ],
-    url: "",
-    platforms: ["iOS"],
-  },
-  {
-    id: "supplementsync",
-    name: "SupplementSync",
-    category: "Health & Wellness",
-    description:
-      "Supplement and medication tracker with wearable integration. Syncs with Apple Health, Whoop, and Oura to show health correlations and optimize your stack.",
-    skills: ["Swift", "SwiftUI", "HealthKit", "Core Data", "Charts", "WidgetKit"],
-    icon: "💊",
-    logo: "/apps/supplementsync/icon.png",
-    screenshots: [
-      "/apps/supplementsync/01_stack.png",
-      "/apps/supplementsync/02_correlations.png",
-      "/apps/supplementsync/03_wearables.png",
-    ],
-    url: "",
-    platforms: ["iOS"],
-  },
-  {
-    id: "qrsimple",
-    name: "QR Simple",
-    category: "Utilities",
-    description:
-      "Clean, fast QR code generator and scanner. Create codes for URLs, WiFi, contacts, and more. No ads, no tracking, just works.",
-    skills: ["React Native", "Expo", "NativeWind", "react-native-qrcode-svg", "expo-camera"],
-    icon: "📱",
-    logo: "/apps/qrsimple/icon.png",
-    screenshots: [
-      "/apps/qrsimple/01_generate.png",
-      "/apps/qrsimple/02_scan.png",
-    ],
-    url: "",
-    platforms: ["iOS", "Android"],
-  },
-  {
-    id: "parchment",
-    name: "Parchment",
-    category: "Journaling",
-    description:
-      "Minimalist AI journaling app with voice dictation and handwriting OCR. Speak or scan your thoughts — Parchment converts them to clean, searchable entries.",
-    skills: [
-      "React Native",
-      "Expo",
-      "ElevenLabs Scribe",
-      "Google Gemini 2.0",
-      "RevenueCat",
-      "AsyncStorage",
-    ],
-    icon: "📜",
-    logo: "/apps/parchment/icon.png",
-    screenshots: [
-      "/apps/parchment/01_home.png",
-      "/apps/parchment/02_voice.png",
-      "/apps/parchment/03_ocr.png",
-      "/apps/parchment/04_reflection.png",
-    ],
-    url: "",
-    platforms: ["iOS", "Android"],
-  },
-  {
-    id: "mealswipe",
-    name: "MealSwipe",
-    category: "Food & Lifestyle",
-    description:
-      "Tinder for meal planning. Swipe through recipe suggestions, save favorites, and generate weekly meal plans. AI learns your preferences over time.",
-    skills: ["React Native", "Expo", "OpenAI API", "AsyncStorage", "Reanimated"],
-    icon: "🍽️",
-    logo: "/apps/mealswipe/icon.png",
-    screenshots: [
-      "/apps/mealswipe/01.png",
-      "/apps/mealswipe/02.png",
-      "/apps/mealswipe/03.png",
-      "/apps/mealswipe/04.png",
-    ],
-    url: "",
-    platforms: ["iOS", "Android"],
-  },
-];
+export const apps: App[] = [];
 
 export interface Experience {
   company: string;
@@ -249,8 +181,8 @@ export const experiences: Experience[] = [
     years: "2024 - Present",
     type: "work",
     highlights: [
-      "Building AI-powered SaaS products",
-      "SDHomePros, National Planning Group, SipWiki, ElementaryStateOfMind, and more",
+      "Building AI-powered SaaS & developer tooling",
+      "Agent Memory Site, SitePilot, SDHomePros, National Planning Group, SipWiki, and more",
     ],
     techStack: [
       "Next.js",

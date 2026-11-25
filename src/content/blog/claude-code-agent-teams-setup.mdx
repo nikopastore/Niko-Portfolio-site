@@ -4,6 +4,17 @@ description: "Agent Teams aren't just sub-agents with a nicer name. They're a co
 publishedAt: "2026-03-24"
 tags: ["claude-code", "ai-agents", "anthropic", "developer-tools", "productivity"]
 image: "/blog/images/claude-agent-teams.jpg"
+keyTakeaways:
+  - "Claude Code Agent Teams (v2.1.32+) spawn 3–5 independent Claude instances that share a task list and message each other directly, unlike isolated sub-agents."
+  - "Enable the experimental feature by setting CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 in ~/.claude/settings.json and optionally launch with tmux or iTerm2 split panes."
+  - "Use Agent Teams for competing-hypothesis debugging or cross-layer refactors; stick with sub-agents for sequential, single-file, or isolated tasks to save tokens."
+faq:
+  - question: "How do you enable Claude Code Agent Teams?"
+    answer: "Update Claude Code to v2.1.32 or newer, add \"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS\": \"1\" under \"env\" in ~/.claude/settings.json, restart your terminal, and prompt Claude to create an agent team."
+  - question: "When should you use Agent Teams instead of sub-agents?"
+    answer: "Use Agent Teams when workers need to share findings, challenge hypotheses, or coordinate across frontend/backend/tests; use sub-agents for focused tasks where only a summary back to the lead is needed."
+  - question: "Which internal tools power Claude Code Agent Teams?"
+    answer: "Teams coordinate via TeamCreate, TaskCreate, the upgraded Task tool (with name and team_name), taskUpdate, and sendMessage for direct or broadcast teammate messages."
 ---
 
 **TL;DR**: Claude Code Agent Teams let 3-5 independent Claude instances collaborate on the same project—sharing tasks, messaging each other, and coordinating in real-time. They're not a replacement for sub-agents. They're for when your workers need to actually talk to each other.

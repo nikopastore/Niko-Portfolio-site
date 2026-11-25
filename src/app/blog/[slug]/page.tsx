@@ -81,11 +81,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const takeaways = (
     post.frontmatter.keyTakeaways.length > 0
       ? post.frontmatter.keyTakeaways
-      : [
-          fallbackFirst,
-          "The goal is practical implementation: clear constraints, real tradeoffs, and examples a builder can reuse.",
-          "AI visibility improves when the answer, examples, diagrams, and source structure are easy for both humans and agents to parse.",
-        ]
+      : [fallbackFirst]
   ).filter((t): t is string => Boolean(t && t.trim()));
 
   return (
