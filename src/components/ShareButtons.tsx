@@ -30,9 +30,13 @@ export default function ShareButtons({ url, title }: { url: string; title: strin
   ];
 
   const copy = async () => {
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1600);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      // Ignore clipboard failures in restricted contexts.
+    }
   };
 
   return (

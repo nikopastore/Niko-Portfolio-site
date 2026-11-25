@@ -7,6 +7,8 @@ import { rateLimit } from "@/lib/rateLimit";
 // emails are never committed to source control.
 const NEWSLETTER_FILE = path.join(process.cwd(), "data", "runtime", "newsletter.json");
 const RUNTIME_DIR = path.dirname(NEWSLETTER_FILE);
+const MAX_EMAIL_LENGTH = 320;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: NextRequest) {
   const rl = rateLimit(request, "subscribe-post");
@@ -20,13 +22,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email } = body;
 
-    if (!email) {
+    if (typeof email !== "string") {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    const normalizedEmail = email.toLowerCase().trim();
+    if (!normalizedEmail || normalizedEmail.length > MAX_EMAIL_LENGTH || !EMAIL_REGEX.test(normalizedEmail)) {
       return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
     }
 
@@ -38,8 +39,6 @@ export async function POST(request: NextRequest) {
     } catch {
       subscribers = [];
     }
-
-    const normalizedEmail = email.toLowerCase().trim();
 
     // Check if already subscribed
     if (subscribers.includes(normalizedEmail)) {

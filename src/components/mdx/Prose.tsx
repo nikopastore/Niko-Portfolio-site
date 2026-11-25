@@ -25,6 +25,10 @@ export function Prose({ children, className }: ProseProps) {
         "[& pre code]:bg-transparent",
         "[& :not(pre)>code]:rounded-md [& :not(pre)>code]:border [& :not(pre)>code]:border-card-border [& :not(pre)>code]:bg-card [& :not(pre)>code]:px-1.5 [& :not(pre)>code]:py-0.5 [& :not(pre)>code]:font-[family-name:var(--font-space-mono)] [& :not(pre)>code]:text-[0.85em]",
         "[& code]:font-[family-name:var(--font-space-mono)]",
+        "[& thead]:border-b [& thead]:border-card-border [& thead]:bg-card/80",
+        "[& th]:px-4 [& th]:py-3 [& th]:font-semibold [& th]:text-foreground",
+        "[& td]:border-t [& td]:border-card-border/60 [& td]:px-4 [& td]:py-3 [& td]:text-foreground/80",
+        "[& del]:opacity-60",
         className
       )}
     >

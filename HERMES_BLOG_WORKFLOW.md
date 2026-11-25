@@ -17,7 +17,7 @@ Last updated: 2026-04-13
 
 1. Draft posts under `docs/blog-drafts/` until approved.
 2. After approval, convert draft into `src/content/blog/<slug>.mdx`.
-3. Add images under `src/content/blog/images/`.
+3. Add images under `public/blog/images/` (referenced in MDX as `/blog/images/...`).
 4. Run `npm run build`.
 5. Commit and push only after approval.
 

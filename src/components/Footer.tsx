@@ -1,5 +1,3 @@
-"use client";
-
 import { SocialLogoButton } from "@/components/SocialIcons";
 import { siteConfig } from "@/lib/data";
 

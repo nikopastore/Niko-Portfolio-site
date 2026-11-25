@@ -29,7 +29,7 @@ Local working clone: /Users/jarvis/hermes-workspaces/Niko-Portfolio-site
 ## Current publish workflow
 
 1. Create/update an MDX post in `src/content/blog/`.
-2. Add any images under `src/content/blog/images/`.
+2. Add any images under `public/blog/images/` (referenced in MDX as `/blog/images/...`).
 3. Run `npm run build` to verify.
 4. Commit and push to `main`.
 5. Vercel auto-deploys from the GitHub repo.

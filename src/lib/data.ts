@@ -11,27 +11,9 @@ export const siteConfig = {
   url: "https://nikopastore-portfolio.vercel.app",
   enableDiscord: false,
   enableNewsletter: false,
+  enableComments: false,
   enableTraining: true,
 };
-
-export const skillTags = [
-  "Snowflake",
-  "Python",
-  "TypeScript",
-  "Next.js",
-  "React",
-  "PostgreSQL",
-  "LLM Orchestration",
-  "OpenAI API",
-  "Anthropic Claude",
-  "LangChain",
-  "ETL Pipelines",
-  "Data Modeling",
-  "AWS",
-  "Vercel",
-  "Playwright",
-  "Node.js",
-];
 
 export interface Project {
   id: string;
@@ -283,7 +265,7 @@ export const experiences: Experience[] = [
   {
     company: "Routeware, Inc.",
     role: "Data Engineer",
-    years: "2023 - Present",
+    years: "2023 - 2026",
     type: "work",
     highlights: [
       "Led Snowflake + Sigma BI implementation",

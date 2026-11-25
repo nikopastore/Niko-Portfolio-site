@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
 import { rateLimit } from "@/lib/rateLimit";
+import { isValidSlug } from "@/lib/blog";
 
 // Data is intentionally written to a runtime folder that is gitignored.
 // This keeps subscriber emails and pending comments out of the repo
@@ -60,8 +61,8 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const slug = searchParams.get("slug");
 
-  if (!slug) {
-    return NextResponse.json({ error: "Missing slug parameter" }, { status: 400 });
+  if (!slug || !isValidSlug(slug)) {
+    return NextResponse.json({ error: "Invalid slug parameter" }, { status: 400 });
   }
 
   const comments = await readComments();
@@ -110,6 +111,7 @@ export async function POST(request: NextRequest) {
 
     if (
       normalizedSlug.length > MAX_SLUG_LENGTH ||
+      !isValidSlug(normalizedSlug) ||
       normalizedName.length > MAX_NAME_LENGTH ||
       normalizedEmail.length > MAX_EMAIL_LENGTH ||
       normalizedComment.length > MAX_COMMENT_LENGTH ||

@@ -1,8 +1,5 @@
-"use client";
-
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { motion } from "framer-motion";
 import { SocialIcon } from "@/components/SocialIcons";
 import { siteConfig, type Training } from "@/lib/data";
 
@@ -190,27 +187,16 @@ export default function TrainingSection({ items }: TrainingSectionProps) {
         </div>
 
         <div className="space-y-6">
-          <motion.div
-            initial={{ opacity: 1, y: 0 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.5 }}
-          >
+          <div>
             <TrainingCard item={featuredItem} featured />
-          </motion.div>
+          </div>
 
           {supportingItems.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2">
-              {supportingItems.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 1, y: 0 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.5, delay: (index + 1) * 0.05 }}
-                >
+              {supportingItems.map((item) => (
+                <div key={item.id}>
                   <TrainingCard item={item} />
-                </motion.div>
+                </div>
               ))}
             </div>
           ) : null}

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Briefcase, X, Send, Check } from "lucide-react";
+import { Briefcase, X, Send, Check, Copy } from "lucide-react";
 import { siteConfig } from "@/lib/data";
 import { useToast } from "@/components/Toast";
 
@@ -17,50 +17,111 @@ interface IntakeForm {
 
 const empty: IntakeForm = { role: "", problem: "", timeline: "", budget: "", links: "", email: "" };
 
+function buildSubject(f: IntakeForm) {
+  return `Hire: ${f.role || "open role"} (${f.timeline || "no timeline"})`;
+}
+
+function buildBody(f: IntakeForm) {
+  return [
+    `Role: ${f.role || "-"}`,
+    `Timeline: ${f.timeline || "-"}`,
+    `Budget: ${f.budget || "-"}`,
+    `Email: ${f.email || "-"}`,
+    "",
+    "Problem:",
+    f.problem || "-",
+    "",
+    "Relevant links:",
+    f.links || "-",
+  ].join("\n");
+}
+
 export default function HireNikoCTA() {
   const [open, setOpen] = useState(false);
-  // Read the dismissal marker once at mount rather than via an effect+setState
-  // (which triggers the react-hooks/set-state-in-effect lint rule and a
-  // cascading render on first paint).
   const [dismissed, setDismissed] = useState(() => {
     if (typeof window === "undefined") return false;
-    return Boolean(window.sessionStorage.getItem("hire-cta-dismissed"));
+    try {
+      return Boolean(window.sessionStorage.getItem("hire-cta-dismissed"));
+    } catch {
+      return false;
+    }
   });
   const [form, setForm] = useState<IntakeForm>(empty);
   const [sending, setSending] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+
+    const triggerEl = triggerRef.current;
+    const dialog = dialogRef.current;
+    const focusTimer = window.setTimeout(() => {
+      const firstInput = dialog?.querySelector<HTMLElement>(
+        "input, textarea, button:not([disabled]), [tabindex]:not([tabindex='-1'])"
+      );
+      firstInput?.focus();
+    }, 20);
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      if (e.key === "Tab" && dialog) {
+        const focusables = Array.from(
+          dialog.querySelectorAll<HTMLElement>(
+            "a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex='-1'])"
+          )
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.clearTimeout(focusTimer);
+      window.removeEventListener("keydown", onKey);
+      triggerEl?.focus();
+    };
   }, [open]);
 
   const dismiss = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (typeof window !== "undefined") window.sessionStorage.setItem("hire-cta-dismissed", "1");
+    if (typeof window !== "undefined") {
+      try {
+        window.sessionStorage.setItem("hire-cta-dismissed", "1");
+      } catch {
+        // Ignore sessionStorage restrictions.
+      }
+    }
     setDismissed(true);
     setOpen(false);
   };
 
   const close = () => setOpen(false);
 
-  const buildMailto = (f: IntakeForm) => {
-    const subject = `Hire: ${f.role || "open role"} (${f.timeline || "no timeline"})`;
-    const body = [
-      `Role: ${f.role || "-"}`,
-      `Timeline: ${f.timeline || "-"}`,
-      `Budget: ${f.budget || "-"}`,
-      `Email: ${f.email || "-"}`,
-      "",
-      "Problem:",
-      f.problem || "-",
-      "",
-      "Relevant links:",
-      f.links || "-",
-    ].join("\n");
-    return `mailto:${siteConfig.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const buildMailto = (f: IntakeForm) =>
+    `mailto:${siteConfig.email}?subject=${encodeURIComponent(buildSubject(f))}&body=${encodeURIComponent(buildBody(f))}`;
+
+  const copyBrief = async () => {
+    const briefText = `To: ${siteConfig.email}\nSubject: ${buildSubject(form)}\n\n${buildBody(form)}`;
+    try {
+      await navigator.clipboard.writeText(briefText);
+      showToast(`Brief & ${siteConfig.email} copied to clipboard!`);
+    } catch {
+      showToast(`Email Niko directly at ${siteConfig.email}`);
+    }
   };
 
   const submit = (e: React.FormEvent) => {
@@ -81,6 +142,7 @@ export default function HireNikoCTA() {
   return (
     <>
       <motion.button
+        ref={triggerRef}
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2, duration: 0.5 }}
@@ -102,6 +164,7 @@ export default function HireNikoCTA() {
             onClick={close}
           >
             <motion.div
+              ref={dialogRef}
               initial={{ scale: 0.96, y: 8, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.96, y: 8, opacity: 0 }}
@@ -120,8 +183,9 @@ export default function HireNikoCTA() {
                   </h3>
                 </div>
                 <button
+                  type="button"
                   onClick={close}
-                  className="rounded-full p-1 hover:bg-card transition-colors"
+                  className="rounded-full p-1 hover:bg-card transition-colors cursor-pointer"
                   aria-label="Close hire form"
                 >
                   <X className="h-5 w-5" />
@@ -138,18 +202,26 @@ export default function HireNikoCTA() {
                 <Field label="Your email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} placeholder="you@company.com" required />
                 <Field label="Relevant links" value={form.links} onChange={(v) => setForm({ ...form, links: v })} placeholder="job spec, repo, brief" />
 
-                <div className="flex items-center justify-end gap-2 pt-2">
+                <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
                   <button
                     type="button"
                     onClick={dismiss}
-                    className="px-4 py-2 text-sm rounded-full border border-card-border hover:bg-card transition-colors"
+                    className="px-4 py-2 text-sm rounded-full border border-card-border hover:bg-card transition-colors cursor-pointer"
                   >
                     Not now
                   </button>
                   <button
+                    type="button"
+                    onClick={copyBrief}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-full border border-card-border hover:bg-card transition-colors cursor-pointer"
+                  >
+                    <Copy className="h-4 w-4" />
+                    Copy brief
+                  </button>
+                  <button
                     type="submit"
                     disabled={sending}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-full bg-foreground text-background hover:opacity-90 transition-opacity disabled:opacity-50"
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-full bg-foreground text-background hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
                   >
                     {sending ? <Check className="h-4 w-4" /> : <Send className="h-4 w-4" />}
                     {sending ? "Opening..." : "Send"}
@@ -157,7 +229,7 @@ export default function HireNikoCTA() {
                 </div>
               </form>
               <p className="mt-3 text-xs text-muted">
-                Opens your mail client with the details pre-filled. No data is stored.
+                Opens your mail client with the details pre-filled, or copy the brief to send from webmail. No data is stored.
               </p>
             </motion.div>
           </motion.div>

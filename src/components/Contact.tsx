@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Mail } from "lucide-react";
 import { siteConfig } from "@/lib/data";
@@ -23,9 +22,8 @@ const socials = siteConfig.enableDiscord
   ? [...socialsBase, discordSocial]
   : socialsBase;
 
-export default function Contact() {
+function PhoenixClock() {
   const [time, setTime] = useState("");
-  const { showToast } = useToast();
 
   useEffect(() => {
     const updateTime = () => {
@@ -43,20 +41,29 @@ export default function Contact() {
     return () => clearInterval(interval);
   }, []);
 
-  const copyEmail = () => {
-    navigator.clipboard.writeText(siteConfig.email);
-    showToast("Email copied to clipboard!");
+  return (
+    <span className="text-muted text-sm font-[family-name:var(--font-space-mono)] tabular-nums">
+      {time ? `${time} MST` : "MST"}
+    </span>
+  );
+}
+
+export default function Contact() {
+  const { showToast } = useToast();
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(siteConfig.email);
+      showToast("Email copied to clipboard!");
+    } catch {
+      showToast(`Email: ${siteConfig.email}`);
+    }
   };
 
   return (
     <section id="contact" className="py-16 px-6 border-t border-card-border">
       <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 1, y: 0 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex flex-col md:flex-row md:items-center md:justify-between gap-6"
-        >
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <h2 className="font-[family-name:var(--font-space-grotesk)] text-xl md:text-2xl font-bold tracking-wide">
             LET&apos;S GET IN TOUCH
           </h2>
@@ -83,10 +90,8 @@ export default function Contact() {
             </button>
           </div>
 
-          <span className="text-muted text-sm font-[family-name:var(--font-space-mono)] tabular-nums">
-            {time} MST
-          </span>
-        </motion.div>
+          <PhoenixClock />
+        </div>
       </div>
     </section>
   );

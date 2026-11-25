@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useCallback, useSyncExternalStore } from "react";
 import Matter from "matter-js";
 
 interface PhysicsTag {
@@ -12,8 +12,6 @@ interface PhysicsTag {
   icon?: string;
 }
 
-// Fixed dimensions - no dynamic scaling for performance
-// Sized to work well across common screen sizes (1366px - 1920px+)
 const PHYSICS_TAGS: PhysicsTag[] = [
   { id: "tag-1", text: "DATA ENGINEERING", width: 340, height: 60 },
   { id: "tag-2", text: "LLM ORCHESTRATION / RAG", width: 480, height: 60 },
@@ -21,7 +19,6 @@ const PHYSICS_TAGS: PhysicsTag[] = [
   { id: "tag-4", text: "PYTHON", width: 170, height: 60 },
   { id: "tag-5", text: "CLOUD ARCHITECTURE", width: 380, height: 60 },
   { id: "tag-6", text: "REACT / NEXT.JS", width: 300, height: 60 },
-  // Decorative circles
   { id: "circle-1", text: "✱", width: 65, height: 65, isCircle: true, icon: "asterisk" },
   { id: "circle-2", text: "→", width: 65, height: 65, isCircle: true, icon: "arrow" },
 ];
@@ -30,8 +27,20 @@ interface MatterMouseWithWheel extends Matter.Mouse {
   mousewheel?: EventListenerOrEventListenerObject;
 }
 
-// Create a Map for O(1) tag lookups instead of .find() on every frame
-const PHYSICS_TAGS_MAP = new Map(PHYSICS_TAGS.map(tag => [tag.id, tag]));
+const PHYSICS_TAGS_MAP = new Map(PHYSICS_TAGS.map((tag) => [tag.id, tag]));
+const SKILL_PILLS = PHYSICS_TAGS.filter((t) => !t.isCircle);
+
+const emptySubscribe = () => () => {};
+
+function subscribeReducedMotion(callback: () => void) {
+  const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+  media.addEventListener("change", callback);
+  return () => media.removeEventListener("change", callback);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 export default function PhysicsCanvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -39,9 +48,16 @@ export default function PhysicsCanvas() {
   const engineRef = useRef<Matter.Engine | null>(null);
   const renderRef = useRef<Matter.Render | null>(null);
   const runnerRef = useRef<Matter.Runner | null>(null);
-  const [isClient, setIsClient] = useState(false);
+  const runnerActiveRef = useRef(false);
+  const spawnTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  // Theme colors - cached and only updated when theme actually changes
+  const isClient = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const reducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    () => false
+  );
+
   const themeColorsRef = useRef({
     strokeColor: "rgba(255,255,255,0.8)",
     textColor: "rgba(255,255,255,0.9)",
@@ -50,7 +66,6 @@ export default function PhysicsCanvas() {
     isDark: true,
   });
 
-  // Update colors only when theme changes (check cached state)
   const updateThemeColors = useCallback(() => {
     const isDark = !document.documentElement.classList.contains("light");
     if (isDark !== themeColorsRef.current.isDark) {
@@ -64,6 +79,25 @@ export default function PhysicsCanvas() {
     }
   }, []);
 
+  const cleanup = useCallback(() => {
+    spawnTimersRef.current.forEach((timer) => clearTimeout(timer));
+    spawnTimersRef.current = [];
+    if (runnerRef.current) {
+      Matter.Runner.stop(runnerRef.current);
+      runnerActiveRef.current = false;
+    }
+    if (renderRef.current) {
+      Matter.Render.stop(renderRef.current);
+    }
+    if (engineRef.current) {
+      Matter.World.clear(engineRef.current.world, false);
+      Matter.Engine.clear(engineRef.current);
+    }
+    runnerRef.current = null;
+    renderRef.current = null;
+    engineRef.current = null;
+  }, []);
+
   const initPhysics = useCallback(() => {
     if (!containerRef.current || !canvasRef.current) return;
 
@@ -72,48 +106,43 @@ export default function PhysicsCanvas() {
     const container = containerRef.current;
     const width = container.offsetWidth;
     const height = container.offsetHeight;
+    if (width <= 0 || height <= 0) return;
 
-    // Update theme colors
+    const scale = width < 640 ? Math.max(0.54, (width - 32) / 510) : 1;
+
     updateThemeColors();
 
-    // Create engine with stronger gravity for heavier feel
     const engine = Engine.create({
       gravity: { x: 0, y: 1.5, scale: 0.001 },
     });
     engineRef.current = engine;
 
-    // Create renderer
     const render = Render.create({
       canvas: canvasRef.current,
-      engine: engine,
+      engine,
       options: {
         width,
         height,
         wireframes: false,
         background: "transparent",
-        pixelRatio: Math.min(window.devicePixelRatio, 2),
+        pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       },
     });
     renderRef.current = render;
 
-    // Create boundary walls (invisible)
     const wallThickness = 60;
-    // Ground positioned so pills sit flush at visible bottom (pill height is 60px)
-    const groundY = height - 30; // Half of pill height so they sit on the visible edge
+    const groundY = height - (60 * scale) / 2;
     const walls = [
-      // Ground - positioned at bottom edge of visible area
       Bodies.rectangle(width / 2, groundY + wallThickness / 2, width + 200, wallThickness, {
         isStatic: true,
         render: { visible: false },
         friction: 0.8,
         restitution: 0.2,
       }),
-      // Left wall - flush with edge
       Bodies.rectangle(-wallThickness / 2, height / 2, wallThickness, height * 2, {
         isStatic: true,
         render: { visible: false },
       }),
-      // Right wall - flush with edge
       Bodies.rectangle(width + wallThickness / 2, height / 2, wallThickness, height * 2, {
         isStatic: true,
         render: { visible: false },
@@ -122,19 +151,20 @@ export default function PhysicsCanvas() {
 
     World.add(engine.world, walls);
 
-    // Create physics bodies with staggered drops
     PHYSICS_TAGS.forEach((tag, index) => {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         if (!engineRef.current) return;
 
-        const x = 150 + Math.random() * (width - 300);
-        const startY = -100 - Math.random() * 300;
+        const scaledW = tag.width * scale;
+        const scaledH = tag.height * scale;
+        const minX = scaledW / 2 + 12;
+        const maxX = Math.max(minX, width - scaledW / 2 - 12);
+        const x = minX + Math.random() * Math.max(1, maxX - minX);
+        const startY = -100 - Math.random() * 260;
 
         let body;
-
         if (tag.isCircle) {
-          // Circle body
-          body = Bodies.circle(x, startY, tag.width / 2, {
+          body = Bodies.circle(x, startY, scaledW / 2, {
             restitution: 0.3,
             friction: 0.8,
             frictionAir: 0.01,
@@ -146,12 +176,11 @@ export default function PhysicsCanvas() {
             label: tag.id,
           });
         } else {
-          // Pill-shaped body (rectangle with full chamfer radius)
-          body = Bodies.rectangle(x, startY, tag.width, tag.height, {
+          body = Bodies.rectangle(x, startY, scaledW, scaledH, {
             restitution: 0.3,
             friction: 0.8,
             frictionAir: 0.01,
-            chamfer: { radius: tag.height / 2 }, // Full pill shape
+            chamfer: { radius: scaledH / 2 },
             render: {
               fillStyle: "transparent",
               strokeStyle: "transparent",
@@ -159,17 +188,16 @@ export default function PhysicsCanvas() {
             },
             label: tag.id,
           });
-          // Increase inertia to resist rotation (makes them want to stay upright)
           Body.setInertia(body, body.inertia * 8);
         }
 
-        // Very minimal initial spin (almost none)
         Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.01);
         Composite.add(engineRef.current.world, body);
       }, index * 150 + Math.random() * 100);
+
+      spawnTimersRef.current.push(timer);
     });
 
-    // Mouse interaction for dragging
     const mouse = Mouse.create(render.canvas);
     const mouseConstraint = MouseConstraint.create(engine, {
       mouse,
@@ -181,7 +209,6 @@ export default function PhysicsCanvas() {
     World.add(engine.world, mouseConstraint);
     render.mouse = mouse;
 
-    // Allow page scrolling over the canvas
     const wheelHandler = (mouse as MatterMouseWithWheel).mousewheel;
     if (wheelHandler) {
       mouse.element.removeEventListener("wheel", wheelHandler);
@@ -189,37 +216,28 @@ export default function PhysicsCanvas() {
       mouse.element.removeEventListener("DOMMouseScroll", wheelHandler);
     }
 
-    // Run physics
     const runner = Runner.create();
     runnerRef.current = runner;
     Runner.run(runner, engine);
+    runnerActiveRef.current = true;
     Render.run(render);
 
-    // Apply restoring torque to keep pills mostly upright
-    // Apply weighted rotation to circles (5 heavy points like real weighted objects)
     Matter.Events.on(engine, "beforeUpdate", () => {
       const bodies = Composite.allBodies(engine.world);
       bodies.forEach((body) => {
         const tag = PHYSICS_TAGS_MAP.get(body.label);
         if (tag && !body.isStatic) {
           if (tag.isCircle) {
-            // 5 weighted points evenly distributed (like a pentagon)
-            // Points at angles: 0, 72°, 144°, 216°, 288° from center
             const numPoints = 5;
             const currentAngle = body.angle % (Math.PI * 2);
-
-            // Find nearest stable angle (where a weight point is at bottom = PI/2 from horizontal)
-            // Stable positions are when a point is directly below center
             const stableAngles = Array.from({ length: numPoints }, (_, i) =>
-              (Math.PI / 2) + (i * (Math.PI * 2) / numPoints)
+              Math.PI / 2 + (i * (Math.PI * 2)) / numPoints
             );
 
-            // Find the nearest stable angle
             let nearestAngle = stableAngles[0];
             let minDiff = Math.abs(currentAngle - nearestAngle);
 
             for (const angle of stableAngles) {
-              // Check both the angle and angle ± 2π for wraparound
               for (const checkAngle of [angle, angle - Math.PI * 2, angle + Math.PI * 2]) {
                 const diff = Math.abs(currentAngle - checkAngle);
                 if (diff < minDiff) {
@@ -229,60 +247,50 @@ export default function PhysicsCanvas() {
               }
             }
 
-            // Apply torque toward nearest stable point
             const angleDiff = nearestAngle - currentAngle;
-            const torque = angleDiff * 0.00003 * body.mass;
-            body.torque = torque;
+            body.torque = angleDiff * 0.00003 * body.mass;
           } else {
-            // Pills: keep mostly upright (rotate toward 0 angle)
-            const torque = -body.angle * 0.0005 * body.mass;
-            body.torque = torque;
+            body.torque = -body.angle * 0.0005 * body.mass;
             Body.setAngularVelocity(body, body.angularVelocity * 0.95);
           }
         }
       });
     });
 
-    // Custom rendering for pills and circles
     Matter.Events.on(render, "afterRender", () => {
       const ctx = render.context;
       const bodies = Composite.allBodies(engine.world);
 
-      // Update colors only if theme changed (cached check inside)
       updateThemeColors();
       const colors = themeColorsRef.current;
-
-      // Set fonts once outside loop
-      const pillFont = "400 26px 'Space Mono', monospace";
-      const circleFont = "bold 26px system-ui, sans-serif";
+      const fontSize = Math.max(13, Math.round(26 * scale));
+      const pillFont = `400 ${fontSize}px 'Space Mono', monospace`;
+      const circleFont = `bold ${fontSize}px system-ui, sans-serif`;
 
       bodies.forEach((body) => {
         const tag = PHYSICS_TAGS_MAP.get(body.label);
         if (tag) {
+          const w = tag.width * scale;
+          const h = tag.height * scale;
+
           ctx.save();
           ctx.translate(body.position.x, body.position.y);
           ctx.rotate(body.angle);
 
           if (tag.isCircle && tag.icon) {
-            // Solid filled circle with icon
             ctx.beginPath();
-            ctx.arc(0, 0, tag.width / 2, 0, Math.PI * 2);
+            ctx.arc(0, 0, w / 2, 0, Math.PI * 2);
             ctx.fillStyle = colors.circleFill;
             ctx.fill();
 
-            // Icon inside circle
             ctx.font = circleFont;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillStyle = colors.circleIconColor;
             ctx.fillText(tag.icon === "asterisk" ? "✱" : "→", 0, 1);
           } else {
-            // Pill outline (NO FILL, only stroke)
-            const w = tag.width;
-            const h = tag.height;
             const radius = h / 2;
 
-            // Draw pill path manually for perfect shape
             ctx.beginPath();
             ctx.moveTo(-w / 2 + radius, -h / 2);
             ctx.lineTo(w / 2 - radius, -h / 2);
@@ -291,12 +299,10 @@ export default function PhysicsCanvas() {
             ctx.arc(-w / 2 + radius, 0, radius, Math.PI / 2, -Math.PI / 2);
             ctx.closePath();
 
-            // Stroke only - NO fill
             ctx.strokeStyle = colors.strokeColor;
             ctx.lineWidth = 1.5;
             ctx.stroke();
 
-            // Text label - single fillText call (much faster than char-by-char)
             ctx.font = pillFont;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -310,51 +316,61 @@ export default function PhysicsCanvas() {
     });
   }, [updateThemeColors]);
 
-  const cleanup = useCallback(() => {
-    if (runnerRef.current) Matter.Runner.stop(runnerRef.current);
-    if (renderRef.current) Matter.Render.stop(renderRef.current);
-    if (engineRef.current) {
-      Matter.World.clear(engineRef.current.world, false);
-      Matter.Engine.clear(engineRef.current);
-    }
-  }, []);
-
-  const handleResize = useCallback(() => {
-    cleanup();
-    initPhysics();
-  }, [cleanup, initPhysics]);
-
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isClient) return;
+    if (!isClient || reducedMotion) return;
 
     initPhysics();
 
-    let resizeTimeout: NodeJS.Timeout;
+    let resizeTimeout: ReturnType<typeof setTimeout>;
     const debouncedResize = () => {
       clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(handleResize, 250);
+      resizeTimeout = setTimeout(() => {
+        cleanup();
+        initPhysics();
+      }, 250);
     };
 
     window.addEventListener("resize", debouncedResize);
 
+    const container = containerRef.current;
+    const observer =
+      typeof IntersectionObserver !== "undefined" && container
+        ? new IntersectionObserver(
+            ([entry]) => {
+              if (!runnerRef.current || !engineRef.current) return;
+              if (entry.isIntersecting && !runnerActiveRef.current) {
+                Matter.Runner.run(runnerRef.current, engineRef.current);
+                runnerActiveRef.current = true;
+              } else if (!entry.isIntersecting && runnerActiveRef.current) {
+                Matter.Runner.stop(runnerRef.current);
+                runnerActiveRef.current = false;
+              }
+            },
+            { threshold: 0.05 }
+          )
+        : null;
+
+    if (observer && container) {
+      observer.observe(container);
+    }
+
     return () => {
       clearTimeout(resizeTimeout);
       window.removeEventListener("resize", debouncedResize);
+      observer?.disconnect();
       cleanup();
     };
-  }, [isClient, initPhysics, cleanup, handleResize]);
+  }, [isClient, reducedMotion, initPhysics, cleanup]);
 
-  // SSR fallback
-  if (!isClient) {
+  if (!isClient || reducedMotion) {
     return (
-      <div className="w-full h-[500px] flex items-center justify-center">
+      <div
+        role="region"
+        aria-label="Interactive skills showcase"
+        className="w-full h-[500px] flex items-center justify-center"
+      >
         <div className="flex flex-wrap gap-3 justify-center max-w-4xl px-6">
-          {PHYSICS_TAGS.filter(t => !t.isCircle).map((tag) => (
+          {SKILL_PILLS.map((tag) => (
             <span
               key={tag.id}
               className="px-6 py-3 rounded-full border border-foreground/20 text-sm font-medium"
@@ -368,7 +384,17 @@ export default function PhysicsCanvas() {
   }
 
   return (
-    <div ref={containerRef} className="w-full h-[500px] overflow-hidden relative">
+    <div
+      ref={containerRef}
+      role="region"
+      aria-label="Interactive skills showcase"
+      className="w-full h-[500px] overflow-hidden relative"
+    >
+      <ul className="sr-only">
+        {SKILL_PILLS.map((tag) => (
+          <li key={tag.id}>{tag.text}</li>
+        ))}
+      </ul>
       <canvas
         ref={canvasRef}
         className="w-full h-full"

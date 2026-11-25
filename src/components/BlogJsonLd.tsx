@@ -7,8 +7,7 @@ export function BlogJsonLd({ post }: { post: BlogPost }) {
     ? new URL(post.frontmatter.image, siteConfig.url).toString()
     : `${siteConfig.url}/niko-photo.jpg`;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
+  const blogPostingNode = {
     "@type": "BlogPosting",
     headline: post.frontmatter.title,
     description: post.frontmatter.excerpt,
@@ -33,6 +32,30 @@ export function BlogJsonLd({ post }: { post: BlogPost }) {
       cssSelector: ["article h1", "article [data-key-takeaways]"],
     },
   };
+
+  const jsonLd =
+    post.frontmatter.faq.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@graph": [
+            blogPostingNode,
+            {
+              "@type": "FAQPage",
+              mainEntity: post.frontmatter.faq.map((item) => ({
+                "@type": "Question",
+                name: item.question,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: item.answer,
+                },
+              })),
+            },
+          ],
+        }
+      : {
+          "@context": "https://schema.org",
+          ...blogPostingNode,
+        };
 
   return (
     <script

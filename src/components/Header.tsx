@@ -12,9 +12,13 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const { showToast } = useToast();
 
-  const copyEmail = () => {
-    navigator.clipboard.writeText(siteConfig.email);
-    showToast("Email copied to clipboard!");
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(siteConfig.email);
+      showToast("Email copied to clipboard!");
+    } catch {
+      showToast(`Email: ${siteConfig.email}`);
+    }
   };
 
   return (
@@ -40,7 +44,27 @@ export default function Header() {
             </span>
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 md:gap-4">
+            <nav aria-label="Primary" className="hidden md:flex items-center gap-4">
+              <Link
+                href="/#work"
+                className="text-sm text-muted hover:text-foreground transition-colors"
+              >
+                Work
+              </Link>
+              <Link
+                href="/#teach"
+                className="text-sm text-muted hover:text-foreground transition-colors"
+              >
+                Teach
+              </Link>
+              <Link
+                href="/#about"
+                className="text-sm text-muted hover:text-foreground transition-colors"
+              >
+                Experience
+              </Link>
+            </nav>
             <Link
               href="/blog"
               className="text-sm text-muted hover:text-foreground transition-colors"

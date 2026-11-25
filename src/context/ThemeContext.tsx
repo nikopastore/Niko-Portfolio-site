@@ -23,18 +23,28 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-    const stored = localStorage.getItem("theme") as Theme | null;
-    if (stored) {
-      setTheme(stored);
-      document.documentElement.classList.toggle("light", stored === "light");
+    try {
+      const stored = localStorage.getItem("theme") as Theme | null;
+      if (stored === "light" || stored === "dark") {
+        setTheme(stored);
+        document.documentElement.classList.toggle("light", stored === "light");
+        document.documentElement.style.colorScheme = stored;
+      }
+    } catch {
+      // Ignore storage failures in restricted browsing contexts.
     }
   }, []);
 
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
+    try {
+      localStorage.setItem("theme", newTheme);
+    } catch {
+      // Ignore storage failures in restricted browsing contexts.
+    }
     document.documentElement.classList.toggle("light", newTheme === "light");
+    document.documentElement.style.colorScheme = newTheme;
   };
 
   return (

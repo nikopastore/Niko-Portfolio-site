@@ -24,7 +24,7 @@ export default function Hero() {
         <h1
           className="font-[family-name:var(--font-space-grotesk)] font-bold tracking-[-0.04em] leading-[0.85] text-center whitespace-nowrap"
           style={{
-            fontSize: 'clamp(3rem, 15vw, 20rem)',
+            fontSize: 'clamp(2.5rem, 13.5vw, 18rem)',
           }}
         >
           {siteConfig.name.toUpperCase()}
@@ -46,9 +46,9 @@ export default function Hero() {
           </h2>
           <div className="text-muted text-base md:text-lg leading-relaxed mt-4">
             <p>
-              Former Data Engineer at Routeware, building Snowflake warehouses and ETL pipelines. 
-              Founder of ScalePilot Labs by night, shipping AI-powered SaaS products. 
-              MS in Data Science from UC San Diego.
+              Former Data Engineer at Routeware, where I built Snowflake warehouses and ETL pipelines.
+              Founder of ScalePilot Labs, shipping AI-powered SaaS products.
+              M.S. in Data Science from UC San Diego.
             </p>
           </div>
         </div>

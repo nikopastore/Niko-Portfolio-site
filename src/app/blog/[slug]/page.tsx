@@ -9,10 +9,11 @@ import NewsletterSignup from "@/components/NewsletterSignup";
 import ReadingProgress from "@/components/ReadingProgress";
 import ShareButtons from "@/components/ShareButtons";
 import { BlogJsonLd } from "@/components/BlogJsonLd";
-import AutoPostDiagrams from "@/components/AutoPostDiagrams";
 import { Prose } from "@/components/mdx/Prose";
 import { formatDate, getPost, getPosts, getRelatedPosts } from "@/lib/blog";
 import { siteConfig } from "@/lib/data";
+
+export const dynamicParams = false;
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -153,8 +154,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <ShareButtons url={canonicalUrl} title={post.frontmatter.title} />
           </div>
 
-          <AutoPostDiagrams post={post} />
-
           <div className="mt-10">
             <Prose>{post.content}</Prose>
           </div>
@@ -203,9 +202,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </section>
           ) : null}
 
-          <div className="mt-14">
-            <Comments postSlug={post.slug} />
-          </div>
+          {siteConfig.enableComments ? (
+            <div className="mt-14">
+              <Comments postSlug={post.slug} />
+            </div>
+          ) : null}
         </article>
       </main>
       <Footer />

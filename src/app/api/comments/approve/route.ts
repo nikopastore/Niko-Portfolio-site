@@ -1,6 +1,9 @@
+import { createHash, timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import { rateLimit } from "@/lib/rateLimit";
+import { isValidSlug } from "@/lib/blog";
 
 const COMMENTS_FILE = path.join(process.cwd(), "data", "runtime", "comments.json");
 
@@ -14,12 +17,24 @@ interface Comment {
   approved: boolean;
 }
 
-export async function POST(request: NextRequest) {
-  // Check API key
-  const apiKey = request.headers.get("x-api-key");
-  const expectedKey = process.env.ADMIN_API_KEY;
+function isAuthorized(apiKey: string | null, expectedKey: string | undefined): boolean {
+  if (!apiKey || !expectedKey) return false;
+  const providedDigest = createHash("sha256").update(apiKey).digest();
+  const expectedDigest = createHash("sha256").update(expectedKey).digest();
+  return timingSafeEqual(providedDigest, expectedDigest);
+}
 
-  if (!expectedKey || apiKey !== expectedKey) {
+export async function POST(request: NextRequest) {
+  const rl = rateLimit(request, "comments-approve");
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec ?? 60) } }
+    );
+  }
+
+  const apiKey = request.headers.get("x-api-key");
+  if (!isAuthorized(apiKey, process.env.ADMIN_API_KEY)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -27,9 +42,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { postSlug, timestamp } = body;
 
-    if (!postSlug || !timestamp) {
+    if (
+      typeof postSlug !== "string" ||
+      !isValidSlug(postSlug) ||
+      typeof timestamp !== "string" ||
+      timestamp.trim().length === 0
+    ) {
       return NextResponse.json(
-        { error: "Missing postSlug or timestamp" },
+        { error: "Invalid postSlug or timestamp" },
         { status: 400 }
       );
     }
@@ -70,10 +90,16 @@ export async function POST(request: NextRequest) {
 
 // GET to list all pending comments (for admin)
 export async function GET(request: NextRequest) {
-  const apiKey = request.headers.get("x-api-key");
-  const expectedKey = process.env.ADMIN_API_KEY;
+  const rl = rateLimit(request, "comments-approve");
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec ?? 60) } }
+    );
+  }
 
-  if (!expectedKey || apiKey !== expectedKey) {
+  const apiKey = request.headers.get("x-api-key");
+  if (!isAuthorized(apiKey, process.env.ADMIN_API_KEY)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

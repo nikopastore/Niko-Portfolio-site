@@ -4,7 +4,12 @@ import matter from "gray-matter";
 import type { ReactElement } from "react";
 import { compileMDX } from "next-mdx-remote/rsc";
 import rehypePrettyCode from "rehype-pretty-code";
+import remarkGfm from "remark-gfm";
 import { mdxComponents } from "@/components/mdx/components";
+
+export function isValidSlug(slug: string): boolean {
+  return /^[a-z0-9-]+$/.test(slug);
+}
 
 export interface BlogFrontmatter {
   title: string;
@@ -142,6 +147,10 @@ export async function getPosts(): Promise<BlogPost[]> {
 }
 
 export async function getPost(slug: string): Promise<BlogPostWithContent | null> {
+  if (!isValidSlug(slug)) {
+    return null;
+  }
+
   const filePath = path.join(postsDirectory, `${slug}.mdx`);
 
   try {
@@ -154,6 +163,7 @@ export async function getPost(slug: string): Promise<BlogPostWithContent | null>
       components: mdxComponents,
       options: {
         mdxOptions: {
+          remarkPlugins: [remarkGfm],
           rehypePlugins: [
             [
               rehypePrettyCode,

@@ -1,7 +1,4 @@
-"use client";
-
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { ArrowUpRight, Zap } from "lucide-react";
 import { Project } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -29,31 +26,14 @@ export default function WorksGrid({ projects }: WorksGridProps) {
               const isLeft = index % 2 === 0;
 
               return (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 1, y: 0 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.6, delay: 0.1 }}
-                  className="relative"
-                >
+                <div key={project.id} className="relative">
                   {/* Timeline dot */}
                   <div className="absolute left-1/2 top-8 w-3 h-3 bg-foreground rounded-full -translate-x-1/2 z-10 hidden md:block" />
 
                   {/* Content wrapper */}
-                  <div
-                    className={cn(
-                      "grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center",
-                      !isLeft && "md:direction-rtl"
-                    )}
-                  >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
                     {/* Project Card (Image side) */}
-                    <div
-                      className={cn(
-                        "md:direction-ltr",
-                        isLeft ? "md:pr-12" : "md:pl-12 md:order-2"
-                      )}
-                    >
+                    <div className={cn(isLeft ? "md:pr-12" : "md:pl-12 md:order-2")}>
                       <div className="group bg-card border border-card-border rounded-2xl overflow-hidden hover:border-muted transition-all duration-300">
                         {/* Image */}
                         <div className="relative w-full aspect-video overflow-hidden">
@@ -144,12 +124,7 @@ export default function WorksGrid({ projects }: WorksGridProps) {
                     </div>
 
                     {/* Description side */}
-                    <div
-                      className={cn(
-                        "md:direction-ltr",
-                        isLeft ? "md:pl-12" : "md:pr-12 md:order-1"
-                      )}
-                    >
+                    <div className={cn(isLeft ? "md:pl-12" : "md:pr-12 md:order-1")}>
                       <div className={cn("md:max-w-md", isLeft ? "md:ml-auto" : "md:mr-auto")}>
                         <span className="text-sm text-muted font-medium tracking-wider">
                           {String(index + 1).padStart(2, "0")}
@@ -160,7 +135,7 @@ export default function WorksGrid({ projects }: WorksGridProps) {
                       </div>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>

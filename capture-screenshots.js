@@ -3,8 +3,9 @@
  * Screenshot capture script for portfolio projects
  * Run: node capture-screenshots.js
  *
- * This requires puppeteer. Install with:
- * npm install --save-dev puppeteer
+ * This requires puppeteer (kept out of devDependencies to speed up CI/installs).
+ * Install temporarily on demand with:
+ * npm install --no-save puppeteer
  */
 
 const puppeteer = require('puppeteer');
