@@ -5,7 +5,7 @@ export function BlogJsonLd({ post }: { post: BlogPost }) {
   const url = `${siteConfig.url}/blog/${post.slug}`;
   const image = post.frontmatter.image
     ? new URL(post.frontmatter.image, siteConfig.url).toString()
-    : `${siteConfig.url}/og-image.jpg`;
+    : `${siteConfig.url}/niko-photo.jpg`;
 
   const jsonLd = {
     "@context": "https://schema.org",

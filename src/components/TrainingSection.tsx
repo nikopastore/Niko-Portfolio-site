@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { SocialIcon } from "@/components/SocialIcons";
@@ -35,7 +36,10 @@ function TrainingIcon({ item }: { item: Training }) {
 
 function TrainingCard({ item, featured = false }: { item: Training; featured?: boolean }) {
   const isComingSoon = !item.url;
+  const primaryUrl = item.url ?? "";
+  const isInternalPrimary = primaryUrl.startsWith("/");
   const secondaryLink = !isComingSoon && item.caseStudyUrl ? item.caseStudyUrl : null;
+  const isInternalSecondary = Boolean(secondaryLink?.startsWith("/"));
   const secondaryCta = item.caseStudyCta ?? "Read the case study";
 
   return (
@@ -110,9 +114,17 @@ function TrainingCard({ item, featured = false }: { item: Training; featured?: b
               <span className="inline-flex items-center gap-2 rounded-full border border-card-border px-4 py-2 text-sm font-medium text-muted">
                 Coming soon
               </span>
+            ) : isInternalPrimary ? (
+              <Link
+                href={primaryUrl}
+                className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              >
+                {item.cta}
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
             ) : (
               <a
-                href={item.url}
+                href={primaryUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
@@ -122,13 +134,25 @@ function TrainingCard({ item, featured = false }: { item: Training; featured?: b
               </a>
             )}
             {secondaryLink ? (
-              <a
-                href={secondaryLink}
-                className="inline-flex items-center gap-2 rounded-full border border-card-border px-4 py-2 text-sm font-medium text-foreground/80 transition-colors hover:border-foreground/50 hover:text-foreground"
-              >
-                {secondaryCta}
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </a>
+              isInternalSecondary ? (
+                <Link
+                  href={secondaryLink}
+                  className="inline-flex items-center gap-2 rounded-full border border-card-border px-4 py-2 text-sm font-medium text-foreground/80 transition-colors hover:border-foreground/50 hover:text-foreground"
+                >
+                  {secondaryCta}
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                </Link>
+              ) : (
+                <a
+                  href={secondaryLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-card-border px-4 py-2 text-sm font-medium text-foreground/80 transition-colors hover:border-foreground/50 hover:text-foreground"
+                >
+                  {secondaryCta}
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                </a>
+              )
             ) : null}
           </div>
         </div>

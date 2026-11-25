@@ -136,7 +136,7 @@ export default function WorksGrid({ projects }: WorksGridProps) {
                                 "font-medium text-sm cursor-default"
                               )}
                             >
-                              In Development
+                              {project.statusLabel ?? "In Development"}
                             </span>
                           )}
                         </div>

@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import { formatDate, getPosts } from "@/lib/blog";
-import { siteConfig } from "@/lib/data";
+import { siteConfig, training } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Blog | Niko Pastore",
@@ -26,6 +26,9 @@ export default async function BlogPage() {
   const projectCaseStudy = posts.find((post) => post.slug === "ai-training-hub-case-study");
   const featured = projectCaseStudy ?? posts[0];
   const featuredIsTrainingHub = featured?.slug === "ai-training-hub-case-study";
+  const aiTrainingHubUrl =
+    training.find((item) => item.id === "ai-training-hub")?.url ??
+    "https://nikopastore.github.io/ai-training-hub/";
   const rest = posts.filter((post) => post.slug !== featured?.slug);
   const tags = Array.from(new Set(posts.flatMap((post) => post.frontmatter.tags))).slice(0, 10);
 
@@ -88,7 +91,7 @@ export default async function BlogPage() {
                   {featuredIsTrainingHub ? (
                     <>
                       <a
-                        href="https://nikopastore.github.io/ai-training-hub/"
+                        href={aiTrainingHubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition hover:opacity-90"

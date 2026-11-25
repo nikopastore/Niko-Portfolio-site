@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { siteConfig } from "@/lib/data";
 import { getPosts } from "@/lib/blog";
 
@@ -15,10 +14,7 @@ function escapeXml(value: string) {
 
 export async function GET() {
   const posts = await getPosts();
-  const headersList = await headers();
-  const host = headersList.get("host") ?? "localhost:3000";
-  const protocol = headersList.get("x-forwarded-proto") ?? "http";
-  const baseUrl = `${protocol}://${host}`;
+  const baseUrl = siteConfig.url;
 
   const items = posts
     .map((post) => {

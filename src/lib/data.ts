@@ -43,6 +43,7 @@ export interface Project {
   image: string;
   url?: string;
   metrics?: string;
+  statusLabel?: string;
 }
 
 export interface App {
@@ -59,23 +60,6 @@ export interface App {
 }
 
 export const projects: Project[] = [
-  {
-    id: "hirepriority",
-    name: "HirePriority",
-    category: "AI-Powered B2B SaaS",
-    description:
-      "A recruiting platform for insurance agencies with ML candidate scoring and Headhunter, an automated sourcing workflow for licensed professionals and university recruiting. Built the full product stack: auth, multi-tenant architecture, scoring pipelines, candidate matching, and production deployment.",
-    techHighlights: [
-      "Automated candidate sourcing from licensing boards and universities",
-      "Custom ML scoring algorithm for candidate quality ranking",
-      "LLM-assisted workflows for recruiting operations",
-      "Production SaaS architecture with auth and multi-tenant data modeling",
-    ],
-    skills: ["Next.js", "TypeScript", "Python", "Scikit-learn", "OpenAI API", "LangChain", "PostgreSQL", "Vercel"],
-    image: "/screenshots/hirepriority.png",
-    url: "https://hirepriority.scalepilotlabs.com/",
-    metrics: "ML scoring that speeds top-talent hiring",
-  },
   {
     id: "sdhomepros",
     name: "SDHomePros",
@@ -107,7 +91,7 @@ export const projects: Project[] = [
     ],
     skills: ["React Native", "Expo", "TypeScript", "AWS Lambda", "DynamoDB", "Affiliate Tech"],
     image: "/screenshots/sipwiki.png",
-    url: "https://www.sipwiki.app/",
+    url: "https://sipwiki.app/",
   },
   {
     id: "elementary-state-of-mind",
@@ -140,7 +124,7 @@ export const projects: Project[] = [
     ],
     skills: ["Next.js", "TypeScript", "Conversion UX", "Real Estate Ops", "SEO", "Vercel"],
     image: "/screenshots/nationalplanninggroup.png",
-    url: "https://nationalplanninggroup.com/",
+    url: "https://www.nationalplanninggroup.com/",
     metrics: "Investor-ready funnel that clarifies property ops",
   },
   {
@@ -158,6 +142,7 @@ export const projects: Project[] = [
     skills: ["Python", "Scikit-learn", "XGBoost", "Pandas", "GeoPandas", "GIS", "Matplotlib"],
     image: "/screenshots/flood.png",
     metrics: "87% accuracy with 48-hour flood warnings",
+    statusLabel: "UCSD M.S. Capstone",
   },
 ];
 
@@ -185,24 +170,6 @@ export const apps: App[] = [
       "/apps/docpilot/03.png",
     ],
     url: "",
-    platforms: ["iOS"],
-  },
-  {
-    id: "ailarm",
-    name: "AiLARM",
-    category: "Productivity",
-    description:
-      "Smart alarm app with AI-powered morning briefings. Wake up to personalized weather, calendar, and motivational messages delivered in a natural voice.",
-    skills: ["Swift", "SwiftUI", "AVFoundation", "Speech Synthesis", "WeatherKit"],
-    icon: "⏰",
-    logo: "/apps/ailarm/icon.png",
-    screenshots: [
-      "/apps/ailarm/01_alarm_list.png",
-      "/apps/ailarm/02_ai_briefing.png",
-      "/apps/ailarm/03_shake_dismiss.png",
-      "/apps/ailarm/04_sounds.png",
-    ],
-    url: "https://ailarm.vercel.app",
     platforms: ["iOS"],
   },
   {
@@ -301,7 +268,7 @@ export const experiences: Experience[] = [
     type: "work",
     highlights: [
       "Building AI-powered SaaS products",
-      "HirePriority, SDHomePros, NPG, SipWiki, and more",
+      "SDHomePros, National Planning Group, SipWiki, ElementaryStateOfMind, and more",
     ],
     techStack: [
       "Next.js",

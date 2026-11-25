@@ -9,7 +9,7 @@ function shareUrl(platform: SocialPlatform, url: string, title: string) {
 
   switch (platform) {
     case "x":
-      return `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+      return `https://x.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
     case "linkedin":
       return `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
     case "hackernews":

@@ -13,12 +13,20 @@ const fs = require('fs');
 
 const websites = [
   {
-    url: 'https://hirepriority.scalepilotlabs.com/',
-    filename: 'hirepriority.png',
+    url: 'https://sdhomepros.app/',
+    filename: 'sdhomepros.png',
   },
   {
-    url: 'https://www.sipwiki.app/',
+    url: 'https://sipwiki.app/',
     filename: 'sipwiki.png',
+  },
+  {
+    url: 'https://www.elementarystateofmind.com/',
+    filename: 'elementarystateofmind.png',
+  },
+  {
+    url: 'https://www.nationalplanninggroup.com/',
+    filename: 'nationalplanninggroup.png',
   },
 ];
 
