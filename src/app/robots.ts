@@ -5,11 +5,30 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        userAgent: ["GPTBot", "ClaudeBot", "CCBot", "Google-Extended", "Applebot-Extended", "Bytespider"],
+        userAgent: [
+          "GPTBot",
+          "ClaudeBot",
+          "CCBot",
+          "Google-Extended",
+          "Applebot-Extended",
+          "Bytespider",
+        ],
         disallow: "/",
       },
       {
-        userAgent: ["OAI-SearchBot", "Claude-SearchBot", "PerplexityBot", "Googlebot", "Bingbot"],
+        userAgent: [
+          "OAI-SearchBot",
+          "ChatGPT-User",
+          "Claude-SearchBot",
+          "Claude-User",
+          "Claude-Code",
+          "PerplexityBot",
+          "Perplexity-User",
+          "YouBot",
+          "DuckAssistBot",
+          "Googlebot",
+          "Bingbot",
+        ],
         allow: "/",
       },
       {
